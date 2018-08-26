@@ -3,3 +3,4 @@ group Client
     Fable.Core
     dotnet-fable
     Fulma
+    Reaction

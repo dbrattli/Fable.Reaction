@@ -5,7 +5,6 @@ open Fable.Helpers.React.Props
 open Fable.Reaction
 
 open Reaction
-open Reaction.Query
 
 // The model holds data that you want to keep track of while the
 // application is running
@@ -40,11 +39,11 @@ let view (model : Model) (dispatch : Dispatch<Msg>) =
 let init () : Model =
     { Letters = Map.empty }
 
-let indexedChars = Seq.toList "TIME FLIES LIKE AN ARROW" |> Seq.zip Core.infinite
-
 // Query for message stream transformation.
 let query msgs = rx {
-    let! i, c = indexedChars |> ofSeq
+    let! i, c = Seq.toList "TIME FLIES LIKE AN ARROW"
+                |> Seq.mapi (fun i c -> i, c)
+                |> ofSeq
 
     let ms = fromMouseMoves () |> delay (100 * i)
     for m in ms do

@@ -7,7 +7,6 @@
         <Compile Include="Client.fs" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\paket-files\Client\dbrattli\Reaction\Sources\Reaction.fsproj" />
         <ProjectReference Include="..\..\..\..\src\Fable.Reaction.fsproj" />
     </ItemGroup>
     <Import Project="..\..\.paket\Paket.Restore.targets" />

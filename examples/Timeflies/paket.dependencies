@@ -4,6 +4,7 @@
     nuget FSharp.Core
     nuget Fable.Core
     nuget Fable.Elmish.React
+    nuget Reaction
 
 group Server
     storage: none
@@ -24,7 +25,7 @@ group Client
     nuget Fable.Elmish.React
     nuget Fable.Elmish.HMR
     nuget Fulma
-    github dbrattli/Reaction
+    nuget Reaction
 
     clitool dotnet-fable
 
