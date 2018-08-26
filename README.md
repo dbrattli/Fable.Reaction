@@ -1,10 +1,12 @@
-# fa·ble / re·ac·tion
+# Fable Reaction
 
-Fable.Reaction is a lightweight Async Reactive ([Rx](http://reactivex.io/)) [Elmish](https://elmish.github.io/)-ish library for F# targeting [Fable](http://fable.io/) and [React](https://reactjs.org/).
+Fable Reaction is a lightweight Async Reactive ([Rx](http://reactivex.io/)) [Elmish](https://elmish.github.io/)-ish library for F# targeting [Fable](http://fable.io/) and [React](https://reactjs.org/).
 
 Currently a playground project for experimenting with MVU-based web applications using async reactive functional programming (Async Observables) in F#. The project is heavily inspired by [Elm](http://elm-lang.org/) and [Elmish](https://elmish.github.io/) but currently a separate project.
 
-## Elmish Reaction example
+The difference from Elmish and Elm is that Fable.Reaction does not need any commands (`Cmd`) or subscriptions. Instead we use an ReactiveX (Rx) style query that transforms the stream of messages (`Msg`).
+
+## Fable Reaction example
 
 Reactive [MVU archtecture](https://guide.elm-lang.org/architecture/) example ([source code](https://github.com/dbrattli/Re-action/tree/master/examples/Timeflies)) using Reaction for implementing the classic Time Flies example from RxJS. This code
 is very simplar to Elmish but the difference is that we can compose powerful reactive
