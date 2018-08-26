@@ -1,0 +1,11 @@
+source https://www.nuget.org/api/v2
+
+nuget coverlet.msbuild
+nuget Microsoft.NET.Test.Sdk
+nuget NUnit
+nuget NUnit3TestAdapter
+nuget FsUnit
+nuget Fable.Core
+nuget Fable.Elmish.React
+
+github dbrattli/Reaction

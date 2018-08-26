@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>Fable.Reaction</PackageId>
+    <Version>0.2.0</Version>
+    <Authors>Dag Brattli</Authors>
+    <Company>Brattli Labs</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Prelude.fs" />
+    <Compile Include="Fable.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="*.fsproj; *.fs" PackagePath="fable\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\paket-files\dbrattli\Reaction\Sources\Reaction.fsproj" />
+  </ItemGroup>
+  <Import Project="..\.paket\Paket.Restore.targets" />
+</Project>
