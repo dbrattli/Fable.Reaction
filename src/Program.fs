@@ -9,8 +9,8 @@ type Dispatch<'msg> = 'msg -> unit
 type Program<'arg, 'model, 'msg, 'view> = {
     init : 'arg -> 'model
     update : 'model -> 'msg -> 'model
-    query : AsyncObservable<'msg> -> AsyncObservable<'msg>
     view : 'model -> Dispatch<'msg> -> 'view
+    stream : AsyncObserver<'msg>*AsyncObservable<'msg>
     observer : Notification<'view> -> Async<unit>
     onError : (string*exn) -> unit
 }
@@ -38,12 +38,13 @@ module Program =
         { init = init
           update = update
           view = view
+          stream  = stream ()
           observer = noop
-          query = (fun msgs -> AsyncObservable.empty ())
           onError = Log.onError }
 
     let withRx (query: AsyncObservable<'msg> -> AsyncObservable<'msg>) program =
-        { program with query = query }
+        let dispatch, msgs = program.stream
+        { program with stream = dispatch, query msgs }
 
     let withReact (elem : string) program =
         { program with observer = renderReact elem }
@@ -51,14 +52,12 @@ module Program =
     let run (program: Program<unit, 'model, 'msg, 'view>) =
         let main = async {
             let initialModel = program.init ()
-            let obv, msgs : (AsyncObserver<'msg>*AsyncObservable<'msg>) = stream ()
-            let dispatch = dispatcher obv
-
+            let dispatch = fst program.stream |> dispatcher
             let view (model : 'model) : 'view =
                 program.view model dispatch.Post
 
             let elems =
-                program.query msgs
+                snd program.stream
                 |> scan initialModel program.update
                 |> map view
 
