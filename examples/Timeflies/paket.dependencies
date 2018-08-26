@@ -1,9 +1,9 @@
  storage: none
     source https://api.nuget.org/v3/index.json
 
-    #nuget FSharp.Core
-    #nuget Fable.Core
-    #nuget Fable.Elmish.React
+    nuget FSharp.Core
+    nuget Fable.Core
+    nuget Fable.Elmish.React
 
 group Server
     storage: none
@@ -25,7 +25,6 @@ group Client
     nuget Fable.Elmish.HMR
     nuget Fulma
     github dbrattli/Reaction
-    github dbrattli/Fable.Reaction
 
     clitool dotnet-fable
 

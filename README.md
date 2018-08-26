@@ -11,22 +11,26 @@ is very simplar to Elmish but the difference is that we can compose powerful rea
 queries to transform, filter, aggregate and time-shift our stream of messages.
 
 ```f#
-// Messages for updating the model
-type Msg =
-    | Letter of int * string * int * int
-
-// Model (state) for updating the view
+// The model holds data that you want to keep track of while the
+// application is running
 type Model = {
     Letters: Map<int, string * int * int>
 }
 
+// The Msg type defines what events/actions can occur while the
+// application is running. The state of the application changes *only*
+// in reaction to these events
+type Msg =
+    | Letter of int * string * int * int
+
+// The update function computes the next state of the application based
+// on the current state and the incoming messages
 let update (currentModel : Model) (msg : Msg) : Model =
     match currentModel.Letters, msg with
     | _, Letter (i, c, x, y) ->
         { currentModel with Letters = currentModel.Letters.Add (i, (c, x, y)) }
 
-// View for being observed by React
-let view (model : Model) =
+let view (model : Model) (dispatch : Dispatch<Msg>) =
     let letters = model.Letters
     let offsetX x i = x + i * 10 + 15
 
@@ -37,23 +41,22 @@ let view (model : Model) =
             ]
     ]
 
-let main = async {
-    let initialModel = { Letters = Map.empty }
+let init () : Model =
+    { Letters = Map.empty }
 
-    let moves =
-        Seq.toList "TIME FLIES LIKE AN ARROW" |> Seq.map string |> ofSeq
-            |> flatMapi (fun (x, i) ->
-                fromMouseMoves ()
-                    |> map (fun m -> Letter (i, x, int m.clientX, int m.clientY))
-                    |> delay (100 * i)
-            )
-            |> scan initialModel update
-            |> map view
+let indexedChars = Seq.toList "TIME FLIES LIKE AN ARROW" |> Seq.zip Core.infinite
 
-    // React observer
-    let obv = renderReact "elmish-app"
+// Query for message stream transformation.
+let query msgs = rx {
+    let! i, c = indexedChars |> ofSeq
 
-    // Subscribe (ignores the disposable)
-    do! moves.RunAsync obv
+    let ms = fromMouseMoves () |> delay (100 * i)
+    for m in ms do
+        yield Letter (i, string c, int m.clientX, int m.clientY)
 }
+
+Program.mkReaction init update view
+|> Program.withRx query
+|> Program.withReact "elmish-app"
+|> Program.run
 ```
