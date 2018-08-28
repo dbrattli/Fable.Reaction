@@ -25,7 +25,7 @@ let update (currentModel : Model) (msg : Msg) : Model =
     | _, Letter (i, c, x, y) ->
         { currentModel with Letters = currentModel.Letters.Add (i, (c, x, y)) }
 
-let view (model : Model) (dispatch : Dispatch<Msg>) =
+let view (dispatch : Dispatch<Msg>) (model : Model) =
     let letters = model.Letters
     let offsetX x i = x + i * 10 + 15
 

@@ -2,14 +2,44 @@
 
 namespace Fable.Reaction
 
+open Fable.Core
 open Fable.Import.Browser
-open Fable.Import.JS
 
 open Reaction
 
 [<AutoOpen>]
 module Fable =
-    //let ofPromise (promise : Promise<_>) =
+
+    let ofPromise (task: 'a -> Fable.Import.JS.Promise<_>) (arg:'a) =
+        let obv = Creation.ofAsync(fun obv _ -> async {
+            try
+                let! result = Async.AwaitPromise (task arg)
+                do! OnNext result |> obv
+                do! OnCompleted |> obv
+            with
+            | ex ->
+                do! OnError ex |> obv
+        })
+        AsyncObservable obv
+
+
+    let ofPromise' (task: 'a -> Fable.Import.JS.Promise<_>) (arg:'a) =
+        let subscribe (obv : Types.AsyncObserver<_>) : Async<Types.AsyncDisposable> =
+            async {
+                try
+                    let! result = Async.AwaitPromise (task arg)
+                    do! OnNext result |> obv
+                    do! OnCompleted |> obv
+                with
+                | ex ->
+                    do! OnError ex |> obv
+
+                let cancel () = async {
+                    ()
+                }
+                return cancel
+            }
+        AsyncObservable subscribe
 
     let fromMouseMoves () : AsyncObservable<MouseEvent> =
         let subscribe (obv : Types.AsyncObserver<MouseEvent>) : Async<Types.AsyncDisposable> =
