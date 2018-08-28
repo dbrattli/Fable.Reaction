@@ -3,11 +3,14 @@
 namespace Fable.Reaction
 
 open Fable.Import.Browser
+open Fable.Import.JS
 
 open Reaction
 
 [<AutoOpen>]
 module Fable =
+    //let ofPromise (promise : Promise<_>) =
+
     let fromMouseMoves () : AsyncObservable<MouseEvent> =
         let subscribe (obv : Types.AsyncObserver<MouseEvent>) : Async<Types.AsyncDisposable> =
             async {

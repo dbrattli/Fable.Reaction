@@ -2,8 +2,8 @@ module Client
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
-open Fable.Reaction
 
+open Fable.Reaction
 open Reaction
 
 // The model holds data that you want to keep track of while the

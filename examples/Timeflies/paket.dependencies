@@ -1,10 +1,10 @@
- storage: none
-    source https://api.nuget.org/v3/index.json
+storage: none
+source https://api.nuget.org/v3/index.json
 
-    nuget FSharp.Core
-    nuget Fable.Core
-    nuget Fable.Elmish.React
-    nuget Reaction
+nuget FSharp.Core
+nuget Fable.Core
+nuget Fable.Elmish.React
+nuget Reaction
 
 group Server
     storage: none

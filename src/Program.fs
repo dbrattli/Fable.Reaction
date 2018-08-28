@@ -9,7 +9,7 @@ type Dispatch<'msg> = 'msg -> unit
 type Program<'arg, 'model, 'msg, 'view> = {
     init : 'arg -> 'model
     update : 'model -> 'msg -> 'model
-    view : 'model -> Dispatch<'msg> -> 'view
+    view : Dispatch<'msg> -> 'model -> 'view
     stream : AsyncObserver<'msg>*AsyncObservable<'msg>
     observer : Notification<'view> -> Async<unit>
     onError : (string*exn) -> unit
@@ -34,7 +34,7 @@ module Program =
     let mkReaction
         (init : 'arg -> 'model)
         (update : 'model -> 'msg -> 'model)
-        (view : 'model -> Dispatch<'msg> -> 'view) =
+        (view : Dispatch<'msg> -> 'model -> 'view) =
         { init = init
           update = update
           view = view
@@ -54,14 +54,14 @@ module Program =
             let initialModel = program.init ()
             let dispatch = fst program.stream |> dispatcher
             let view (model : 'model) : 'view =
-                program.view model dispatch.Post
+                program.view dispatch.Post model
 
-            let elems =
+            let result =
                 snd program.stream
                 |> scan initialModel program.update
                 |> map view
 
-            do! elems.RunAsync program.observer
+            do! result.RunAsync program.observer
         }
 
         main |> Async.StartImmediate
