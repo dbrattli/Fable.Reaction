@@ -20,9 +20,6 @@ group Client
     source https://api.nuget.org/v3/index.json
 
     nuget Fable.Core
-    nuget Fable.Elmish.Debugger
-    nuget Fable.Elmish.React
-    nuget Fable.Elmish.HMR
     nuget Fulma
     nuget Reaction 0.3
 
