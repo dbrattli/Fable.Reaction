@@ -56,12 +56,15 @@ module Program =
             let view (model : 'model) : 'view =
                 program.view dispatch.Post model
 
-            let result =
+            // Render inital view to avoid startWith below
+            do! view initialModel |> OnNext |> program.observer
+
+            let views =
                 snd program.stream
                 |> scan initialModel program.update
                 |> map view
 
-            do! result.RunAsync program.observer
+            do! views.RunAsync program.observer
         }
 
         main |> Async.StartImmediate
