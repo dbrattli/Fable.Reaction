@@ -10,7 +10,7 @@ The difference from Elmish and Elm is that Fable.Reaction does not need any comm
 
 Fable Reaction is very similar to [Elm](http://elm-lang.org/) and [Elmish](https://elmish.github.io/) in regards to the [MVU architecture](https://guide.elm-lang.org/architecture/).
 
-![Reactive MVU](R-MVU.png)
+<img src="R-MVU.png" width="400">
 
 * **Model**, application state as immutable data
 * **View**, a pure function that takes the model to produce the output view (HTML elements)
