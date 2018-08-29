@@ -7,4 +7,4 @@ nuget NUnit3TestAdapter
 nuget FsUnit
 nuget Fable.Core
 nuget Fable.Elmish.React
-nuget Reaction
+nuget Reaction 0.4

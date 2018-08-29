@@ -10,7 +10,7 @@ type Program<'arg, 'model, 'msg, 'view> = {
     init : 'arg -> 'model
     update : 'model -> 'msg -> 'model
     view : Dispatch<'msg> -> 'model -> 'view
-    stream : AsyncObserver<'msg>*AsyncObservable<'msg>
+    msgs : AsyncObserver<'msg>*AsyncObservable<'msg>
     observer : Notification<'view> -> Async<unit>
     onError : (string*exn) -> unit
 }
@@ -38,13 +38,13 @@ module Program =
         { init = init
           update = update
           view = view
-          stream  = stream ()
+          msgs  = stream ()
           observer = noop
           onError = Log.onError }
 
-    let withReaction (query: AsyncObservable<'msg> -> AsyncObservable<'msg>) program =
-        let dispatch, msgs = program.stream
-        { program with stream = dispatch, query msgs }
+    let withMsgs (query: AsyncObservable<'msg> -> AsyncObservable<'msg>) program =
+        let dispatch, msgs = program.msgs
+        { program with msgs = dispatch, query msgs }
 
     let withReact (elem : string) program =
         { program with observer = renderReact elem }
@@ -52,7 +52,7 @@ module Program =
     let run (program: Program<unit, 'model, 'msg, 'view>) =
         let main = async {
             let initialModel = program.init ()
-            let dispatch = fst program.stream |> dispatcher
+            let dispatch = fst program.msgs |> dispatcher
             let view (model : 'model) : 'view =
                 program.view dispatch.Post model
 
@@ -60,7 +60,7 @@ module Program =
             do! view initialModel |> OnNext |> program.observer
 
             let views =
-                snd program.stream
+                snd program.msgs
                 |> scan initialModel program.update
                 |> map view
 

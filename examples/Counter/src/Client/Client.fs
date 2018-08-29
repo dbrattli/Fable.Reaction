@@ -97,10 +97,10 @@ let loadCountCmd =
         |> map (Ok >> InitialCountLoaded)
         |> catch (Error >> InitialCountLoaded >> single)
 
-let query (msgs: AsyncObservable<Msg>) =
-    concat [loadCountCmd; msgs]
+let query (msgs: AsyncObservable<Msg>) : AsyncObservable<Msg> =
+    loadCountCmd + msgs
 
 Program.mkProgram init update view
-|> Program.withReaction query
+|> Program.withMsgs query
 |> Program.withReact "elmish-app"
 |> Program.run

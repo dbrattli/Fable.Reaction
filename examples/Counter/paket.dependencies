@@ -3,7 +3,7 @@ source https://api.nuget.org/v3/index.json
 
 nuget FSharp.Core
 nuget Fable.Elmish.React
-nuget Reaction 0.3
+nuget Reaction 0.4
 
 group Server
     storage: none
@@ -21,7 +21,7 @@ group Client
 
     nuget Fable.Core
     nuget Fulma
-    nuget Reaction 0.3
+    nuget Reaction 0.4
 
     clitool dotnet-fable
 

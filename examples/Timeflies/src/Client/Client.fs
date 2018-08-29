@@ -51,6 +51,6 @@ let query msgs = rx {
 }
 
 Program.mkProgram init update view
-|> Program.withReaction query
+|> Program.withMsgs query
 |> Program.withReact "elmish-app"
 |> Program.run

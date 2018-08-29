@@ -22,7 +22,7 @@ group Client
 
     nuget Fable.Core
     nuget Fulma
-    nuget Reaction
+    nuget Reaction 0.4
 
     clitool dotnet-fable
 
