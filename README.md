@@ -4,7 +4,7 @@ Fable Reaction is a lightweight Async Reactive ([Rx](http://reactivex.io/)) [Elm
 
 Currently a playground project for experimenting with MVU-based web applications using async reactive functional programming (Async Observables) in F#. The project is heavily inspired by [Elm](http://elm-lang.org/) and [Elmish](https://elmish.github.io/) but currently a separate project.
 
-The difference from Elmish and Elm is that Fable.Reaction does not need any commands (`Cmd`) or subscriptions. Instead we use an ReactiveX (Rx) style query (Reaction) that transforms the stream of messages (`Msg`).
+The difference from Elmish and Elm is that Fable.Reaction does not need any commands (`Cmd`) or subscriptions. Instead we use an [ReactiveX](http://reactivex.io/) (Rx) style query that transforms the stream of messages (`Msg`).
 
 ## MVU Architecture
 
@@ -17,7 +17,7 @@ Fable Reaction is very similar to [Elm](http://elm-lang.org/) and [Elmish](https
 
 In addition, Fable Reaction may also have a reaction. A reaction is a query that transforms the "stream" of messages.
 
-* **Reaction**, a query function that takes the message stream and produces a new (transformed) message stream. Note that this also replaces Elm(ish) commands (Cmd) since the reaction is free to produce initial messages, map and merge in side-effects such as web requests (fetch) etc.
+* **Reaction**, a query function that takes the message stream and produces a new (transformed) message stream. Note that this also replaces Elm(ish) commands (Cmd) since the reaction is free to produce initial messages out of thin air, transform, filter, time-shift messages and combine side-effects such as web requests (fetch) etc.
 
 ## Fable Reaction example
 
