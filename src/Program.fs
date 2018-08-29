@@ -31,7 +31,7 @@ module Program =
         async { () }
 
     /// Typical program, new commands are produced by `init` and `update` along with the new state.
-    let mkReaction
+    let mkProgram
         (init : 'arg -> 'model)
         (update : 'model -> 'msg -> 'model)
         (view : Dispatch<'msg> -> 'model -> 'view) =
@@ -42,7 +42,7 @@ module Program =
           observer = noop
           onError = Log.onError }
 
-    let withRx (query: AsyncObservable<'msg> -> AsyncObservable<'msg>) program =
+    let withReaction (query: AsyncObservable<'msg> -> AsyncObservable<'msg>) program =
         let dispatch, msgs = program.stream
         { program with stream = dispatch, query msgs }
 

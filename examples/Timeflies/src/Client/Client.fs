@@ -50,7 +50,7 @@ let query msgs = rx {
         yield Letter (i, string c, int m.clientX, int m.clientY)
 }
 
-Program.mkReaction init update view
-|> Program.withRx query
+Program.mkProgram init update view
+|> Program.withReaction query
 |> Program.withReact "elmish-app"
 |> Program.run

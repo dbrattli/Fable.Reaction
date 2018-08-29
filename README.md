@@ -4,12 +4,24 @@ Fable Reaction is a lightweight Async Reactive ([Rx](http://reactivex.io/)) [Elm
 
 Currently a playground project for experimenting with MVU-based web applications using async reactive functional programming (Async Observables) in F#. The project is heavily inspired by [Elm](http://elm-lang.org/) and [Elmish](https://elmish.github.io/) but currently a separate project.
 
-The difference from Elmish and Elm is that Fable.Reaction does not need any commands (`Cmd`) or subscriptions. Instead we use an ReactiveX (Rx) style query that transforms the stream of messages (`Msg`).
+The difference from Elmish and Elm is that Fable.Reaction does not need any commands (`Cmd`) or subscriptions. Instead we use an ReactiveX (Rx) style query (Reaction) that transforms the stream of messages (`Msg`).
+
+## MVU Architecture
+
+Fable Reaction is very similar to [Elm](http://elm-lang.org/) and [Elmish](https://elmish.github.io/) in regards to the [MVU archtecture](https://guide.elm-lang.org/architecture/).
+
+* Model, application state as immutable data
+* View, a pure function that takes the model to produce the output view (HTML elements)
+* Message, a data event that represents a change
+* Update, a pure function that produces a new model based on a received message and the previous model
+
+In addition, Fable Reaction may also have a reaction. A reaction is a query that transforms the "stream" of messages.
+
+* Reaction, a query function that takes the message stream and produces a new (transformed) message stream. Note that this also replaces Elm(ish) commands (Cmd) since the reaction is free to produce initial messages, map and merge in side-effects such as web requests (fetch) etc.
 
 ## Fable Reaction example
 
-Reactive [MVU archtecture](https://guide.elm-lang.org/architecture/) example ([source code](https://github.com/dbrattli/Re-action/tree/master/examples/Timeflies)) using Reaction for implementing the classic Time Flies example from RxJS. This code
-is very simplar to Elmish but the difference is that we can compose powerful reactive
+Example ([source code](https://github.com/dbrattli/Re-action/tree/master/examples/Timeflies)) implementing the classic Time Flies example from RxJS. This code is very simplar to Elmish but the difference is that we can compose powerful reactive
 queries to transform, filter, aggregate and time-shift our stream of messages.
 
 ```f#
@@ -46,19 +58,20 @@ let view (model : Model) (dispatch : Dispatch<Msg>) =
 let init () : Model =
     { Letters = Map.empty }
 
-// Query for message stream transformation.
-let query msgs = rx {
-    let! i, c = Seq.toList "TIME FLIES LIKE AN ARROW"
-                |> Seq.mapi (fun i c -> i, c)
-                |> ofSeq
+// Message stream transformation.
+let query (msgs : AsyncObservable<Msg>) =
+    rx {
+        let! i, c = Seq.toList "TIME FLIES LIKE AN ARROW"
+                    |> Seq.mapi (fun i c -> i, c)
+                    |> ofSeq
 
-    let ms = fromMouseMoves () |> delay (100 * i)
-    for m in ms do
-        yield Letter (i, string c, int m.clientX, int m.clientY)
-}
+        let ms = fromMouseMoves () |> delay (100 * i)
+        for m in ms do
+            yield Letter (i, string c, int m.clientX, int m.clientY)
+    }
 
-Program.mkReaction init update view
-|> Program.withRx query
+Program.mkProgram init update view
+|> Program.withReaction query
 |> Program.withReact "elmish-app"
 |> Program.run
 ```

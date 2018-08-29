@@ -100,7 +100,7 @@ let loadCountCmd =
 let query (msgs: AsyncObservable<Msg>) =
     concat [loadCountCmd; msgs]
 
-Program.mkReaction init update view
-|> Program.withRx query
+Program.mkProgram init update view
+|> Program.withReaction query
 |> Program.withReact "elmish-app"
 |> Program.run
