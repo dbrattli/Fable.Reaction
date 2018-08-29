@@ -10,14 +10,14 @@ The difference from Elmish and Elm is that Fable.Reaction does not need any comm
 
 Fable Reaction is very similar to [Elm](http://elm-lang.org/) and [Elmish](https://elmish.github.io/) in regards to the [MVU archtecture](https://guide.elm-lang.org/architecture/).
 
-* Model, application state as immutable data
-* View, a pure function that takes the model to produce the output view (HTML elements)
-* Message, a data event that represents a change
-* Update, a pure function that produces a new model based on a received message and the previous model
+* **Model**, application state as immutable data
+* **View**, a pure function that takes the model to produce the output view (HTML elements)
+* **Message**, a data event that represents a change
+* **Update**, a pure function that produces a new model based on a received message and the previous model
 
 In addition, Fable Reaction may also have a reaction. A reaction is a query that transforms the "stream" of messages.
 
-* Reaction, a query function that takes the message stream and produces a new (transformed) message stream. Note that this also replaces Elm(ish) commands (Cmd) since the reaction is free to produce initial messages, map and merge in side-effects such as web requests (fetch) etc.
+* **Reaction**, a query function that takes the message stream and produces a new (transformed) message stream. Note that this also replaces Elm(ish) commands (Cmd) since the reaction is free to produce initial messages, map and merge in side-effects such as web requests (fetch) etc.
 
 ## Fable Reaction example
 
