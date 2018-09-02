@@ -27,10 +27,11 @@ module Program =
             }
             messageLoop ()
         )
+
     let noop (x : Notification<_>) =
         async { () }
 
-    /// Typical program, new commands are produced by `init` and `update` along with the new state.
+    /// Typical program using `init`, `update`, and `view`.
     let mkProgram
         (init : 'arg -> 'model)
         (update : 'model -> 'msg -> 'model)

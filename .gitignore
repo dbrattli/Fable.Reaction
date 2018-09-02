@@ -456,3 +456,4 @@ bower_components
 Scripts/
 bundle.js
 bundle.js.map
+.editorconfig

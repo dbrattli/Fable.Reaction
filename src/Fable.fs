@@ -10,10 +10,10 @@ open Reaction
 [<AutoOpen>]
 module Fable =
 
-    let ofPromise (task: 'a -> Fable.Import.JS.Promise<_>) (arg:'a) =
+    let ofPromise (pr: Fable.Import.JS.Promise<_>) =
         let obv = Creation.ofAsync(fun obv _ -> async {
             try
-                let! result = Async.AwaitPromise (task arg)
+                let! result = Async.AwaitPromise pr
                 do! OnNext result |> obv
                 do! OnCompleted |> obv
             with
@@ -21,25 +21,6 @@ module Fable =
                 do! OnError ex |> obv
         })
         AsyncObservable obv
-
-
-    let ofPromise' (task: 'a -> Fable.Import.JS.Promise<_>) (arg:'a) =
-        let subscribe (obv : Types.AsyncObserver<_>) : Async<Types.AsyncDisposable> =
-            async {
-                try
-                    let! result = Async.AwaitPromise (task arg)
-                    do! OnNext result |> obv
-                    do! OnCompleted |> obv
-                with
-                | ex ->
-                    do! OnError ex |> obv
-
-                let cancel () = async {
-                    ()
-                }
-                return cancel
-            }
-        AsyncObservable subscribe
 
     let fromMouseMoves () : AsyncObservable<MouseEvent> =
         let subscribe (obv : Types.AsyncObserver<MouseEvent>) : Async<Types.AsyncDisposable> =
@@ -79,7 +60,7 @@ module Fable =
             async {
                 match notification with
                 | OnNext view -> render view
-                | OnError err -> printfn "renderReact, error: %A" err
+                | OnError err -> Log.onError ("renderReact, error", err)
                 | _ -> ()
             }
         observer

@@ -2,8 +2,8 @@ module Client
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
-
 open Fable.Reaction
+
 open Reaction
 
 // The model holds data that you want to keep track of while the
@@ -40,17 +40,27 @@ let init () : Model =
     { Letters = Map.empty }
 
 // Query for message stream transformation.
-let query msgs = rx {
+
+let query'' msgs =
+    Seq.toList "TIME FLIES LIKE AN ARROW"
+    |> Seq.mapi (fun i c -> i, c)
+    |> ofSeq
+    |> flatMap (fun (i, c) ->
+        printfn "%A" (i, c)
+        fromMouseMoves ()
+        |> delay (100 * i)
+        |> map (fun m -> Letter (i, string c, int m.clientX, int m.clientY)))
+
+let query' msgs = rx {
     let! i, c = Seq.toList "TIME FLIES LIKE AN ARROW"
                 |> Seq.mapi (fun i c -> i, c)
                 |> ofSeq
-
     let ms = fromMouseMoves () |> delay (100 * i)
     for m in ms do
         yield Letter (i, string c, int m.clientX, int m.clientY)
 }
 
 Program.mkProgram init update view
-|> Program.withMsgs query
+|> Program.withMsgs query'
 |> Program.withReact "elmish-app"
 |> Program.run

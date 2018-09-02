@@ -1,6 +1,3 @@
-storage: none
-source https://api.nuget.org/v3/index.json
-
 group Server
     storage: none
     source https://api.nuget.org/v3/index.json
@@ -16,9 +13,10 @@ group Client
     source https://api.nuget.org/v3/index.json
 
     nuget Fable.Core
-    nuget Fulma
     nuget Reaction 0.8.1
     nuget Fable.Reaction 0.3
+    nuget Fulma
+    nuget Thoth.Json
 
     clitool dotnet-fable
 

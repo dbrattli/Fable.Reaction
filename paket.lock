@@ -1,3 +1,4 @@
+STORAGE: NONE
 NUGET
   remote: https://www.nuget.org/api/v2
     coverlet.msbuild (2.2.1)
@@ -113,7 +114,7 @@ NUGET
       System.Threading.Thread (>= 4.3) - restriction: >= netcoreapp1.0
       System.Xml.XmlDocument (>= 4.3) - restriction: >= netcoreapp1.0
       System.Xml.XPath.XmlDocument (>= 4.3) - restriction: >= netcoreapp1.0
-    Reaction (0.4)
+    Reaction (0.8.1)
       FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
     runtime.native.System (4.3.1) - restriction: >= netcoreapp1.0
       Microsoft.NETCore.Platforms (>= 1.1.1)

@@ -6,6 +6,12 @@ Fable Reaction is built on top of [Reaction](https://github.com/dbrattli/Reactio
 
 The difference from Elmish and Elm is that Fable.Reaction does not need any commands (`Cmd`) or subscriptions. Instead we use a [ReactiveX](http://reactivex.io/) (Rx) style query that transforms the stream of messages (`Msg`).
 
+## Install
+
+```cmd
+paket add Fable.Reaction
+```
+
 ## Reactive MVU Architecture
 
 Fable Reaction is very similar to [Elm](http://elm-lang.org/) and [Elmish](https://elmish.github.io/) in regards to the [MVU architecture](https://guide.elm-lang.org/architecture/).
