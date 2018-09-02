@@ -71,6 +71,17 @@ let safeComponents =
 
 
 let view (dispatch : Msg -> unit) (model : Model) =
+    let active (result : string list) =
+        if result.Length > 0 then
+            "is-active"
+        else
+            ""
+    let loading (loading: bool) =
+        if loading then
+            "is-loading"
+        else
+            ""
+
     div [] [
         Navbar.navbar [ Navbar.Color IsPrimary ] [
             Navbar.Item.div [ ] [
@@ -84,11 +95,13 @@ let view (dispatch : Msg -> unit) (model : Model) =
                 str "Search Wikipedia"
             ]
 
-            div [ Class "dropdown is-active" ] [
+            div [ sprintf "dropdown %s" (active model.Result) |> Class ] [
                 div [ Class "dropdown-trigger" ] [
-                    input [ Placeholder "Enter query ..."
-                            OnKeyUp (KeyboardEvent >> dispatch)
-                            Class "input"]
+                    div [ Class ("control " + loading model.Loading) ] [
+                        input [ Placeholder "Enter query ..."
+                                OnKeyUp (KeyboardEvent >> dispatch)
+                                Class "input" ]
+                    ]
                 ]
                 div [ Class "dropdown-menu"
                       Id "dropdown-menu"
@@ -110,21 +123,6 @@ let view (dispatch : Msg -> unit) (model : Model) =
             ]
         ]
     ]
-
-open Fable.PowerPack
-
-let ofPromise (pr: Fable.Import.JS.Promise<_>) =
-    let obv = Creation.ofAsync(fun obv _ -> async {
-        try
-            let! result = Async.AwaitPromise pr
-            do! OnNext result |> obv
-            do! OnCompleted |> obv
-        with
-        | ex ->
-            printfn "ofPromise: got error: %s" (ex.ToString ())
-            do! OnError ex |> obv
-    })
-    AsyncObservable obv
 
 let searchWikipedia (term : string) =
     let jsonDecode txt =
@@ -155,11 +153,18 @@ let query (msgs: AsyncObservable<Msg>) =
         |> choose Msg.asKeyboardEvent
         |> map targetValue
         |> filter (fun term -> term.Length > 2 || term.Length = 0)
-        |> debounce(750)  // Pause for 750ms
+        |> debounce(750)         // Pause for 750ms
         |> distinctUntilChanged  // Only if the value has changed
 
-    terms
-    |> flatMapLatest searchWikipedia
+    let loading =
+        terms
+        |> map (fun _ -> Loading)
+
+    let results =
+        terms
+        |> flatMapLatest searchWikipedia
+
+    results |> merge loading
 
 Program.mkProgram init update view
 |> Program.withMsgs query
