@@ -1,6 +1,5 @@
 module Client
 
-open Fable.Core
 open Fable.Core.JsInterop
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
@@ -38,16 +37,15 @@ let init () : Model = {
 // It can also run side-effects (encoded as commands) like calling the server via Http.
 // these commands in turn, can dispatch messages to which the update function will react.
 let update (currentModel : Model) (msg : Msg) : Model =
-    printfn "Model: %A" (currentModel, msg)
     let model =
         match msg with
         | QueryResult res ->
             match res with
             | Ok lists ->
                 { Result = lists.[1]; Loading = false }
-            | _ -> currentModel
+            | _ -> { currentModel with Loading = false }
         | Loading ->
-            { currentModel with Loading = true}
+            { currentModel with Loading = true }
         | _ -> currentModel
     model
 
@@ -59,7 +57,7 @@ let safeComponents =
              str ", "
              a [ Href "http://fable.io" ] [ str "Fable" ]
              str ", "
-             a [ Href "https://elmish.github.io/elmish/" ] [ str "Elmish" ]
+             a [ Href "https://github.com/dbrattli/Fable.Reaction" ] [ str "Fable.Reaction" ]
              str ", "
              a [ Href "https://mangelmaxime.github.io/Fulma" ] [ str "Fulma" ]
            ]
@@ -86,11 +84,11 @@ let view (dispatch : Msg -> unit) (model : Model) =
         Navbar.navbar [ Navbar.Color IsPrimary ] [
             Navbar.Item.div [ ] [
                 Heading.h2 [ ] [
-                    str "Fable Reaction Autocomplete Example" ]
+                    str "Autocomplete" ]
             ]
         ]
 
-        Container.container [] [
+        Container.container [ Container.Props [Style [ CSSProp.PaddingTop 40; CSSProp.PaddingBottom 150 ]]] [
             h1 [] [
                 str "Search Wikipedia"
             ]
@@ -146,7 +144,9 @@ let searchWikipedia (term : string) =
 
 let query (msgs: AsyncObservable<Msg>) =
     let targetValue (ev : Fable.Import.React.KeyboardEvent) : string =
-        (unbox<string> ev.target?value).Trim()
+        try
+            (unbox<string> ev.target?value).Trim()
+        with _ -> ""
 
     let terms =
         msgs
@@ -158,6 +158,7 @@ let query (msgs: AsyncObservable<Msg>) =
 
     let loading =
         terms
+        |> filter (fun x -> x.Length > 0)
         |> map (fun _ -> Loading)
 
     let results =
