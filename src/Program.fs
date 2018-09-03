@@ -75,15 +75,25 @@ module Program =
     let withReaction (query: AsyncObservable<'msg> -> AsyncObservable<'msg>) (program:Elmish.Program<_,_,_,_>) =
         let obv, stream = stream<'msg> ()
         let elimshView = program.view
+        let mutable elmishDispatch = ignore
 
         let dispatch' = dispatcher<'msg> obv
 
         let view model (dispatch : Elmish.Dispatch<'msg>) =
+            elmishDispatch <- dispatch
             program.view dispatch'.Post model
+
+        let observer n = async {
+            match n with
+            | OnNext x ->
+                elmishDispatch x
+            | _ -> ()
+            ()
+        }
 
         let main = async {
             let msgs = query stream
-            do! msgs.RunAsync program.observer
+            do! msgs.RunAsync observer
             ()
         }
         main |> Async.StartImmediate
