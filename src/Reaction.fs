@@ -1,5 +1,3 @@
-// TODO: move to a separate project (assembly)
-
 namespace Fable.Reaction
 
 open Fable.Core
@@ -38,29 +36,3 @@ module Fable =
             }
 
         AsyncObservable subscribe
-
-    open Fable.Import.React
-
-    /// Setup rendering of root React component inside html element identified by placeholderId
-    let renderReact placeholderId =
-        let render view =
-            let mutable lastRequest = None
-
-            match lastRequest with
-            | Some r -> window.cancelAnimationFrame r
-            | _ -> ()
-
-            lastRequest <- Some (window.requestAnimationFrame (fun _ ->
-                Fable.Import.ReactDom.render(
-                    view,
-                    document.getElementById(placeholderId)
-                )))
-
-        let observer (notification : Notification<ReactElement>) =
-            async {
-                match notification with
-                | OnNext view -> render view
-                | OnError err -> Log.onError ("renderReact, error", err)
-                | _ -> ()
-            }
-        observer
