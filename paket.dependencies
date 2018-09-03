@@ -7,5 +7,6 @@ nuget NUnit
 nuget NUnit3TestAdapter
 nuget FsUnit
 nuget Fable.Core
-nuget Fable.Elmish.React
+nuget Fable.Elmish
+nuget Fable.React
 nuget Reaction 0.8.1

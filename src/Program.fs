@@ -18,7 +18,7 @@ type Program<'arg, 'model, 'msg, 'view> = {
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module Program =
-    let dispatcher (obv : AsyncObserver<'msg>) =
+    let dispatcher<'msg> (obv : AsyncObserver<'msg>) =
         MailboxProcessor.Start(fun inbox ->
             let rec messageLoop _ = async {
                 let! msg = inbox.Receive ()
@@ -43,6 +43,7 @@ module Program =
           observer = noop
           onError = Log.onError }
 
+    /// Attach a reaction query to the message (Msg) stream.
     let withMsgs (query: AsyncObservable<'msg> -> AsyncObservable<'msg>) program =
         let dispatch, msgs = program.msgs
         { program with msgs = dispatch, query msgs }
@@ -69,3 +70,22 @@ module Program =
         }
 
         main |> Async.StartImmediate
+
+    /// Attach a reaction query to the message (Msg) stream of an Elmish program.
+    let withReaction (query: AsyncObservable<'msg> -> AsyncObservable<'msg>) (program:Elmish.Program<_,_,_,_>) =
+        let obv, stream = stream<'msg> ()
+        let elimshView = program.view
+
+        let dispatch' = dispatcher<'msg> obv
+
+        let view model (dispatch : Elmish.Dispatch<'msg>) =
+            program.view dispatch'.Post model
+
+        let main = async {
+            let msgs = query stream
+            do! msgs.RunAsync program.observer
+            ()
+        }
+        main |> Async.StartImmediate
+
+        { program with view = view }

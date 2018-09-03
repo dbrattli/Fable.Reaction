@@ -153,7 +153,7 @@ let query (msgs: AsyncObservable<Msg>) =
         |> choose Msg.asKeyboardEvent
         |> map targetValue
         |> filter (fun term -> term.Length > 2 || term.Length = 0)
-        |> debounce(750)         // Pause for 750ms
+        |> debounce 750          // Pause for 750ms
         |> distinctUntilChanged  // Only if the value has changed
 
     let loading =

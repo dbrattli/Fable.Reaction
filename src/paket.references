@@ -1,4 +1,5 @@
 FSharp.Core
 Fable.Core
-Fable.Elmish.React
+Fable.Elmish
+Fable.React
 Reaction
