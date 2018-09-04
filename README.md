@@ -12,7 +12,7 @@ paket add Fable.Reaction --version 0.4.0
 
 Fable Reaction is very similar to [Elm](http://elm-lang.org/) and [Elmish](https://elmish.github.io/) in regards to the [MVU architecture](https://guide.elm-lang.org/architecture/). But when using Fable Reaction, we do not need any commands (`Cmd`) or subscriptions with Elmish. Instead we use a [ReactiveX](http://reactivex.io/) (Rx) style query that transforms the stream of messages (`Msg`).
 
-<img src="R-MVU.png" width="400">
+<img src="R-MVU.png" width="550">
 
 * **Model**, application state as immutable data
 * **View**, a pure function that takes the model to produce the output view (HTML elements)
