@@ -1,7 +1,6 @@
 # Fable Reaction
 
-Fable Reaction is a helper library for using the [Reaction](https://github.com/dbrattli/Reaction) Async Reactive ([Rx](http://reactivex.io/)) library with Fable and [Elmish](https://elmish.github.io/) .
-
+Fable Reaction is a helper library for using the [Reaction](https://github.com/dbrattli/Reaction) Async Reactive ([Rx](http://reactivex.io/)) library with Fable and [Elmish](https://elmish.github.io/).
 
 ## Install
 
@@ -13,7 +12,6 @@ paket add Fable.Reaction --version 0.4.0
 
 Fable Reaction is very similar to [Elm](http://elm-lang.org/) and [Elmish](https://elmish.github.io/) in regards to the [MVU architecture](https://guide.elm-lang.org/architecture/). But when using Fable Reaction, we do not need any commands (`Cmd`) or subscriptions with Elmish. Instead we use a [ReactiveX](http://reactivex.io/) (Rx) style query that transforms the stream of messages (`Msg`).
 
-
 <img src="R-MVU.png" width="400">
 
 * **Model**, application state as immutable data
@@ -24,6 +22,23 @@ Fable Reaction is very similar to [Elm](http://elm-lang.org/) and [Elmish](https
 In addition, Fable Reaction may also have a reaction query that transforms the "stream" of messages.
 
 * **Reaction**, a query function that takes the message stream and produces a new (transformed) message stream. Note that this also replaces Elm(ish) commands (Cmd) since the reaction is free to produce initial messages out of thin air, transform, filter, time-shift messages or combine side-effects such as web requests (fetch) etc.
+
+## Howto use with Elmish
+
+```f#
+open Reaction        // 1. Open Reaction, for operators such as delay.
+open Fable.Reaction  // 2. Open Fable.Reaction
+
+// (your Elmish program here)
+
+let query msgs = // 3. Add rective query
+    msgs |> delay 1000
+
+Program.mkSimple init update view
+|> Program.withQuery query       // 4. Enable the query in Elmish
+|> Program.withReact "elmish-app"
+|> Program.run
+```
 
 ## Elmish Examples
 
