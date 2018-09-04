@@ -6,7 +6,7 @@ Fable Reaction is a helper library for using the [Reaction](https://github.com/d
 ## Install
 
 ```cmd
-paket add Fable.Reaction
+paket add Fable.Reaction --version 0.4.0
 ```
 
 ## Reactive MVU Architecture

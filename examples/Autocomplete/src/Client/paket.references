@@ -2,6 +2,7 @@ group Client
     FSharp.Core
     Fable.Core
     Fable.Reaction
+    Fable.Elmish.React
     Elmish
     dotnet-fable
     Fulma

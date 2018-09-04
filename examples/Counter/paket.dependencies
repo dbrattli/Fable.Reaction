@@ -16,9 +16,10 @@ group Client
     source https://api.nuget.org/v3/index.json
 
     nuget Fable.Core
-    nuget Fulma
+    nuget Fable.Reaction 0.4
+    nuget Fable.Elmish.React
     nuget Elmish
-    nuget Fable.Reaction 0.3
+    nuget Fulma
     nuget Thoth.Json
 
     clitool dotnet-fable

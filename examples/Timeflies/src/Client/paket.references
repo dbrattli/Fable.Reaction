@@ -5,3 +5,4 @@ group Client
     Fulma
     Fable.Reaction
     Elmish
+    Fable.Elmish.React
