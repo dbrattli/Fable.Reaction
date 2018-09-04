@@ -143,7 +143,7 @@ let searchWikipedia (term : string) =
         |> map QueryResult
         |> catch (sprintf "%A" >> Error >> QueryResult >> single)
 
-let query (msgs: AsyncObservable<Msg>) =
+let query msgs =
     let targetValue (ev : Fable.Import.React.KeyboardEvent) : string =
         try
             (unbox<string> ev.target?value).Trim()

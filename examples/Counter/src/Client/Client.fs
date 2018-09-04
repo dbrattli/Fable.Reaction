@@ -99,7 +99,7 @@ let loadCountCmd =
         |> map (Ok >> InitialCountLoaded)
         |> catch (Error >> InitialCountLoaded >> single)
 
-let query (msgs: AsyncObservable<Msg>) : AsyncObservable<Msg> =
+let query msgs =
     loadCountCmd + msgs
 
 Program.mkSimple init update view

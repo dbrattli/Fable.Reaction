@@ -41,26 +41,26 @@ let view (model : Model) (dispatch : Dispatch<Msg>) =
 let init () : Model =
     { Letters = Map.empty }
 
-// Query for message stream transformation.
-
+// Query for message stream transformation (same as below)
 let query' msgs =
     Seq.toList "TIME FLIES LIKE AN ARROW"
     |> Seq.mapi (fun i c -> i, c)
     |> ofSeq
     |> flatMap (fun (i, c) ->
-        printfn "%A" (i, c)
         fromMouseMoves ()
         |> delay (100 * i)
         |> map (fun m -> Letter (i, string c, int m.clientX, int m.clientY)))
 
-let query (msgs: AsyncObservable<Msg>) = rx {
-    let! i, c = Seq.toList "TIME FLIES LIKE AN ARROW"
-                |> Seq.mapi (fun i c -> i, c)
-                |> ofSeq
-    let ms = fromMouseMoves () |> delay (100 * i)
-    for m in ms do
-        yield Letter (i, string c, int m.clientX, int m.clientY)
-}
+// Query for message stream transformation (expression style)
+let query msgs =
+    rx {
+        let! i, c = Seq.toList "TIME FLIES LIKE AN ARROW"
+                    |> Seq.mapi (fun i c -> i, c)
+                    |> ofSeq
+        let ms = fromMouseMoves () |> delay (100 * i)
+        for m in ms do
+            yield Letter (i, string c, int m.clientX, int m.clientY)
+    }
 
 Program.mkSimple init update view
 |> Program.withQuery query
