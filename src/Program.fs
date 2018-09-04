@@ -17,7 +17,7 @@ module Program =
         )
 
     /// Attach a reaction query to the message (Msg) stream of an Elmish program.
-    let withReaction (query: AsyncObservable<'msg> -> AsyncObservable<'msg>) (program: Elmish.Program<_,_,_,_>) =
+    let withQuery (query: AsyncObservable<'msg> -> AsyncObservable<'msg>) (program: Elmish.Program<_,_,_,_>) =
         let obv, stream = stream<'msg> ()
         let mutable dispatch' : Dispatch<'msg> = ignore
 

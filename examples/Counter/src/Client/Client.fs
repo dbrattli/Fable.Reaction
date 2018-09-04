@@ -1,13 +1,15 @@
 module Client
 
-open Fable.Reaction
 open Fable.PowerPack.Fetch
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
-
+open Fable.Reaction
 open Reaction
+
 open Shared
 open Fulma
+open Elmish
+open Elmish.React
 
 
 // The model holds data that you want to keep track of while the application is running
@@ -30,7 +32,7 @@ let init () : Model =
 // The update function computes the next state of the application based on the current state and the incoming events/messages
 // It can also run side-effects (encoded as commands) like calling the server via Http.
 // these commands in turn, can dispatch messages to which the update function will react.
-let update (currentModel : Model) (msg : Msg) : Model =
+let update (msg : Msg) (currentModel : Model) : Model =
     match currentModel.Counter, msg with
     | Some x, Increment ->
         let nextModel = { currentModel with Counter = Some (x + 1) }
@@ -74,7 +76,7 @@ let button txt onClick =
           Button.OnClick onClick ]
         [ str txt ]
 
-let view (dispatch : Msg -> unit) (model : Model) =
+let view (model : Model) (dispatch : Msg -> unit) =
     div []
         [ Navbar.navbar [ Navbar.Color IsPrimary ]
             [ Navbar.Item.div [ ]
@@ -93,14 +95,14 @@ let view (dispatch : Msg -> unit) (model : Model) =
                     [ safeComponents ] ] ]
 
 let loadCountCmd =
-    ofPromise (fetchAs<int> "/api/init") []
+    ofPromise (fetchAs<int> "/api/init" [])
         |> map (Ok >> InitialCountLoaded)
         |> catch (Error >> InitialCountLoaded >> single)
 
 let query (msgs: AsyncObservable<Msg>) : AsyncObservable<Msg> =
     loadCountCmd + msgs
 
-Program.mkProgram init update view
-|> Program.withMsgs query
+Program.mkSimple init update view
+|> Program.withQuery query
 |> Program.withReact "elmish-app"
 |> Program.run

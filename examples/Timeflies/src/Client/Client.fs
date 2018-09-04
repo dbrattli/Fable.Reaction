@@ -63,6 +63,6 @@ let query (msgs: AsyncObservable<Msg>) = rx {
 }
 
 Program.mkSimple init update view
-|> Program.withReaction query
+|> Program.withQuery query
 |> Program.withReact "elmish-app"
 |> Program.run

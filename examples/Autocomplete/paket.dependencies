@@ -13,7 +13,7 @@ group Client
     source https://api.nuget.org/v3/index.json
 
     nuget Fable.Core
-    nuget Reaction 0.8.1
+    nuget Elmish
     nuget Fable.Reaction 0.3
     nuget Fulma
     nuget Thoth.Json
