@@ -21,7 +21,7 @@ Fable Reaction is very similar to [Elm](http://elm-lang.org/) and [Elmish](https
 
 In addition, Fable Reaction may also have a reaction query that transforms the "stream" of messages.
 
-* **Reaction**, a query function that takes the message stream and produces a new (transformed) message stream. Note that this also replaces Elm(ish) commands (Cmd) since the reaction is free to produce initial messages out of thin air, transform, filter, time-shift messages or combine side-effects such as web requests (fetch) etc.
+* **Query**, a function that takes the message stream and produces a new (transformed) message stream. Note that this also replaces the need for Elm(ish) commands (Cmd) since the reaction is free to produce any messages (out of thin air), transform, filter, time-shift messages or combine side-effects such as web requests (fetch) etc.
 
 ## Howto use with Elmish
 
