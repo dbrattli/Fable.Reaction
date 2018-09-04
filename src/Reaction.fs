@@ -6,7 +6,7 @@ open Fable.Import.Browser
 open Reaction
 
 [<AutoOpen>]
-module Fable =
+module Reaction =
 
     let ofPromise (pr: Fable.Import.JS.Promise<_>) =
         let obv = Creation.ofAsync(fun obv _ -> async {
