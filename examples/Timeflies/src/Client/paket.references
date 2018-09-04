@@ -3,5 +3,5 @@ group Client
     Fable.Core
     dotnet-fable
     Fulma
-    Reaction
     Fable.Reaction
+    Elmish

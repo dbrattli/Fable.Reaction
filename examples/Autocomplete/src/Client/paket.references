@@ -2,6 +2,7 @@ group Client
     FSharp.Core
     Fable.Core
     Fable.Reaction
+    Elmish
     dotnet-fable
     Fulma
     Thoth.Json

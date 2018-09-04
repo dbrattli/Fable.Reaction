@@ -17,7 +17,7 @@ group Client
 
     nuget Fable.Core
     nuget Fulma
-    nuget Reaction 0.8.1
+    nuget Elmish
     nuget Fable.Reaction 0.3
     nuget Thoth.Json
 

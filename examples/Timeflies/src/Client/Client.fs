@@ -2,9 +2,11 @@ module Client
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
-open Fable.Reaction
 
+open Fable.Reaction
 open Reaction
+open Elmish
+open Elmish.React
 
 // The model holds data that you want to keep track of while the
 // application is running
@@ -20,12 +22,12 @@ type Msg =
 
 // The update function computes the next state of the application based
 // on the current state and the incoming messages
-let update (currentModel : Model) (msg : Msg) : Model =
+let update (msg : Msg) (currentModel : Model) : Model =
     match currentModel.Letters, msg with
     | _, Letter (i, c, x, y) ->
         { currentModel with Letters = currentModel.Letters.Add (i, (c, x, y)) }
 
-let view (dispatch : Dispatch<Msg>) (model : Model) =
+let view (model : Model) (dispatch : Dispatch<Msg>) =
     let letters = model.Letters
     let offsetX x i = x + i * 10 + 15
 
@@ -41,7 +43,7 @@ let init () : Model =
 
 // Query for message stream transformation.
 
-let query'' msgs =
+let query' msgs =
     Seq.toList "TIME FLIES LIKE AN ARROW"
     |> Seq.mapi (fun i c -> i, c)
     |> ofSeq
@@ -51,7 +53,7 @@ let query'' msgs =
         |> delay (100 * i)
         |> map (fun m -> Letter (i, string c, int m.clientX, int m.clientY)))
 
-let query' msgs = rx {
+let query (msgs: AsyncObservable<Msg>) = rx {
     let! i, c = Seq.toList "TIME FLIES LIKE AN ARROW"
                 |> Seq.mapi (fun i c -> i, c)
                 |> ofSeq
@@ -60,7 +62,7 @@ let query' msgs = rx {
         yield Letter (i, string c, int m.clientX, int m.clientY)
 }
 
-Program.mkProgram init update view
-|> Program.withMsgs query'
+Program.mkSimple init update view
+|> Program.withQuery query
 |> Program.withReact "elmish-app"
 |> Program.run
