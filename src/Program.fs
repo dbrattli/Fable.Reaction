@@ -5,31 +5,20 @@ open Reaction
 
 [<RequireQualifiedAccess>]
 module Program =
-    let dispatcher<'msg> (obv : AsyncObserver<'msg>) =
-        MailboxProcessor.Start(fun inbox ->
-            let rec messageLoop _ = async {
-                let! msg = inbox.Receive ()
-                do! obv.OnNextAsync msg
-                return! messageLoop ()
-            }
-            messageLoop ()
-        )
-
     /// Attach a Reaction query to the message (Msg) stream of an Elmish program.
     let withQuery (query: AsyncObservable<'msg> -> AsyncObservable<'msg>) (program: Elmish.Program<_,_,_,_>) =
-        let obv, stream = stream<'msg> ()
         let mutable dispatch' : Dispatch<'msg> = ignore
+        let mb, stream = mbStream<'msg> ()
 
         let view model dispatch =
             dispatch' <- dispatch
-            let disp = ((dispatcher obv).Post)
-            program.view model disp
+            program.view model mb.Post
 
         let main = async {
             let msgObserver n = async {
                 match n with
                 | OnNext x -> dispatch' x
-                | OnError ex -> program.onError ("Reaction error", ex)
+                | OnError ex -> program.onError ("Query error", ex)
                 | OnCompleted -> ()
             }
 
