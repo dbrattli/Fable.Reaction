@@ -31,7 +31,7 @@ open Fable.Reaction  // 2. Open Fable.Reaction
 
 // (your Elmish program here)
 
-let query msgs = // 3. Add rective query
+let query msgs = // 3. Add reactive query
     msgs |> delay 1000
 
 Program.mkSimple init update view
