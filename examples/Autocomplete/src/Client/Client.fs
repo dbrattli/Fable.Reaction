@@ -58,7 +58,7 @@ let safeComponents =
              str ", "
              a [ Href "http://fable.io" ] [ str "Fable" ]
              str ", "
-             a [ Href "https://github.com/dbrattli/Fable.Reaction" ] [ str "Fable.Reaction" ]
+             a [ Href "https://elmish.github.io/elmish/" ] [ str "Elmish" ]
              str ", "
              a [ Href "https://mangelmaxime.github.io/Fulma" ] [ str "Fulma" ]
            ]
