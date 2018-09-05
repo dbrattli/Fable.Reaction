@@ -64,5 +64,5 @@ let query msgs =
 
 Program.mkSimple init update view
 |> Program.withQuery query
-|> Program.withReact "elmish-app"
+|> Program.withReactUnoptimized "elmish-app"
 |> Program.run

@@ -9,4 +9,4 @@ nuget FsUnit
 nuget Fable.Core
 nuget Fable.Elmish
 nuget Fable.React
-nuget Reaction 0.8.2
+nuget Reaction 0.9.1
