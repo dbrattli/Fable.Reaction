@@ -146,13 +146,14 @@ let searchWikipedia (term : string) =
 let query msgs =
     let targetValue (ev : Fable.Import.React.KeyboardEvent) : string =
         try
-            (unbox<string> ev.target?value).Trim()
+            let target = !!ev.target?value : string
+            target.Trim ()
         with _ -> ""
 
     let terms =
         msgs
         |> choose Msg.asKeyboardEvent
-        |> map targetValue
+        |> map targetValue       // Map keyboard event to input value
         |> filter (fun term -> term.Length > 2 || term.Length = 0)
         |> debounce 750          // Pause for 750ms
         |> distinctUntilChanged  // Only if the value has changed
