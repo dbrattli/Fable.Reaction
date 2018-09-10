@@ -40,9 +40,9 @@ type Msg =
 // defines the initial state and initial command (= side-effect) of the application
 let init () : Model =
     [
-        { Name= "Elmish"; Logo="url(Images/logo-elmish.png)" }, { Top = 150.0; Left = 100.0 }
-        { Name= "ReactiveX"; Logo="url(Images/logo.png)" } , { Top = 200.0; Left = 700.0 }
-        { Name= "Fable"; Logo="url(Images/logo-fable.png)" } , { Top = 300.0; Left = 400.0 }
+        { Name = "Elmish"; Logo= "url(Images/logo-elmish.png)" }, { Top = 150.0; Left = 100.0 }
+        { Name = "ReactiveX"; Logo = "url(Images/logo.png)" } , { Top = 200.0; Left = 700.0 }
+        { Name = "Fable"; Logo = "url(Images/logo-fable.png)" } , { Top = 300.0; Left = 400.0 }
     ]
     |> Map.ofSeq
 
