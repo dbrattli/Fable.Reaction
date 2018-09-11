@@ -23,7 +23,7 @@ type Msg =
     | KeyboardEvent of Fable.Import.React.KeyboardEvent
     | Loading
     | QueryResult of Result<string list list, string>
-
+        static member EmptyResult = [[];[];[]]
         static member asKeyboardEvent = function
             | KeyboardEvent ev -> Some ev
             | _ -> None
@@ -37,7 +37,7 @@ let init () : Model = {
 // The update function computes the next state of the application based on the current state and the incoming events/messages
 // It can also run side-effects (encoded as commands) like calling the server via Http.
 // these commands in turn, can dispatch messages to which the update function will react.
-let update (msg : Msg) (currentModel : Model) : Model =
+let update (msg: Msg) (currentModel: Model) : Model =
     let model =
         match msg with
         | QueryResult res ->
@@ -69,12 +69,10 @@ let safeComponents =
           components ]
 
 
-let view (model : Model) (dispatch : Msg -> unit) =
+let view (model: Model) (dispatch : Msg -> unit) =
     let active (result : string list) =
-        if result.Length > 0 then
-            "is-active"
-        else
-            ""
+        Dropdown.Option.IsActive (result.Length > 0)
+
     let loading (loading: bool) =
         if loading then
             "is-loading"
@@ -94,18 +92,17 @@ let view (model : Model) (dispatch : Msg -> unit) =
                 str "Search Wikipedia"
             ]
 
-            div [ sprintf "dropdown %s" (active model.Result) |> Class ] [
-                div [ Class "dropdown-trigger" ] [
+            Dropdown.dropdown [ active model.Result ] [
+                div [] [
                     div [ Class ("control " + loading model.Loading) ] [
-                        input [ Placeholder "Enter query ..."
-                                OnKeyUp (KeyboardEvent >> dispatch)
-                                Class "input" ]
+                        Input.input [ Input.Option.Placeholder "Enter query ..."
+                                      Input.Option.Props [ OnKeyUp (KeyboardEvent >> dispatch)]
+                                    ]
                     ]
                 ]
-                div [ Class "dropdown-menu"
-                      Id "dropdown-menu"
-                      Role "menu" ] [
-                    div [ Class "dropdown-content" ] [
+
+                Dropdown.menu [ GenericOption.Props [ Role "menu" ]] [
+                    Dropdown.content [] [
                         for item in model.Result do
                             yield
                                 a [ Href "#"
@@ -123,7 +120,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
         ]
     ]
 
-let searchWikipedia (term : string) =
+let searchWikipedia (term: string) =
     let jsonDecode txt =
         let decoders = Decode.oneOf [ Decode.list Decode.string; (Decode.succeed []) ]
         Decode.decodeString (Decode.list decoders) txt
@@ -135,7 +132,7 @@ let searchWikipedia (term : string) =
     ]
 
     if term.Length = 0 then
-        QueryResult (Ok [[];[];[]]) |> single
+        QueryResult (Ok Msg.EmptyResult) |> single
     else
         ofPromise (fetch url props)
         |> flatMap (fun res -> res.text() |> ofPromise)
@@ -144,7 +141,7 @@ let searchWikipedia (term : string) =
         |> catch (sprintf "%A" >> Error >> QueryResult >> single)
 
 let query msgs =
-    let targetValue (ev : Fable.Import.React.KeyboardEvent) : string =
+    let targetValue (ev: Fable.Import.React.KeyboardEvent) : string =
         try
             let target = !!ev.target?value : string
             target.Trim ()

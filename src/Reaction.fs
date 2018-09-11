@@ -25,9 +25,9 @@ module ReactionExtension =
 
     /// Returns an async observable of mouse events.
     let ofMouseMove () : AsyncObservable<MouseEvent> =
-        let subscribe (obv : Types.AsyncObserver<MouseEvent>) : Async<Types.AsyncDisposable> =
+        let subscribe (obv: Types.AsyncObserver<MouseEvent>) : Async<Types.AsyncDisposable> =
             async {
-                let onMouseMove (ev : Fable.Import.Browser.MouseEvent) =
+                let onMouseMove (ev: Fable.Import.Browser.MouseEvent) =
                     async {
                         do! OnNext ev |> obv
                     } |> Async.StartImmediate
