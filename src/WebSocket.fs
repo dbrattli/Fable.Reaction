@@ -1,68 +1,58 @@
-// From: https://github.com/ncthbrt/Fable.Websockets/blob/master/src/Fable.Websockets.Client/src/Client.fs
+namespace Fable.Reaction.WebSocket
 
-module Fable.Reaction.WebSocket
-
-open System
-open Fable.Core
 open Fable.Core.JsInterop
-open Fable.Import
 open Fable.Import.Browser
 
-open Fable.Reaction.WebSocket.Protocol
+open Reaction
 
-let private toObj () = obj()
+module WebSocket =
 
-let [<PassGenerics>] private receiveMessage<'clientProtocol> (receiveSubject: Subject<WebsocketEvent<'clientProtocol>>) (msgEvent:MessageEvent) =
-    try
-        let msg = ofJson<'clientProtocol> (string msgEvent.data)
-        Msg msg
-    with
-        | e -> Exception e
-    |> receiveSubject.Next
-    |> toObj
+    exception Error of string
 
-let private receiveCloseEvent<'clientProtocol, 'serverProtocol> (receiveSubject:Subject<WebsocketEvent<'clientProtocol>>) (sendSubject:Subject<'serverProtocol>) (closeEvent:CloseEvent) =
-    let closedCode = (toClosedCode<<uint16) closeEvent.code
-    let payload  = { code = closedCode; reason= closeEvent.reason; wasClean=closeEvent.wasClean }
+    /// Websocket operator.
+    let websocket (uri: string) (source: AsyncObservable<'msg>) : AsyncObservable<'msg> =
+        let subscribe (obv: Types.AsyncObserver<'msg'>) : Async<Types.AsyncDisposable> =
+            async {
+                let websocket = WebSocket.Create uri
+                let mutable disposable = Core.disposableEmpty
 
-    do payload
-    |> WebsocketEvent.Closed
-    |> receiveSubject.Next
+                let _obv n = async {
+                    match n with
+                    | OnNext x -> websocket.send x
+                    | OnError ex ->
+                        websocket.close ()
+                    | OnCompleted ->
+                        websocket.close ()
+                }
 
-    do sendSubject.Completed()
-    do receiveSubject.Completed()
+                let onMessage (ev : MessageEvent) =
+                    let msg = ofJson<'msg'> (string ev.data)
+                    Async.RunSynchronously (OnNext msg |> obv)
 
-    obj()
+                let onOpen _ =
+                    let action = async {
+                        let! disposable' = source.SubscribeAsync _obv
+                        disposable <- AsyncDisposable.Unwrap disposable'
+                    }
 
-let private sendMessage (websocket:WebSocket) (receiveSubject:Subject<WebsocketEvent<'a>>) msg =
-    try
-        let jsonMsg = msg |> toJson
-        do websocket.send jsonMsg
-    with
-        | e -> receiveSubject.Next (Exception e)
+                    Async.StartImmediate action
 
+                let onError ev =
+                    let ex = Error (ev.ToString ())
+                    Async.RunSynchronously (OnError ex |> obv)
 
-let [<PassGenerics>] public establishWebsocketConnection<'serverProtocol, 'clientProtocol> (uri:string) :
-    (('serverProtocol->unit)*IObservable<WebsocketEvent<'clientProtocol>>*(ClosedCode->string->unit)) =
+                let onClose ev =
+                    Async.RunSynchronously (obv OnCompleted)
 
+                websocket.onmessage <- onMessage
+                websocket.onclose <- onClose
+                websocket.onopen <- onOpen
+                websocket.onerror <- onError
 
-    let receiveSubject = Subject<WebsocketEvent<'clientProtocol>>()
-    let sendSubject = Subject<'serverProtocol>()
+                let cancel () = async {
+                    do! disposable ()
+                }
+                return cancel
+            }
 
-    let websocket = WebSocket.Create(uri)
-
-    let connection = (sendSubject.Subscribe (sendMessage websocket receiveSubject))
-
-    let closeHandle (code:ClosedCode) (reason:string) =
-        let state = websocket.readyState |> uint16 |> toReadyState
-        if state=Connecting || state=Open then
-            websocket.close((float<<fromClosedCode) code, reason)
-            connection.Dispose()
-        else ()
-
-    websocket.onmessage <- fun msg -> (receiveMessage<'clientProtocol> receiveSubject msg)
-    websocket.onclose <- fun msg -> (receiveCloseEvent receiveSubject sendSubject msg)
-    websocket.onopen <- fun _ -> receiveSubject.Next Opened |> toObj
-    websocket.onerror <- fun _ -> receiveSubject.Next Error |> toObj
-
-    (sendSubject.Next, receiveSubject :> IObservable<_>, closeHandle)
+        AsyncObservable subscribe
