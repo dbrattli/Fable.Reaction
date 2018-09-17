@@ -1,6 +1,5 @@
 namespace Fable.Reaction
 
-open Fable.Core.JsInterop
 open Fable.Import.Browser
 
 open Reaction
@@ -9,9 +8,11 @@ module WebSocket =
 
     exception WSError of string
 
-    /// Websocket operator.
-    let websocket (uri: string) (source: AsyncObservable<'msg>) : AsyncObservable<'msg> =
-        let subscribe (obv: Types.AsyncObserver<'msg'>) : Async<Types.AsyncDisposable> =
+    /// Websocket channel operator. Passes string items as ws messages to
+    /// the server. Received ws messages will be forwarded down stream.
+    /// JSON encode/decode of application messages is left to the client.
+    let channel (uri: string) (source: AsyncObservable<string>) : AsyncObservable<string> =
+        let subscribe (obv: Types.AsyncObserver<string>) : Async<Types.AsyncDisposable> =
             async {
                 let websocket = WebSocket.Create uri
                 let mutable disposable = Core.disposableEmpty
@@ -30,7 +31,7 @@ module WebSocket =
                 }
 
                 let onMessage (ev : MessageEvent) =
-                    let msg = ofJson<'msg'> (string ev.data)
+                    let msg = (string ev.data)
                     Async.StartImmediate (OnNext msg |> obv)
 
                 let onOpen _ =
@@ -66,3 +67,13 @@ module WebSocket =
             }
 
         AsyncObservable subscribe
+
+    /// Websocket message channel operator. Items {'msg} will be encoded
+    /// to JSON using `encode` and passed as over the ws channel to the server.
+    /// Data received on the ws channel as strings (JSON) will be
+    /// decoded using `decode` and forwarded down stream as messages {'msg}.
+    let msgChannel<'msg> (uri: string) (encode: 'msg -> string) (decode: string -> 'msg option) (source: AsyncObservable<'msg>) : AsyncObservable<'msg> =
+        source
+        |> map encode
+        |> channel uri
+        |> choose decode
