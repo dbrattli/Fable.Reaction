@@ -12,6 +12,7 @@ open Shared
 
 open Giraffe.Serialization
 open WebSocketApp.Middleware
+open Reaction
 
 let publicPath = Path.GetFullPath "../Client/public"
 let port = 8085us
@@ -25,9 +26,12 @@ let webApp =
                 return! Successful.OK counter next ctx
             }
 
+let query (msgs: AsyncObservable<Msg>) : AsyncObservable<Msg> =
+    msgs
+
 let configureApp (app : IApplicationBuilder) =
     app.UseWebSockets()
-       .UseMiddleware<WebSocketMiddleware>()
+       .UseMiddleware<ReactionMiddleware<Msg>>(query, Msg.Encode, Msg.Decode)
        .UseDefaultFiles()
        .UseStaticFiles()
        .UseGiraffe webApp

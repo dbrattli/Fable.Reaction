@@ -6,6 +6,8 @@ module Middleware =
     open System.Threading
     open System.Net.WebSockets
     open Microsoft.AspNetCore.Http
+    open Reaction
+    open Shared
 
     open FSharp.Control.Tasks.ContextInsensitive
 
@@ -39,26 +41,44 @@ module Middleware =
                         | _ -> sockets <- removeSocket sockets socket
             }
 
-    let echo (context: HttpContext) (webSocket: WebSocket) : Async<unit> =
+
+
+    let reaction (context: HttpContext) (webSocket: WebSocket) (query: AsyncObservable<'msg> -> AsyncObservable<'msg>) (encode: 'msg -> string) (decode: string -> 'msg) : Async<unit> =
+        let obv, stream = stream<'msg> ()
         async {
-            printfn "echo"
             let buffer : byte [] = Array.zeroCreate 4096
             let! ct = Async.CancellationToken
             let! result = webSocket.ReceiveAsync (new ArraySegment<byte>(buffer), ct) |> Async.AwaitTask
             let mutable finished = false
 
+            let msgObserver n = async {
+                match n with
+                | OnNext x ->
+                    let newString = encode x
+                    let bytes = System.Text.Encoding.UTF8.GetBytes (newString)
+                    do! webSocket.SendAsync (new ArraySegment<byte>(bytes), WebSocketMessageType.Text, result.EndOfMessage, CancellationToken.None) |> Async.AwaitTask
+
+                | OnError ex -> ()
+                | OnCompleted -> ()
+            }
+
+            let msgs = query stream
+            do! msgs.RunAsync msgObserver
+
             while not finished do
-                printfn "looping"
 
-                do! webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), result.MessageType, result.EndOfMessage, CancellationToken.None) |> Async.AwaitTask
-
-                let! result = webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), ct) |> Async.AwaitTask
+                let! result = webSocket.ReceiveAsync (new ArraySegment<byte>(buffer), ct) |> Async.AwaitTask
                 finished <- result.CloseStatus.HasValue
+
+                if not finished then
+                    let receiveString = System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count)
+                    let msg = decode receiveString
+                    do! obv.OnNextAsync msg
 
             do! webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None) |> Async.AwaitTask
         }
 
-    type WebSocketMiddleware(next: RequestDelegate) =
+    type ReactionMiddleware<'msg> (next: RequestDelegate, query: AsyncObservable<'msg> -> AsyncObservable<'msg>, encode: 'msg -> string, decode: string -> 'msg) =
         member __.Invoke (ctx: HttpContext) =
             async {
                 if ctx.Request.Path = PathString "/ws" then
@@ -67,7 +87,7 @@ module Middleware =
                     | true ->
                         let! webSocket = ctx.WebSockets.AcceptWebSocketAsync() |> Async.AwaitTask
                         sockets <- addSocket sockets webSocket
-                        do! echo ctx webSocket
+                        do! reaction ctx webSocket query encode decode
 
                     | false -> ctx.Response.StatusCode <- 400
                 else

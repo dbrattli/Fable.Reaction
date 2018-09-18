@@ -9,54 +9,16 @@ open Fable.Helpers.React.Props
 open Fable.PowerPack.Fetch
 open Fable.Reaction
 open Fable.Reaction.WebSocket
-open Thoth.Json
 open Reaction
 open Shared
 
 open Fulma
-
 
 // The model holds data that you want to keep track of while the application is running
 // in this case, we are keeping track of a counter
 // we mark it as optional, because initially it will not be available from the client
 // the initial value will be requested from server
 type Model = { Counter: Counter option }
-
-// The Msg type defines what events/actions can occur while the application is running
-// the state of the application changes *only* in reaction to these events
-type Msg =
-    | Increment
-    | Decrement
-    | InitialCountLoaded of Result<Counter, exn>
-
-    static member Encode (msg: Msg) : string =
-        let data =
-            match msg with
-            | Increment ->
-                Encode.object [ "msg", Encode.string "increment"]
-            | Decrement ->
-                Encode.object [ "msg", Encode.string "decrement"]
-            | _ ->
-                Encode.object []
-
-        Encode.encode 4 data
-
-    static member Decode (json: string) : Option<Msg> =
-        let decodeMsg =
-            (Decode.field "msg" Decode.string)
-            |> Decode.map (fun str ->
-                            match str with
-                            | "increment" -> Increment
-                            | "decrement" -> Decrement
-                            | _ -> Decrement
-                          )
-        let result = Decode.decodeString decodeMsg json
-
-        match result with
-        | Ok msg ->
-            Some msg
-        | Error err ->
-            None
 
 // defines the initial state and initial command (= side-effect) of the application
 let init () : Model * Cmd<Msg> =

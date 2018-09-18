@@ -8,6 +8,8 @@ group Server
     nuget Microsoft.AspNetCore.StaticFiles
     nuget Microsoft.AspNetCore.WebSockets
     nuget Fable.JsonConverter
+    nuget Thoth.Json.Net
+    nuget Reaction
 
 group Client
     storage: none

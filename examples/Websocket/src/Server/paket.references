@@ -5,3 +5,5 @@ group Server
     Microsoft.AspNetCore.StaticFiles
     Microsoft.AspNetCore.WebSockets
     Fable.JsonConverter
+    Thoth.Json.Net
+    Reaction
