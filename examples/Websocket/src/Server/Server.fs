@@ -5,6 +5,7 @@ open System.Threading.Tasks
 open Microsoft.AspNetCore
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Hosting
+open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.DependencyInjection
 
 open Giraffe
@@ -26,13 +27,13 @@ let webApp =
                 return! Successful.OK counter next ctx
             }
 
-let query (msgs: AsyncObservable<Msg>) : AsyncObservable<Msg> =
+let query (ctx: HttpContext) (msgs: AsyncObservable<Msg>) : AsyncObservable<Msg> =
     msgs |> debounce 2000
 
 let configureApp (app : IApplicationBuilder) =
     app.UseWebSockets()
-       .UseReaction<Msg>(fun () ->
-       {
+       .UseReaction<Msg>(fun config ->
+       { config with
            Query = query
            Encode = Msg.Encode
            Decode = Msg.Decode
