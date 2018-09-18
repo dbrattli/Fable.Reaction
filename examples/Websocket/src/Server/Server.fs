@@ -27,11 +27,16 @@ let webApp =
             }
 
 let query (msgs: AsyncObservable<Msg>) : AsyncObservable<Msg> =
-    msgs
+    msgs |> debounce 2000
 
 let configureApp (app : IApplicationBuilder) =
     app.UseWebSockets()
-       .UseMiddleware<ReactionMiddleware<Msg>>(query, Msg.Encode, Msg.Decode)
+       .UseReaction<Msg>(fun () ->
+       {
+           Query = query
+           Encode = Msg.Encode
+           Decode = Msg.Decode
+       })
        .UseDefaultFiles()
        .UseStaticFiles()
        .UseGiraffe webApp

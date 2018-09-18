@@ -1,15 +1,24 @@
 namespace WebSocketApp
 
-module Middleware =
-    open System
-    open System.Text
-    open System.Threading
-    open System.Net.WebSockets
-    open Microsoft.AspNetCore.Http
-    open Reaction
-    open Shared
+open System
+open System.Net.WebSockets
+open System.Threading
+open System.Text
+open FSharp.Control.Tasks.ContextInsensitive
+open Microsoft.AspNetCore.Builder
+open Microsoft.AspNetCore.Http
 
-    open FSharp.Control.Tasks.ContextInsensitive
+open Reaction
+
+module Middleware =
+    [<CLIMutable>]
+    type ReactionConfig<'msg> =
+        {
+            Query: AsyncObservable<'msg> -> AsyncObservable<'msg>
+            Encode: 'msg -> string
+            Decode: string -> 'msg option
+        }
+
 
     let mutable sockets = list<WebSocket>.Empty
 
@@ -41,9 +50,7 @@ module Middleware =
                         | _ -> sockets <- removeSocket sockets socket
             }
 
-
-
-    let reaction (context: HttpContext) (webSocket: WebSocket) (query: AsyncObservable<'msg> -> AsyncObservable<'msg>) (encode: 'msg -> string) (decode: string -> 'msg) : Async<unit> =
+    let reaction (context: HttpContext) (webSocket: WebSocket) (query: AsyncObservable<'msg> -> AsyncObservable<'msg>) (encode: 'msg -> string) (decode: string -> 'msg option) : Async<unit> =
         let obv, stream = stream<'msg> ()
         async {
             let buffer : byte [] = Array.zeroCreate 4096
@@ -72,14 +79,18 @@ module Middleware =
 
                 if not finished then
                     let receiveString = System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count)
-                    let msg = decode receiveString
-                    do! obv.OnNextAsync msg
+                    let msg' = decode receiveString
+                    match msg' with
+                    | Some msg ->
+                        do! obv.OnNextAsync msg
+                    | None -> ()
 
             do! webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None) |> Async.AwaitTask
         }
 
-    type ReactionMiddleware<'msg> (next: RequestDelegate, query: AsyncObservable<'msg> -> AsyncObservable<'msg>, encode: 'msg -> string, decode: string -> 'msg) =
+    type ReactionMiddleware<'msg> (next: RequestDelegate, getOptions: unit -> ReactionConfig<'msg>)  =
         member __.Invoke (ctx: HttpContext) =
+            let options = getOptions ()
             async {
                 if ctx.Request.Path = PathString "/ws" then
                     printfn "Get ws"
@@ -87,7 +98,7 @@ module Middleware =
                     | true ->
                         let! webSocket = ctx.WebSockets.AcceptWebSocketAsync() |> Async.AwaitTask
                         sockets <- addSocket sockets webSocket
-                        do! reaction ctx webSocket query encode decode
+                        do! reaction ctx webSocket options.Query options.Encode options.Decode
 
                     | false -> ctx.Response.StatusCode <- 400
                 else
@@ -95,3 +106,7 @@ module Middleware =
                     return! next.Invoke ctx
                     |> Async.AwaitTask
             } |> Async.StartAsTask
+
+    type IApplicationBuilder with
+        member this.UseReaction<'msg> (getOptions: unit -> ReactionConfig<'msg>) =
+            this.UseMiddleware<ReactionMiddleware<'msg>> getOptions
