@@ -60,7 +60,6 @@ module Middleware =
 
             let options = getConfig defaultOptions
 
-
             async {
                 // One time setup of the broadcast query (all sockets)
                 if subscription.IsNone then
@@ -92,13 +91,16 @@ module Middleware =
 
                 let msgObserver (n: Notification<'msg*ConnectionId>) = async {
                     match n with
-                    | OnNext (x, socketId) ->
+                    | OnNext (x, _) ->
                         let newString = options.Encode x
                         let bytes = System.Text.Encoding.UTF8.GetBytes (newString)
                         do! webSocket.SendAsync (new ArraySegment<byte>(bytes), WebSocketMessageType.Text, result.EndOfMessage, CancellationToken.None) |> Async.AwaitTask
-
-                    | OnError ex -> ()
-                    | OnCompleted -> ()
+                    | OnError ex ->
+                        printf "Got OnError: %A" ex
+                        finished <- true
+                    | OnCompleted ->
+                        printf "Got OnCompleted"
+                        finished <- true
                 }
 
                 let msgs = options.Query socketId stream
