@@ -5,7 +5,6 @@ open System.Threading.Tasks
 open Microsoft.AspNetCore
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Hosting
-open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.DependencyInjection
 
 open Giraffe
@@ -27,8 +26,8 @@ let webApp =
                 return! Successful.OK counter next ctx
             }
 
-let query (ctx: HttpContext) (msgs: AsyncObservable<Msg>) : AsyncObservable<Msg> =
-    msgs |> debounce 2000
+let query (connectionId: ConnectionId) (msgs: AsyncObservable<Msg*ConnectionId>) : AsyncObservable<Msg*ConnectionId> =
+    msgs |> filter (fun (msg, cId) -> cId <> connectionId)
 
 let configureApp (app : IApplicationBuilder) =
     app.UseWebSockets()

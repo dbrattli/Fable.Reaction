@@ -13,15 +13,16 @@ open Giraffe.Serialization
 open Reaction
 
 module Middleware =
-    type Query<'msg> = HttpContext -> AsyncObservable<'msg> -> AsyncObservable<'msg>
+    type ConnectionId = string
+    type Query<'msg> = ConnectionId -> AsyncObservable<'msg*ConnectionId> -> AsyncObservable<'msg*ConnectionId>
 
     [<CLIMutable>]
     type ReactionConfig<'msg> =
         {
             /// A query for the stream of all messages
-            QueryAll: Query<'msg>
+            QueryAll: AsyncObservable<'msg*ConnectionId> -> AsyncObservable<'msg*ConnectionId>
             /// A query for stream of messages to a given client
-            Query: Query<'msg>
+            Query: ConnectionId -> AsyncObservable<'msg*ConnectionId> -> AsyncObservable<'msg*ConnectionId>
             /// Encoder for serializing a message to JSON string
             Encode: 'msg -> string
             /// Decoder for deserializing a JSON string to a message
@@ -34,15 +35,15 @@ module Middleware =
 
     type ReactionMiddleware<'msg> (next: RequestDelegate, getConfig: GetConfig<'msg>)  =
         let sockets = List<WebSocket> ()
-        let obvAll, streamAll = stream<'msg> ()
-        let obv, stream = stream<'msg> ()
+        let obvAll, streamAll = stream<'msg*ConnectionId> ()
+        let obv, stream = stream<'msg*ConnectionId> ()
         let mutable subscription : AsyncDisposable option = None
 
         member this.Invoke (ctx: HttpContext) =
             let serializer : IJsonSerializer = ctx.RequestServices.GetService<IJsonSerializer> ()
 
             let defaultOptions = {
-                QueryAll = fun _ msgs -> msgs
+                QueryAll = fun msgs -> msgs
                 Query = fun _ msgs -> msgs
                 Encode = fun msg ->
                     serializer.Serialize msg
@@ -63,7 +64,7 @@ module Middleware =
             async {
                 // One time setup of the broadcast query (all sockets)
                 if subscription.IsNone then
-                    let queryAll = options.QueryAll ctx streamAll
+                    let queryAll = options.QueryAll streamAll
                     let! disposable = queryAll.SubscribeAsync obv
                     subscription <- Some disposable
 
@@ -71,25 +72,28 @@ module Middleware =
                     match ctx.WebSockets.IsWebSocketRequest with
                     | true ->
                         let! webSocket = ctx.WebSockets.AcceptWebSocketAsync() |> Async.AwaitTask
+                        let connectionId = ctx.Connection.Id
+                        printfn "Connection ID: %A" connectionId
+
                         sockets.Add webSocket
-                        do! this.Reaction ctx webSocket options.Query options.Encode options.Decode
+                        do! this.Reaction connectionId webSocket options
 
                     | false -> ctx.Response.StatusCode <- 400
                 else
                     return! next.Invoke ctx |> Async.AwaitTask
             } |> Async.StartAsTask
 
-        member private this.Reaction (ctx: HttpContext) (webSocket: WebSocket) (query: Query<'msg>) (encode: 'msg -> string) (decode: string -> 'msg option) : Async<unit> =
+        member private this.Reaction (socketId: ConnectionId) (webSocket: WebSocket) (options: ReactionConfig<'msg>) : Async<unit> =
             async {
                 let buffer : byte [] = Array.zeroCreate 4096
                 let! ct = Async.CancellationToken
                 let! result = webSocket.ReceiveAsync (new ArraySegment<byte> (buffer), ct) |> Async.AwaitTask
                 let mutable finished = false
 
-                let msgObserver n = async {
+                let msgObserver (n: Notification<'msg*ConnectionId>) = async {
                     match n with
-                    | OnNext x ->
-                        let newString = encode x
+                    | OnNext (x, socketId) ->
+                        let newString = options.Encode x
                         let bytes = System.Text.Encoding.UTF8.GetBytes (newString)
                         do! webSocket.SendAsync (new ArraySegment<byte>(bytes), WebSocketMessageType.Text, result.EndOfMessage, CancellationToken.None) |> Async.AwaitTask
 
@@ -97,7 +101,7 @@ module Middleware =
                     | OnCompleted -> ()
                 }
 
-                let msgs = query ctx stream
+                let msgs = options.Query socketId stream
                 do! msgs.RunAsync msgObserver
 
                 while not finished do
@@ -107,10 +111,10 @@ module Middleware =
 
                     if not finished then
                         let receiveString = System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count)
-                        let msg' = decode receiveString
+                        let msg' = options.Decode receiveString
                         match msg' with
                         | Some msg ->
-                            do! obvAll.OnNextAsync msg
+                            do! obvAll.OnNextAsync (msg, socketId)
                         | None -> ()
 
                 do! webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None) |> Async.AwaitTask
