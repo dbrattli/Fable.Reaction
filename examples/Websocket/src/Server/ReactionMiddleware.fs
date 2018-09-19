@@ -21,7 +21,7 @@ module Middleware =
         {
             /// A query for the stream of all messages
             QueryAll: AsyncObservable<'msg*ConnectionId> -> AsyncObservable<'msg*ConnectionId>
-            /// A query for stream of messages to a given client
+            /// A query for the stream of messages to a given client
             Query: ConnectionId -> AsyncObservable<'msg*ConnectionId> -> AsyncObservable<'msg*ConnectionId>
             /// Encoder for serializing a message to JSON string
             Encode: 'msg -> string
@@ -86,28 +86,34 @@ module Middleware =
             async {
                 let buffer : byte [] = Array.zeroCreate 4096
                 let! ct = Async.CancellationToken
-                let! result = webSocket.ReceiveAsync (new ArraySegment<byte> (buffer), ct) |> Async.AwaitTask
                 let mutable finished = false
 
                 let msgObserver (n: Notification<'msg*ConnectionId>) = async {
                     match n with
-                    | OnNext (x, _) ->
+                    | OnNext (x, _) when not finished ->
                         let newString = options.Encode x
                         let bytes = System.Text.Encoding.UTF8.GetBytes (newString)
-                        do! webSocket.SendAsync (new ArraySegment<byte>(bytes), WebSocketMessageType.Text, result.EndOfMessage, CancellationToken.None) |> Async.AwaitTask
+                        try
+                            do! webSocket.SendAsync (new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None) |> Async.AwaitTask
+                        with
+                        | ex ->
+                            printfn "Unable to write, closing: %A" ex
+                            finished <- true
                     | OnError ex ->
                         printf "Got OnError: %A" ex
                         finished <- true
                     | OnCompleted ->
                         printf "Got OnCompleted"
                         finished <- true
+                    | _ -> ()
+
                 }
 
                 let msgs = options.Query socketId stream
                 do! msgs.RunAsync msgObserver
 
                 while not finished do
-
+                    printfn "Receiveing ..."
                     let! result = webSocket.ReceiveAsync (new ArraySegment<byte>(buffer), ct) |> Async.AwaitTask
                     finished <- result.CloseStatus.HasValue
 
@@ -118,11 +124,12 @@ module Middleware =
                         | Some msg ->
                             do! obvAll.OnNextAsync (msg, socketId)
                         | None -> ()
-
-                do! webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None) |> Async.AwaitTask
+                try
+                    do! webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None) |> Async.AwaitTask
+                with
+                | _ -> ()
                 sockets.Remove webSocket |> ignore
             }
-
 
     type IApplicationBuilder with
         member this.UseReaction<'msg> (getConfig: GetConfig<'msg>) =
