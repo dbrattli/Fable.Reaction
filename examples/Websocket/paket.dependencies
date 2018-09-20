@@ -9,7 +9,7 @@ group Server
     nuget Microsoft.AspNetCore.WebSockets
     nuget Fable.JsonConverter
     nuget Thoth.Json.Net
-    nuget Reaction
+    nuget Reaction 0.11.0
 
 group Client
     storage: none

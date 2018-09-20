@@ -90,6 +90,7 @@ module Middleware =
                 let buffer : byte [] = Array.zeroCreate 4096
                 let! ct = Async.CancellationToken
                 let mutable finished = false
+                let mutable closure = WebSocketCloseStatus.NormalClosure
 
                 let msgObserver (n: Notification<'msg*ConnectionId>) = async {
                     match n with
@@ -102,9 +103,11 @@ module Middleware =
                         with
                         | ex ->
                             logger.LogError("Unable to write to WebSocket, closing ...")
+                            closure <- WebSocketCloseStatus.ProtocolError
                             finished <- true
                     | OnError ex ->
                         logger.LogError ("Reaction stream error (OnError): {Error}", ex.ToString ())
+                        closure <- WebSocketCloseStatus.InternalServerError
                         finished <- true
                     | OnCompleted ->
                         logger.LogInformation ("Reaction stream completed (OnCompleted)")
@@ -121,16 +124,18 @@ module Middleware =
 
                     if not finished then
                         logger.LogDebug ("Received message with {bytes} bytes", result.Count)
-                        let receiveString = System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count)
+                        let receiveString = System.Text.Encoding.UTF8.GetString (buffer, 0, result.Count)
                         let msg' = options.Decode receiveString
                         match msg' with
                         | Some msg ->
                             do! obvAll.OnNextAsync (msg, connectionId)
                         | None -> ()
+                    else
+                        closure <- result.CloseStatus.Value
 
                 logger.LogInformation ("Closing WebSocket with ID: {ConnectionID}", connectionId)
                 try
-                    do! webSocket.CloseAsync (WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None) |> Async.AwaitTask
+                    do! webSocket.CloseAsync (closure, "Closing", CancellationToken.None) |> Async.AwaitTask
                 with
                 | _ -> ()
                 sockets.Remove webSocket |> ignore

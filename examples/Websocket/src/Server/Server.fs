@@ -27,7 +27,11 @@ let webApp =
             }
 
 let query (connectionId: ConnectionId) (msgs: AsyncObservable<Msg*ConnectionId>) : AsyncObservable<Msg*ConnectionId> =
-    msgs |> filter (fun (msg, cId) -> cId <> connectionId)
+    msgs
+    |> filter (fun (msg, cId) -> cId <> connectionId)
+    |> flatMapLatest (fun (x, i) ->
+        interval 100
+        |> map (fun _ -> x, i))
 
 let configureApp (app : IApplicationBuilder) =
     app.UseWebSockets()
