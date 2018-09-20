@@ -11,6 +11,7 @@ open Microsoft.Extensions.DependencyInjection
 open Giraffe.Serialization
 
 open Reaction
+open Microsoft.Extensions.Logging
 
 module Middleware =
     type ConnectionId = string
@@ -31,16 +32,18 @@ module Middleware =
             RequestPath: string
         }
 
-    type GetConfig<'msg> = ReactionConfig<'msg> -> ReactionConfig<'msg>
+    type GetOptions<'msg> = ReactionConfig<'msg> -> ReactionConfig<'msg>
 
-    type ReactionMiddleware<'msg> (next: RequestDelegate, getConfig: GetConfig<'msg>)  =
+    type ReactionMiddleware<'msg> (next: RequestDelegate, getOptions: GetOptions<'msg>)  =
         let sockets = List<WebSocket> ()
         let obvAll, streamAll = stream<'msg*ConnectionId> ()
         let obv, stream = stream<'msg*ConnectionId> ()
         let mutable subscription : AsyncDisposable option = None
 
         member this.Invoke (ctx: HttpContext) =
-            let serializer : IJsonSerializer = ctx.RequestServices.GetService<IJsonSerializer> ()
+            let serializer = ctx.RequestServices.GetService<IJsonSerializer> ()
+            let loggerFactory  = ctx.RequestServices.GetService<ILoggerFactory> ()
+            let logger = loggerFactory.CreateLogger("Reaction.Middleware")
 
             let defaultOptions = {
                 QueryAll = fun msgs -> msgs
@@ -58,7 +61,7 @@ module Middleware =
                 RequestPath = "/ws"
             }
 
-            let options = getConfig defaultOptions
+            let options = getOptions defaultOptions
 
             async {
                 // One time setup of the broadcast query (all sockets)
@@ -72,17 +75,17 @@ module Middleware =
                     | true ->
                         let! webSocket = ctx.WebSockets.AcceptWebSocketAsync() |> Async.AwaitTask
                         let connectionId = ctx.Connection.Id
-                        printfn "Connection ID: %A" connectionId
+                        logger.LogInformation ("Established WebSocket connection with ID: {ConnectionID}", connectionId)
 
                         sockets.Add webSocket
-                        do! this.Reaction connectionId webSocket options
+                        do! this.Reaction connectionId webSocket options logger
 
                     | false -> ctx.Response.StatusCode <- 400
                 else
                     return! next.Invoke ctx |> Async.AwaitTask
             } |> Async.StartAsTask
 
-        member private this.Reaction (socketId: ConnectionId) (webSocket: WebSocket) (options: ReactionConfig<'msg>) : Async<unit> =
+        member private this.Reaction (connectionId: ConnectionId) (webSocket: WebSocket) (options: ReactionConfig<'msg>) (logger: ILogger): Async<unit> =
             async {
                 let buffer : byte [] = Array.zeroCreate 4096
                 let! ct = Async.CancellationToken
@@ -93,44 +96,46 @@ module Middleware =
                     | OnNext (x, _) when not finished ->
                         let newString = options.Encode x
                         let bytes = System.Text.Encoding.UTF8.GetBytes (newString)
+                        logger.LogDebug ("Sending message with {bytes} bytes", bytes.Length)
                         try
                             do! webSocket.SendAsync (new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None) |> Async.AwaitTask
                         with
                         | ex ->
-                            printfn "Unable to write, closing: %A" ex
+                            logger.LogError("Unable to write to WebSocket, closing ...")
                             finished <- true
                     | OnError ex ->
-                        printf "Got OnError: %A" ex
+                        logger.LogError ("Reaction stream error (OnError): {Error}", ex.ToString ())
                         finished <- true
                     | OnCompleted ->
-                        printf "Got OnCompleted"
+                        logger.LogInformation ("Reaction stream completed (OnCompleted)")
                         finished <- true
                     | _ -> ()
-
                 }
 
-                let msgs = options.Query socketId stream
+                let msgs = options.Query connectionId stream
                 do! msgs.RunAsync msgObserver
 
                 while not finished do
-                    printfn "Receiveing ..."
                     let! result = webSocket.ReceiveAsync (new ArraySegment<byte>(buffer), ct) |> Async.AwaitTask
                     finished <- result.CloseStatus.HasValue
 
                     if not finished then
+                        logger.LogDebug ("Received message with {bytes} bytes", result.Count)
                         let receiveString = System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count)
                         let msg' = options.Decode receiveString
                         match msg' with
                         | Some msg ->
-                            do! obvAll.OnNextAsync (msg, socketId)
+                            do! obvAll.OnNextAsync (msg, connectionId)
                         | None -> ()
+
+                logger.LogInformation ("Closing WebSocket with ID: {ConnectionID}", connectionId)
                 try
-                    do! webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None) |> Async.AwaitTask
+                    do! webSocket.CloseAsync (WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None) |> Async.AwaitTask
                 with
                 | _ -> ()
                 sockets.Remove webSocket |> ignore
             }
 
     type IApplicationBuilder with
-        member this.UseReaction<'msg> (getConfig: GetConfig<'msg>) =
-            this.UseMiddleware<ReactionMiddleware<'msg>> getConfig
+        member this.UseReaction<'msg> (getOptions: GetOptions<'msg>) =
+            this.UseMiddleware<ReactionMiddleware<'msg>> getOptions

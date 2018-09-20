@@ -31,8 +31,8 @@ let query (connectionId: ConnectionId) (msgs: AsyncObservable<Msg*ConnectionId>)
 
 let configureApp (app : IApplicationBuilder) =
     app.UseWebSockets()
-       .UseReaction<Msg>(fun config ->
-       { config with
+       .UseReaction<Msg>(fun options ->
+       { options with
            Query = query
            Encode = Msg.Encode
            Decode = Msg.Decode
