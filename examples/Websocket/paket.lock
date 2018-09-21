@@ -1479,7 +1479,7 @@ NUGET
       Fable.Elmish (>= 1.0.3) - restriction: >= netstandard2.0
       Fable.React (>= 3.1.4) - restriction: >= netstandard2.0
       FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
-      Reaction (>= 0.10) - restriction: >= netstandard2.0
+      Reaction (>= 0.9.1) - restriction: >= netstandard2.0
 
 GROUP Server
 STORAGE: NONE
