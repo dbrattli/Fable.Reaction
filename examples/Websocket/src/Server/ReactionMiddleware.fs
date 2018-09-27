@@ -48,8 +48,7 @@ module Middleware =
             let defaultOptions = {
                 QueryAll = fun msgs -> msgs
                 Query = fun _ msgs -> msgs
-                Encode = fun msg ->
-                    serializer.Serialize msg
+                Encode = fun msg -> serializer.Serialize msg
 
                 Decode = fun str ->
                     let msg =

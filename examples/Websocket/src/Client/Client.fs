@@ -96,7 +96,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
                 [ Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ]
                     [ safeComponents ] ] ]
 
-let query (msgs: AsyncObservable<Msg>) =
+let query (msgs: IAsyncObservable<Msg>) =
     msgs
     |> msgChannel "ws://localhost:8085/ws" Msg.Encode Msg.Decode
 

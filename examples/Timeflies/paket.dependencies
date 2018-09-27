@@ -16,8 +16,10 @@ group Client
     source https://api.nuget.org/v3/index.json
 
     nuget Fable.Core
-    nuget Fable.Reaction >= 0.4
+    nuget Fable.Reaction 0.7.1
+    nuget Reaction 0.12.3
     nuget Fable.Elmish.React
+    nuget Fable.Import.Browser
     nuget Elmish
     nuget Fulma
 

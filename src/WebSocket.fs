@@ -3,6 +3,7 @@ namespace Fable.Reaction
 open Fable.Import.Browser
 
 open Reaction
+open Reaction.AsyncObservable
 
 module WebSocket =
 
@@ -11,11 +12,11 @@ module WebSocket =
     /// Websocket channel operator. Passes string items as ws messages to
     /// the server. Received ws messages will be forwarded down stream.
     /// JSON encode/decode of application messages is left to the client.
-    let channel (uri: string) (source: AsyncObservable<string>) : AsyncObservable<string> =
-        let subscribe (obv: Types.AsyncObserver<string>) : Async<Types.AsyncDisposable> =
+    let channel (uri: string) (source: IAsyncObservable<string>) : IAsyncObservable<string> =
+        let subscribe (obv: IAsyncObserver<string>) : Async<IAsyncDisposable> =
             async {
                 let websocket = WebSocket.Create uri
-                let mutable disposable = Core.disposableEmpty
+                let mutable disposable = AsyncDisposable.Empty
 
                 let _obv n = async {
                     match n with
@@ -32,7 +33,7 @@ module WebSocket =
 
                 let onMessage (ev : MessageEvent) =
                     let msg = (string ev.data)
-                    Async.StartImmediate (OnNext msg |> obv)
+                    Async.StartImmediate (obv.OnNextAsync msg)
 
                 let onOpen _ =
                     printfn "onOpen"
@@ -40,7 +41,7 @@ module WebSocket =
                     let action = async {
                         printfn "Subscribing upstream"
                         let! disposable' = source.SubscribeAsync _obv
-                        disposable <- AsyncDisposable.Unwrap disposable'
+                        disposable <- disposable'
                     }
 
                     Async.StartImmediate action
@@ -49,11 +50,11 @@ module WebSocket =
                     printfn "onError: %A" ev
 
                     let ex = WSError (ev.ToString ())
-                    Async.StartImmediate (OnError ex |> obv)
+                    Async.StartImmediate (obv.OnErrorAsync ex)
 
                 let onClose ev =
                     printfn "onClose: %A" ev
-                    Async.StartImmediate (obv OnCompleted)
+                    Async.StartImmediate (obv.OnCompletedAsync ())
 
                 websocket.onmessage <- onMessage
                 websocket.onclose <- onClose
@@ -61,18 +62,18 @@ module WebSocket =
                 websocket.onerror <- onError
 
                 let cancel () = async {
-                    do! disposable ()
+                    do! disposable.DisposeAsync ()
                 }
-                return cancel
+                return AsyncDisposable.Create cancel
             }
 
-        AsyncObservable subscribe
+        AsyncObservable.create subscribe
 
     /// Websocket message channel operator. Items {'msg} will be encoded
     /// to JSON using `encode` and passed as over the ws channel to the server.
     /// Data received on the ws channel as strings (JSON) will be
     /// decoded using `decode` and forwarded down stream as messages {'msg}.
-    let msgChannel<'msg> (uri: string) (encode: 'msg -> string) (decode: string -> 'msg option) (source: AsyncObservable<'msg>) : AsyncObservable<'msg> =
+    let msgChannel<'msg> (uri: string) (encode: 'msg -> string) (decode: string -> 'msg option) (source: IAsyncObservable<'msg>) : IAsyncObservable<'msg> =
         source
         |> map encode
         |> channel uri

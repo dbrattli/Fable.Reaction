@@ -7,6 +7,7 @@ open Fable.Reaction
 open Reaction
 open Elmish
 open Elmish.React
+open Fable.Helpers
 
 // The model holds data that you want to keep track of while the
 // application is running
@@ -45,19 +46,20 @@ let init () : Model =
 let query' msgs =
     Seq.toList "TIME FLIES LIKE AN ARROW"
     |> Seq.mapi (fun i c -> i, c)
-    |> ofSeq
-    |> flatMap (fun (i, c) ->
+    |> AsyncObservable.ofSeq
+    |> AsyncObservable.flatMap (fun (i, c) ->
         fromMouseMoves ()
-        |> delay (100 * i)
-        |> map (fun m -> Letter (i, string c, int m.clientX, int m.clientY)))
+        |> AsyncObservable.delay (100 * i)
+        |> AsyncObservable.map (fun m -> Letter (i, string c, int m.clientX, int m.clientY)))
 
 // Query for message stream transformation (expression style)
 let query msgs =
-    rx {
+    reaction {
         let! i, c = Seq.toList "TIME FLIES LIKE AN ARROW"
                     |> Seq.mapi (fun i c -> i, c)
-                    |> ofSeq
-        let ms = fromMouseMoves () |> delay (100 * i)
+                    |> AsyncObservable.ofSeq
+
+        let ms = fromMouseMoves () |> AsyncObservable.delay (100 * i)
         for m in ms do
             yield Letter (i, string c, int m.clientX, int m.clientY)
     }

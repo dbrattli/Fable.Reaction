@@ -5,6 +5,7 @@ open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fable.Reaction
 open Reaction
+open Reaction.AsyncObservable
 
 open Shared
 open Fulma
@@ -100,7 +101,7 @@ let loadCountCmd =
         |> catch (Error >> InitialCountLoaded >> single)
 
 let query msgs =
-    loadCountCmd + msgs
+    concat [loadCountCmd; msgs]
 
 Program.mkSimple init update view
 |> Program.withQuery query

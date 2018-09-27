@@ -19,7 +19,7 @@ group Client
     nuget Fable.Elmish.Debugger
     nuget Fable.Elmish.React
     nuget Fable.Elmish.HMR
-    nuget Fable.Reaction 0.6.8
+    nuget Fable.Reaction 0.7.1
     nuget Thoth.Json
     nuget Fulma
 

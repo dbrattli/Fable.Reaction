@@ -23,6 +23,18 @@ In addition, Fable Reaction may also have a reaction query that transforms the "
 
 * **Query**, a function that takes the message stream and produces a new (transformed) message stream. Note that this also replaces the need for Elm(ish) commands (Cmd) since the reaction is free to produce any messages (out of thin air), transform, filter, time-shift messages or combine side-effects such as web requests (fetch) etc.
 
+## When to use Fable Reaction
+
+The Elm(ish) way of structuring applications solves most scenarios, and for many applications it does not make sense to use Fable Reaction. The scenarios where it may make sense to use Fable Reaction are:
+
+* Your update function gets complicated and handles messages paired as "do" and "done", e.g `DoFetchResults/DoneFetchResults`. Fable Reaction helps you keep the update function clean and simple.
+
+* You need to combine and orchestrate *multiple* sources of events, e.g mouse moves, clicks, fetch results, websocket events.
+
+* You need to time-shift events, e.g delay, throttle, debounce or set timeouts for actions.
+
+* You need to group and aggregate messages by category, count or time.
+
 ## Howto use with Elmish
 
 To use Fable Reaction with Elmish you need to call the `Program.withQuery` with your query. The query function takes an `AsyncObservable<'msg>` and returns a possibibly transformed `AsyncObservable<'msg>`.

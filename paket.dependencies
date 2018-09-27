@@ -1,5 +1,4 @@
 source https://www.nuget.org/api/v2
-storage: none
 
 nuget coverlet.msbuild
 nuget Microsoft.NET.Test.Sdk
@@ -9,4 +8,4 @@ nuget FsUnit
 nuget Fable.Core
 nuget Fable.Elmish
 nuget Fable.React
-nuget Reaction 0.11.0
+nuget Reaction 0.12.3

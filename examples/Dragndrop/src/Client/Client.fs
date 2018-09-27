@@ -109,15 +109,15 @@ let view (model : Model) (dispatch : Msg -> unit) =
 
 open Fable.Import.Browser
 
-let query (msgs : AsyncObservable<Msg>) : AsyncObservable<Msg> =
+let query (msgs : IAsyncObservable<Msg>) : IAsyncObservable<Msg> =
     let mouseMove = fromMouseMoves ()
     let mouseUp =
         msgs
-        |> choose Msg.asMouseUpEvent
+        |> AsyncObservable.choose Msg.asMouseUpEvent
 
     let mouseDown =
         msgs
-        |> choose Msg.asMouseDownEvent
+        |> AsyncObservable.choose Msg.asMouseDownEvent
 
     (*
     mouseDown
@@ -136,9 +136,9 @@ let query (msgs : AsyncObservable<Msg>) : AsyncObservable<Msg> =
         let startX, startY = ev.clientX - rect.left, ev.clientY - rect.top
 
         yield! mouseMove
-            |> map (fun ev ->
+            |> AsyncObservable.map (fun ev ->
                 MouseDragEvent (ev.clientX - startX, ev.clientY - startY, project))
-            |> takeUntil mouseUp
+            |> AsyncObservable.takeUntil mouseUp
     }
 
 #if DEBUG

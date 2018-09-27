@@ -6,6 +6,7 @@ open Fable.Helpers.React.Props
 open Fable.PowerPack.Fetch
 open Fable.Reaction
 open Reaction
+open Reaction.AsyncObservable
 open Elmish
 open Elmish.React
 open Fulma

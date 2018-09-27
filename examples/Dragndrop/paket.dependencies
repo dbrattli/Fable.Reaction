@@ -11,12 +11,14 @@ group Server
 group Client
     storage: none
     source https://api.nuget.org/v3/index.json
+    source /Users/dbrattli/Developer/packages
 
     nuget Fable.Core
+    nuget Fable.Reaction 0.7.1
+    nuget Reaction 0.12.3
     nuget Fable.Elmish.Debugger
     nuget Fable.Elmish.React
     nuget Fable.Elmish.HMR
-    nuget Fable.Reaction >= 0.4.1
     nuget Fulma
 
     clitool dotnet-fable

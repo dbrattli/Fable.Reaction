@@ -2,11 +2,13 @@ namespace Fable.Reaction
 
 open Elmish
 open Reaction
+open Reaction.AsyncObservable
+open Reaction.Streams
 
 [<RequireQualifiedAccess>]
 module Program =
     /// Attach a Reaction query to the message (Msg) stream of an Elmish program.
-    let withQuery (query: AsyncObservable<'msg> -> AsyncObservable<'msg>) (program: Elmish.Program<_,_,_,_>) =
+    let withQuery (query: IAsyncObservable<'msg> -> IAsyncObservable<'msg>) (program: Elmish.Program<_,_,_,_>) =
         let mutable dispatch' : Dispatch<'msg> = ignore
         let mb, stream = mbStream<'msg> ()
 
