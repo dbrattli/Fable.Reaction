@@ -15,15 +15,16 @@ group Client
     storage: none
     source https://api.nuget.org/v3/index.json
 
-    nuget Fable.Core
-    nuget Fable.Reaction 0.7.1
+    nuget Fable.Core 2.0.0
+    nuget Fable.Reaction 2.0.0-alpha1
     nuget Reaction 0.12.3
-    nuget Fable.Elmish.React
-    nuget Fable.Import.Browser
-    nuget Elmish
+    nuget Fable.Elmish prerelease
+    nuget Fable.Elmish.React prerelease
+    nuget Fable.Import.Browser prerelease
+    nuget Fable.PowerPack prerelease
     nuget Fulma
 
-    clitool dotnet-fable
+    clitool dotnet-fable 2.0.0
 
 group Build
     storage: none
