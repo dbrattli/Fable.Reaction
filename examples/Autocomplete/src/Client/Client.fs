@@ -124,7 +124,7 @@ let view (model: Model) (dispatch : Msg -> unit) =
 let searchWikipedia (term: string) =
     let jsonDecode txt =
         let decoders = Decode.oneOf [ Decode.list Decode.string; (Decode.succeed []) ]
-        Decode.decodeString (Decode.list decoders) txt
+        Decode.fromString (Decode.list decoders) txt
 
     let url = sprintf "http://en.wikipedia.org/w/api.php?action=opensearch&origin=*&format=json&search=%s" term
     let props = [

@@ -3,7 +3,7 @@ group Client
     Fable.Core
     Fable.Reaction
     Fable.Elmish.React
-    Elmish
+    Fable.Elmish
     dotnet-fable
     Fulma
     Thoth.Json
