@@ -1,4 +1,5 @@
 var path = require("path");
+var webpack = require("webpack");
 
 function resolve(filePath) {
     return path.join(__dirname, filePath)
@@ -57,5 +58,9 @@ module.exports = {
                 },
             }
         ]
-    }
+    },
+    plugins: isProduction ? [] : [
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.NamedModulesPlugin()
+    ]
 }
