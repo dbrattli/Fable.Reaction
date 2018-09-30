@@ -1,11 +1,12 @@
 source https://www.nuget.org/api/v2
+storage: none
 
 nuget coverlet.msbuild
 nuget Microsoft.NET.Test.Sdk
 nuget NUnit
 nuget NUnit3TestAdapter
 nuget FsUnit
-nuget Fable.Core
-nuget Fable.Elmish
-nuget Fable.React
-nuget Reaction 0.12.3
+nuget Fable.Core 2.0.0
+nuget Fable.Elmish prerelease
+nuget Fable.React prerelease
+nuget Reaction 0.13.0
