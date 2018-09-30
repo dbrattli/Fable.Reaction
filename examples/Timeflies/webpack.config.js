@@ -5,6 +5,14 @@ function resolve(filePath) {
 }
 
 var babelOptions = {
+    presets: [
+        ["@babel/preset-env", {
+            "targets": {
+                "browsers": ["last 2 versions"]
+            },
+            "modules": false
+        }]
+    ],
     plugins: ["@babel/plugin-transform-runtime"]
 };
 

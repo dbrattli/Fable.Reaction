@@ -112,7 +112,7 @@ NUGET
       System.Threading.Thread (>= 4.3) - restriction: >= netcoreapp1.0
       System.Xml.XmlDocument (>= 4.3) - restriction: >= netcoreapp1.0
       System.Xml.XPath.XmlDocument (>= 4.3) - restriction: >= netcoreapp1.0
-    Reaction (0.12.3)
+    Reaction (0.13)
       FSharp.Control.AsyncSeq (>= 2.0.21) - restriction: >= netstandard2.0
       FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
     runtime.native.System (4.3.1) - restriction: >= netcoreapp1.0

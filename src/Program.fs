@@ -14,20 +14,26 @@ module Program =
 
         let view model dispatch =
             dispatch' <- dispatch
-            program.view model mb.Post
+            program.view model (OnNext >> mb.Post)
 
         let main = async {
-            let msgObserver n = async {
-                match n with
-                | OnNext x -> dispatch' x
-                | OnError ex -> program.onError ("Query error", ex)
-                | OnCompleted -> ()
-            }
+            let msgObserver =
+                { new IAsyncObserver<'msg> with
+                    member this.OnNextAsync x = async {
+                        dispatch' x
+                    }
+                    member this.OnErrorAsync err = async {
+                        program.onError ("Query error", err)
+                    }
+                    member this.OnCompletedAsync () = async {
+                        ()
+                    }
+                }
 
             let msgs = query stream
             do! msgs.RunAsync msgObserver
         }
-        main |> Async.StartImmediate
+        Async.StartImmediate main
 
         { program with view = view }
 
