@@ -866,6 +866,12 @@ NUGET
       Fable.Core (>= 2.0.0-alpha-006) - restriction: >= netstandard2.0
       Fable.Import.Browser (>= 1.1.1) - restriction: >= netstandard2.0
       FSharp.Core (>= 4.3.4) - restriction: >= netstandard2.0
+    Fable.Reaction (2.0.0-alpha1)
+      Fable.Core (>= 2.0) - restriction: >= netstandard2.0
+      Fable.Elmish (>= 2.0.0-beta-4) - restriction: >= netstandard2.0
+      Fable.React (>= 4.0.0-alpha-001) - restriction: >= netstandard2.0
+      FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
+      Reaction (>= 0.12.3) - restriction: >= netstandard2.0
     FSharp.Compiler.Service (25.0.1) - restriction: >= netcoreapp2.0
       FSharp.Core (>= 4.1.18) - restriction: || (>= net45) (>= netstandard2.0)
       System.Collections.Immutable (>= 1.5) - restriction: || (>= net45) (>= netstandard2.0)
@@ -1153,13 +1159,6 @@ NUGET
     Thoth.Json (2.0.0-beta-005) - restriction: >= netstandard2.0
       Fable.Core (>= 2.0.0-beta-001) - restriction: >= netstandard2.0
       FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
-  remote: /Users/dbrattli/Developer/packages
-    Fable.Reaction (2.0.0-beta-001)
-      Fable.Core (>= 2.0) - restriction: >= netstandard2.0
-      Fable.Elmish (>= 2.0.0-beta-4) - restriction: >= netstandard2.0
-      Fable.React (>= 4.0.0-alpha-001) - restriction: >= netstandard2.0
-      FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
-      Reaction (>= 0.12.3) - restriction: >= netstandard2.0
 
 GROUP Server
 STORAGE: NONE
