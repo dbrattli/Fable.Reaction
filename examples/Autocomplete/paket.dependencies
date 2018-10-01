@@ -17,7 +17,7 @@ group Client
 
     nuget Fable.Core 2.0.0
     nuget Fable.Reaction 2.0.0-beta1
-    nuget Reaction 0.13.0
+    nuget Reaction 0.13.1
     nuget Fable.Elmish prerelease
     nuget Fable.Elmish.React prerelease
     nuget Fable.Import.Browser prerelease
