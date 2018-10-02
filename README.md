@@ -37,7 +37,7 @@ The Elm(ish) way of structuring applications solves most scenarios, and for many
 
 ## Howto use with Elmish
 
-To use Fable Reaction with Elmish you need to call the `Program.withQuery` with your query. The query function takes an `AsyncObservable<'msg>` and returns a possibibly transformed `AsyncObservable<'msg>`.
+To use Fable Reaction with Elmish you need to call the `Program.withQuery` with your query. The query function takes an `IAsyncObservable<'msg>` and returns a possibibly transformed `IAsyncObservable<'msg>`.
 
 ```f#
 open Reaction        // 1. Open Reaction, for operators such as delay.
@@ -130,7 +130,7 @@ let view (dispatch : Dispatch<Msg>) (model : Model)  =
 let init () : Model = { Letters = Map.empty }
 
 // Message stream transformation using Reaction
-let query (msgs : AsyncObservable<Msg>) : AsyncObservable<Msg>) =
+let query (msgs : IAsyncObservable<Msg>) : IAsyncObservable<Msg>) =
     rx {
         let! i, c = Seq.toList "TIME FLIES LIKE AN ARROW"
                     |> Seq.mapi (fun i c -> i, c)
