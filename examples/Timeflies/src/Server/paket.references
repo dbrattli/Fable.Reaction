@@ -4,3 +4,4 @@ group Server
     Microsoft.AspNetCore
     Microsoft.AspNetCore.StaticFiles
     Fable.JsonConverter
+    TaskBuilder.fs

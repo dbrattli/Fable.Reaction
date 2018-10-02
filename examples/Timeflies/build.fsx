@@ -30,7 +30,7 @@ let platformTool tool winTool =
 let nodeTool = platformTool "node" "node.exe"
 let yarnTool = platformTool "yarn" "yarn.cmd"
 
-let install = lazy DotNet.install DotNet.Versions.Release_2_1_300
+let install = lazy DotNet.install DotNet.Versions.Release_2_1_402
 
 let inline withWorkDir wd =
     DotNet.Options.lift install.Value

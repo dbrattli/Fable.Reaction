@@ -6,10 +6,11 @@ group Server
     source https://api.nuget.org/v3/index.json
 
     nuget FSharp.Core
-    nuget Giraffe ~> 1
+    nuget Giraffe ~> 3
     nuget Microsoft.AspNetCore
     nuget Microsoft.AspNetCore.StaticFiles
     nuget Fable.JsonConverter
+    nuget TaskBuilder.fs
 
 group Client
     storage: none
