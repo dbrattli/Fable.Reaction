@@ -24,8 +24,9 @@ type Model = { Counter: Counter option }
 let init () : Model * Cmd<Msg> =
     let initialModel = { Counter = None }
     let loadCountCmd =
+        let decoder = Thoth.Json.Decode.int
         Cmd.ofPromise
-            (fetchAs<int> "/api/init")
+            (fetchAs<int> "/api/init" decoder)
             []
             (Ok >> InitialCountLoaded)
             (Result.Error >> InitialCountLoaded)

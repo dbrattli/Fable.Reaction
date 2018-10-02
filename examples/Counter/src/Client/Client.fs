@@ -96,7 +96,8 @@ let view (model : Model) (dispatch : Msg -> unit) =
                     [ safeComponents ] ] ]
 
 let loadCountCmd =
-    ofPromise (fetchAs<int> "/api/init" [])
+    let decoder = Thoth.Json.Decode.int
+    ofPromise (fetchAs<int> "/api/init" decoder [])
         |> map (Ok >> InitialCountLoaded)
         |> catch (Error >> InitialCountLoaded >> single)
 

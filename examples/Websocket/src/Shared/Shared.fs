@@ -25,7 +25,7 @@ type Msg =
             | _ ->
                 Encode.object []
 
-        Encode.encode 4 data
+        Encode.toString 4 data
 
     static member Decode (json: string) : Option<Msg> =
         let decodeMsg =
@@ -36,7 +36,7 @@ type Msg =
                             | "decrement" -> Decrement
                             | _ -> Decrement
                           )
-        let result = Decode.decodeString decodeMsg json
+        let result = Decode.fromString decodeMsg json
 
         match result with
         | Ok msg ->

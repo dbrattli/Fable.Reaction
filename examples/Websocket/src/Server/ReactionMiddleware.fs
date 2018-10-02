@@ -11,19 +11,21 @@ open Microsoft.Extensions.DependencyInjection
 open Giraffe.Serialization
 
 open Reaction
+open Reaction.AsyncObservable
+open Reaction.Streams
 open Microsoft.Extensions.Logging
 
 module Middleware =
     type ConnectionId = string
-    type Query<'msg> = ConnectionId -> AsyncObservable<'msg*ConnectionId> -> AsyncObservable<'msg*ConnectionId>
+    type Query<'msg> = ConnectionId -> IAsyncObservable<'msg*ConnectionId> -> IAsyncObservable<'msg*ConnectionId>
 
     [<CLIMutable>]
     type ReactionConfig<'msg> =
         {
             /// A query for the stream of all messages
-            QueryAll: AsyncObservable<'msg*ConnectionId> -> AsyncObservable<'msg*ConnectionId>
+            QueryAll: IAsyncObservable<'msg*ConnectionId> -> IAsyncObservable<'msg*ConnectionId>
             /// A query for the stream of messages to a given client
-            Query: ConnectionId -> AsyncObservable<'msg*ConnectionId> -> AsyncObservable<'msg*ConnectionId>
+            Query: ConnectionId -> IAsyncObservable<'msg*ConnectionId> -> IAsyncObservable<'msg*ConnectionId>
             /// Encoder for serializing a message to JSON string
             Encode: 'msg -> string
             /// Decoder for deserializing a JSON string to a message
@@ -38,7 +40,7 @@ module Middleware =
         let sockets = List<WebSocket> ()
         let obvAll, streamAll = stream<'msg*ConnectionId> ()
         let obv, stream = stream<'msg*ConnectionId> ()
-        let mutable subscription : AsyncDisposable option = None
+        let mutable subscription : IAsyncDisposable option = None
 
         member this.Invoke (ctx: HttpContext) =
             let serializer = ctx.RequestServices.GetService<IJsonSerializer> ()

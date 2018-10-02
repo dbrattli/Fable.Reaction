@@ -1,6 +1,6 @@
 group Client
     FSharp.Core
-    Elmish
+    Fable.Elmish
     Fable.Core
     Fable.Reaction
     Fable.Elmish.React

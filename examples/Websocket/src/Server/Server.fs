@@ -13,6 +13,7 @@ open Shared
 open Giraffe.Serialization
 open WebSocketApp.Middleware
 open Reaction
+open Reaction.AsyncObservable
 
 let publicPath = Path.GetFullPath "../Client/public"
 let port = 8085us
@@ -26,12 +27,13 @@ let webApp =
                 return! Successful.OK counter next ctx
             }
 
-let query (connectionId: ConnectionId) (msgs: AsyncObservable<Msg*ConnectionId>) : AsyncObservable<Msg*ConnectionId> =
+let query (connectionId: ConnectionId) (msgs: IAsyncObservable<Msg*ConnectionId>) : IAsyncObservable<Msg*ConnectionId> =
     msgs
     |> filter (fun (msg, cId) -> cId <> connectionId)
     |> flatMapLatest (fun (x, i) ->
-        interval 100
-        |> map (fun _ -> x, i))
+        interval 100 100
+        |> map (fun _ -> x, i)
+    )
 
 let configureApp (app : IApplicationBuilder) =
     app.UseWebSockets()

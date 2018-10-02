@@ -1,51 +1,50 @@
 var path = require("path");
 var webpack = require("webpack");
-var fableUtils = require("fable-utils");
 
 function resolve(filePath) {
     return path.join(__dirname, filePath)
 }
 
-var babelOptions = fableUtils.resolveBabelOptions({
+var babelOptions = {
     presets: [
-        ["env", {
+        ["@babel/preset-env", {
             "targets": {
                 "browsers": ["last 2 versions"]
             },
             "modules": false
         }]
     ],
-    plugins: ["transform-runtime"]
-});
-
+    plugins: ["@babel/plugin-transform-runtime"]
+};
 
 var isProduction = process.argv.indexOf("-p") >= 0;
-var port = process.env.SUAVE_FABLE_PORT || "8085";
 console.log("Bundling for " + (isProduction ? "production" : "development") + "...");
+var port = process.env.SUAVE_FABLE_PORT || "8085";
 
 module.exports = {
     devtool: "source-map",
-    entry: resolve('./Client.fsproj'),
-    mode: isProduction ? "production" : "development",
+    mode: "development",
+    entry: "./src/Client/Client.fsproj",
     output: {
-        path: resolve('./public/js'),
+        path: path.join(__dirname, "./src/Client/public/js"),
         publicPath: "/js",
-        filename: "bundle.js"
-    },
-    resolve: {
-        symlinks: false,
-        modules: [resolve("../../node_modules/")]
+        filename: "bundle.js",
     },
     devServer: {
+        contentBase: "./src/Client/public",
+        port: 8080,
         proxy: {
             '/api/*': {
                 target: 'http://localhost:' + port,
                 changeOrigin: true
             }
         },
-        contentBase: "./public",
         hot: true,
         inline: true
+    },
+    resolve: {
+        symlinks: false,
+        modules: [resolve("node_modules/")]
     },
     module: {
         rules: [
@@ -73,4 +72,5 @@ module.exports = {
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NamedModulesPlugin()
     ]
-};
+}
+
