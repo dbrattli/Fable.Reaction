@@ -3,13 +3,15 @@ group Server
     source https://api.nuget.org/v3/index.json
 
     nuget FSharp.Core
-    nuget Giraffe ~> 1
+    nuget Giraffe ~> 3
     nuget Microsoft.AspNetCore
     nuget Microsoft.AspNetCore.StaticFiles
     nuget Microsoft.AspNetCore.WebSockets
     nuget Fable.JsonConverter
     nuget Thoth.Json.Net 2.0.0
     nuget Reaction 0.13.1
+    nuget Reaction.Giraffe 0.2.0
+    nuget TaskBuilder.fs
 
 group Client
     storage: none
@@ -31,6 +33,6 @@ group Build
 
     nuget FSharp.Core 4.3.4 // https://github.com/fsharp/FAKE/issues/2001
     nuget Fake.Core.Target
-    nuget Fake.DotNet.Cli
+    nuget Fake.DotNet.Cli 5.7.2
     nuget Fake.IO.FileSystem
 

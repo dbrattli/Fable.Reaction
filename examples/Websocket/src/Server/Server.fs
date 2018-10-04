@@ -8,12 +8,14 @@ open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.DependencyInjection
 
 open Giraffe
-open Shared
+open FSharp.Control.Tasks.V2.ContextInsensitive
 
 open Giraffe.Serialization
-open WebSocketApp.Middleware
+open Reaction.Giraffe.Middleware
 open Reaction
 open Reaction.AsyncObservable
+
+open Shared
 
 let publicPath = Path.GetFullPath "../Client/public"
 let port = 8085us

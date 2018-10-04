@@ -7,3 +7,5 @@ group Server
     Fable.JsonConverter
     Thoth.Json.Net
     Reaction
+    Reaction.Giraffe
+    TaskBuilder.fs

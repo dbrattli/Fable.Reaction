@@ -30,7 +30,7 @@ let platformTool tool winTool =
 let nodeTool = platformTool "node" "node.exe"
 let yarnTool = platformTool "yarn" "yarn.cmd"
 
-let install = lazy DotNet.install DotNet.Versions.Release_2_1_300
+let install = lazy DotNet.install DotNet.Versions.Release_2_1_402
 
 let inline withWorkDir wd =
     DotNet.Options.lift install.Value
@@ -80,7 +80,7 @@ Target.create "RestoreServer" (fun _ ->
 
 Target.create "Build" (fun _ ->
     runDotNet "build" serverPath
-    runDotNet "fable webpack --port free -- -p" clientPath
+    runDotNet "fable webpack -- -p" clientPath
 )
 
 Target.create "Run" (fun _ ->
@@ -88,7 +88,7 @@ Target.create "Run" (fun _ ->
         runDotNet "watch run" serverPath
     }
     let client = async {
-        runDotNet "fable webpack-dev-server --port free" clientPath
+        runDotNet "fable webpack-dev-server" clientPath
     }
     let browser = async {
         do! Async.Sleep 5000
