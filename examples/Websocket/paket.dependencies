@@ -33,6 +33,6 @@ group Build
 
     nuget FSharp.Core 4.3.4 // https://github.com/fsharp/FAKE/issues/2001
     nuget Fake.Core.Target
-    nuget Fake.DotNet.Cli 5.7.2
+    nuget Fake.DotNet.Cli
     nuget Fake.IO.FileSystem
 
