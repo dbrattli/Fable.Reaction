@@ -30,12 +30,6 @@ let platformTool tool winTool =
 let nodeTool = platformTool "node" "node.exe"
 let yarnTool = platformTool "yarn" "yarn.cmd"
 
-let install = lazy DotNet.install DotNet.Versions.Release_2_1_300
-
-let inline withWorkDir wd =
-    DotNet.Options.lift install.Value
-    >> DotNet.Options.withWorkingDirectory wd
-
 let runTool cmd args workingDir =
     let result =
         Process.execSimple (fun info ->
@@ -48,7 +42,7 @@ let runTool cmd args workingDir =
 
 let runDotNet cmd workingDir =
     let result =
-        DotNet.exec (withWorkDir workingDir) cmd ""
+        DotNet.exec (DotNet.Options.withWorkingDirectory workingDir) cmd ""
     if result.ExitCode <> 0 then failwithf "'dotnet %s' failed in %s" cmd workingDir
 
 let openBrowser url =
