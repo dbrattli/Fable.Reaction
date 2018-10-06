@@ -19,6 +19,7 @@ var babelOptions = {
 
 var isProduction = process.argv.indexOf("-p") >= 0;
 console.log("Bundling for " + (isProduction ? "production" : "development") + "...");
+var port = process.env.SUAVE_FABLE_PORT || "8085";
 
 module.exports = {
     devtool: "source-map",
@@ -30,8 +31,16 @@ module.exports = {
         filename: "bundle.js",
     },
     devServer: {
+        proxy: {
+            '/api/*': {
+                target: 'http://localhost:' + port,
+                changeOrigin: true
+            }
+        },
         contentBase: "./src/Client/public",
         port: 8080,
+        hot: true,
+        inline: true
     },
     resolve: {
         symlinks: false,
