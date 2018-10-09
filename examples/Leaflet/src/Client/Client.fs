@@ -78,7 +78,7 @@ let button txt onClick =
           Button.OnClick onClick ]
         [ str txt ]
 
-let view (model : Model) (dispatch : Msg -> unit) =
+let view model dispatch =
     let zoom =
         match model.Counter with
         | Some value -> value
@@ -94,12 +94,12 @@ let view (model : Model) (dispatch : Msg -> unit) =
         ]
 
         ReactLeaflet.map [
-             MapProps.Center !^ (69.4, 24.2)
-             MapProps.SetView true
-             MapProps.Zoom zoom
-             MapProps.ZoomSnap 0.1
-             MapProps.Id "myMap"
-             MapProps.Style [ CSSProp.Height "500px" ]
+            MapProps.Center !^ (69.4, 24.2)
+            MapProps.SetView true
+            MapProps.Zoom zoom
+            MapProps.ZoomSnap 0.1
+            MapProps.Id "myMap"
+            MapProps.Style [ CSSProp.Height "500px" ]
         ] [
             tileLayer [
                 TileLayerProps.Attribution "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"
