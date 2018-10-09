@@ -47,7 +47,6 @@ let update (msg : Msg) (currentModel : Model) : Model =
 
     | _ -> currentModel
 
-
 let safeComponents =
     let components =
         span [ ]
