@@ -30,12 +30,6 @@ let platformTool tool winTool =
 let nodeTool = platformTool "node" "node.exe"
 let yarnTool = platformTool "yarn" "yarn.cmd"
 
-let install = lazy DotNet.install DotNet.Versions.Release_2_1_300
-
-let inline withWorkDir wd =
-    DotNet.Options.lift install.Value
-    >> DotNet.Options.withWorkingDirectory wd
-
 let runTool cmd args workingDir =
     let result =
         Process.execSimple (fun info ->
@@ -48,7 +42,7 @@ let runTool cmd args workingDir =
 
 let runDotNet cmd workingDir =
     let result =
-        DotNet.exec (withWorkDir workingDir) cmd ""
+        DotNet.exec (DotNet.Options.withWorkingDirectory workingDir) cmd ""
     if result.ExitCode <> 0 then failwithf "'dotnet %s' failed in %s" cmd workingDir
 
 let openBrowser url =
@@ -80,7 +74,7 @@ Target.create "RestoreServer" (fun _ ->
 
 Target.create "Build" (fun _ ->
     runDotNet "build" serverPath
-    runDotNet "fable webpack -- -p" clientPath
+    runDotNet "fable webpack --port free -- -p" clientPath
 )
 
 Target.create "Run" (fun _ ->
@@ -88,7 +82,7 @@ Target.create "Run" (fun _ ->
         runDotNet "watch run" serverPath
     }
     let client = async {
-        runDotNet "fable webpack-dev-server" clientPath
+        runDotNet "fable webpack-dev-server --port free" clientPath
     }
     let browser = async {
         do! Async.Sleep 5000
