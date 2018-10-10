@@ -21,7 +21,7 @@ group Client
     nuget Fable.Elmish.Debugger 2.0.0
     nuget Fable.Elmish.React 2.0.0
     nuget Fable.Elmish.HMR 2.0.0
-    nuget Fable.Reaction 2.0.0-beta1
+    nuget Fable.Reaction 2.0.0-beta2
     nuget Thoth.Json 2.0.0
     nuget Fulma
 

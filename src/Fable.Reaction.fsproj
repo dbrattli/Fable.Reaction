@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Fable.Reaction</PackageId>
     <Version>2.0.0</Version>
-    <PackageVersion>2.0.0-beta1</PackageVersion>
+    <PackageVersion>2.0.0-beta2</PackageVersion>
     <Authors>Dag Brattli</Authors>
     <Company>Brattli Labs</Company>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <Compile Include="Reaction.fs" />
-    <Compile Include="Websocket.fs" />
+    <Compile Include="WebSocket.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
