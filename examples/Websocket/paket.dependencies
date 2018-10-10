@@ -25,7 +25,7 @@ group Client
     nuget Thoth.Json 2.0.0
     nuget Fulma
 
-    clitool dotnet-fable 2.0.1
+    clitool dotnet-fable 2.0.3
 
 group Build
     storage: none
