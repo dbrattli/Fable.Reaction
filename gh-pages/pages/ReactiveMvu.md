@@ -2,7 +2,7 @@
 
 Fable Reaction is very similar to [Elm](http://elm-lang.org/) and [Elmish](https://elmish.github.io/) in regards to the [MVU architecture](https://guide.elm-lang.org/architecture/). But when using Fable Reaction, we do not need any commands (`Cmd`) or subscriptions with Elmish. Instead we use a [ReactiveX](http://reactivex.io/) (Rx) style query that transforms the stream of messages (`Msg`).
 
-<img src="images/R-MVU.png" width="550">
+<img src="https://raw.githubusercontent.com/dbrattli/Fable.Reaction/master/gh-pages/images/R-MVU.png" width="550">
 
 * **Model**, application state as immutable data
 * **View**, a pure function that takes the model to produce the output view (HTML elements)
