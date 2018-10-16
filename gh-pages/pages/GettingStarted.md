@@ -1,9 +1,9 @@
 # Howto use with Elmish
 
-To use Fable Reaction with Elmish you need to call the `Program.withQuery` with your query. The query function takes an `IAsyncObservable<'msg>` and returns a possibibly transformed `IAsyncObservable<'msg>`.
+To use Fable Reaction with Elmish you need to call the `Program.withQuery` with your reactive query. The query function takes an `IAsyncObservable<'msg>` and returns a possibibly transformed `IAsyncObservable<'msg>`.
 
 ```f#
-open Reaction        // 1. Open Reaction, for operators such as delay.
+open Reaction.AsyncObservable // 1. Open AsyncObserable for operators such as delay.
 open Fable.Reaction  // 2. Open Fable.Reaction
 
 // (your Elmish program here)
@@ -19,16 +19,20 @@ Program.mkSimple init update view
 
 ## Loading initial State
 
-To load initial state from the server without using commands (`Cmd`) you create an Async Observable using `ofPromise` can concat (`+`) the result into the message stream. Thus the message stream in the example below will start with the initialCountLoaded message.
+To load initial state from the server without using commands (`Cmd`) you create an Async Observable using `ofPromise` and then concat the result into the message stream. Thus the message stream in the example below will start with the initialCountLoaded message.
 
 ```f#
+// Add open statements to top of file
+open Reaction.AsyncObservable
+open Fable.Reaction
+
 let loadCount =
     ofPromise (fetchAs<int> "/api/init" [])
         |> map (Ok >> InitialCountLoaded)
         |> catch (Error >> InitialCountLoaded >> single)
 
 let query msgs =
-    loadCount + msgs
+    concat [loadCount; msgs]
 ```
 
 ## Doing side effects per message
@@ -38,6 +42,10 @@ The `flatMapLatest` operator is a combination of the `map` and `switchLatest` op
 `flatMap` but will auto-cancel any ongoing fetch operation if a new query is made before the previous result is ready.
 
 ```f#
+// Add open statements to top of file
+open Reaction.AsyncObservable
+open Fable.Reaction
+
 let query msgs =
     msgs
     |> choose Msg.asKeyboardEvent
@@ -48,4 +56,3 @@ let query msgs =
     |> flatMapLatest searchWikipedia
 
 ```
-
