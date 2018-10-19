@@ -110,7 +110,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
 open Fable.Import.Browser
 
 let query (msgs : IAsyncObservable<Msg>) : IAsyncObservable<Msg> =
-    let mouseMove = fromMouseMoves ()
+    let mouseMove = ofMouseMove ()
     let mouseUp =
         msgs
         |> AsyncObservable.choose Msg.asMouseUpEvent

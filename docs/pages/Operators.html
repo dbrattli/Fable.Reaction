@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>Getting Started · GitBook</title>
+        <title>Opeartors · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.3">
@@ -57,10 +57,10 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="Operators.html" />
+    <link rel="next" href="Examples.html" />
     
     
-    <link rel="prev" href="ReactiveMvu.html" />
+    <link rel="prev" href="GettingStarted.html" />
     
 
     </head>
@@ -115,7 +115,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.3" data-path="GettingStarted.html">
+        <li class="chapter " data-level="1.3" data-path="GettingStarted.html">
             
                 <a href="GettingStarted.html">
             
@@ -128,7 +128,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.4" data-path="Operators.html">
+        <li class="chapter active" data-level="1.4" data-path="Operators.html">
             
                 <a href="Operators.html">
             
@@ -197,7 +197,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >Getting Started</a>
+        <a href=".." >Opeartors</a>
     </h1>
 </div>
 
@@ -212,52 +212,18 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="howto-use-with-elmish">Howto use with Elmish</h1>
-<p>To use Fable Reaction with Elmish you need to call the <code>Program.withQuery</code> with your reactive query. The query function takes an <code>IAsyncObservable&lt;&apos;msg&gt;</code> and returns a possibibly transformed <code>IAsyncObservable&lt;&apos;msg&gt;</code>.</p>
-<pre><code class="lang-f#">open Reaction.AsyncObservable // 1. Open AsyncObserable for operators such as delay.
-open Fable.Reaction  // 2. Open Fable.Reaction
-
-// (your Elmish program here)
-
-let query msgs = // 3. Add reactive query
-    msgs |&gt; delay 1000
-
-Program.mkSimple init update view
-|&gt; Program.withQuery query       // 4. Enable the query in Elmish
-|&gt; Program.withReact &quot;elmish-app&quot;
-|&gt; Program.run
-</code></pre>
-<h2 id="loading-initial-state">Loading initial State</h2>
-<p>To load initial state from the server without using commands (<code>Cmd</code>) you create an Async Observable using <code>ofPromise</code> and then concat the result into the message stream. Thus the message stream in the example below will start with the initialCountLoaded message.</p>
-<pre><code class="lang-f#">// Add open statements to top of file
-open Reaction.AsyncObservable
-open Fable.Reaction
-
-let loadCount =
-    ofPromise (fetchAs&lt;int&gt; &quot;/api/init&quot; [])
-        |&gt; map (Ok &gt;&gt; InitialCountLoaded)
-        |&gt; catch (Error &gt;&gt; InitialCountLoaded &gt;&gt; single)
-
-let query msgs =
-    concat [loadCount; msgs]
-</code></pre>
-<h2 id="doing-side-effects-per-message">Doing side effects per message</h2>
-<p>In the example below we flat map (map and merge) the result of querying Wikipedia back into the message stream.
-The <code>flatMapLatest</code> operator is a combination of the <code>map</code> and <code>switchLatest</code> operators. This operator works like
-<code>flatMap</code> but will auto-cancel any ongoing fetch operation if a new query is made before the previous result is ready.</p>
-<pre><code class="lang-f#">// Add open statements to top of file
-open Reaction.AsyncObservable
-open Fable.Reaction
-
-let query msgs =
-    msgs
-    |&gt; choose Msg.asKeyboardEvent
-    |&gt; map targetValue
-    |&gt; filter (fun term -&gt; term.Length &gt; 2 || term.Length = 0)
-    |&gt; debounce 750          // Pause for 750ms
-    |&gt; distinctUntilChanged  // Only if the value has changed
-    |&gt; flatMapLatest searchWikipedia
-</code></pre>
+                                <h1 id="fablereaction-operators">Fable.Reaction Operators</h1>
+<p>Fable.Reaction may use any operator from <a href="https://dbrattli.github.io/Reaction/pages/Operators.html" target="_blank">Reaction</a>.
+In addition the following Fable.Reaction specific operators have been defined.</p>
+<h2 id="ofpromise">ofPromise</h2>
+<p>The operator <code>ofPromise</code> converts a Promise to an Async Observable. If the promise resolves with a value,
+then the observable will produce a single value (<code>OnNext</code>) and then complete with <code>OnCompleted</code>.</p>
+<p>This operator is very handy for merging (<code>flatMap</code>) web request responses into the reactive pipeline.</p>
+<h2 id="ofmousemove">ofMouseMove</h2>
+<p>The operator <code>ofMouseMove</code> produces events of type <code>Fable.Import.Browser.MouseEvent</code>  by attaching
+an event listener on the <code>Window</code>. Thus you want to use this to get mouse moves independent of
+any HTML elements. To mouse moves from a particular HTML element you should probably use the <code>OnMouseMove</code>
+property and dispatch a message instead.</p>
 
                                 
                                 </section>
@@ -285,12 +251,12 @@ let query msgs =
 
             
                 
-                <a href="ReactiveMvu.html" class="navigation navigation-prev " aria-label="Previous page: Reactive MVU">
+                <a href="GettingStarted.html" class="navigation navigation-prev " aria-label="Previous page: Getting Started">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="Operators.html" class="navigation navigation-next " aria-label="Next page: Opeartors">
+                <a href="Examples.html" class="navigation navigation-next " aria-label="Next page: Examples">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -301,7 +267,7 @@ let query msgs =
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Getting Started","level":"1.3","depth":1,"next":{"title":"Opeartors","level":"1.4","depth":1,"path":"pages/Operators.md","ref":"pages/Operators.md","articles":[]},"previous":{"title":"Reactive MVU","level":"1.2","depth":1,"path":"pages/ReactiveMvu.md","ref":"pages/ReactiveMvu.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"pages/GettingStarted.md","mtime":"2018-10-16T03:58:17.161Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-10-19T12:26:58.346Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Opeartors","level":"1.4","depth":1,"next":{"title":"Examples","level":"1.5","depth":1,"path":"pages/Examples.md","ref":"pages/Examples.md","articles":[]},"previous":{"title":"Getting Started","level":"1.3","depth":1,"path":"pages/GettingStarted.md","ref":"pages/GettingStarted.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"pages/Operators.md","mtime":"2018-10-19T12:26:38.023Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-10-19T12:26:58.346Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
