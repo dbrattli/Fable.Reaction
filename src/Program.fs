@@ -1,5 +1,7 @@
 namespace Fable.Reaction
 
+open System
+
 open Elmish
 open Reaction
 open Reaction.AsyncObservable
@@ -11,10 +13,8 @@ module Program =
     let withQuery (query: IAsyncObservable<'msg> -> IAsyncObservable<'msg>) (program: Elmish.Program<_,_,_,_>) =
         let mutable dispatch' : Dispatch<'msg> = ignore
         let mb, stream = mbStream<'msg> ()
-
-        let view model dispatch =
-            dispatch' <- dispatch
-            program.view model (OnNext >> mb.Post)
+        let mutable running = false
+        let post = OnNext >> mb.Post
 
         let main = async {
             let msgObserver =
@@ -23,17 +23,24 @@ module Program =
                         dispatch' x
                     }
                     member this.OnErrorAsync err = async {
-                        program.onError ("Query error", err)
+                        program.onError ("Reaction query error", err)
                     }
                     member this.OnCompletedAsync () = async {
-                        ()
+                        program.onError ("Reaction query completed", Exception ())
                     }
                 }
 
             let msgs = query stream
             do! msgs.RunAsync msgObserver
         }
-        Async.StartImmediate main
+
+        let view model dispatch =
+            if not running then
+                running <- true
+                Async.StartImmediate main
+
+            dispatch' <- dispatch
+            program.view model post
 
         { program with view = view }
 
