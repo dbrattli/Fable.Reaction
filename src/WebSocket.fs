@@ -21,7 +21,6 @@ module WebSocket =
                 let _obv n = async {
                     match n with
                     | OnNext msg ->
-                        printfn "Sending %A" msg
                         websocket.send msg
                     | OnError ex ->
                         printfn "OnError: closing"
@@ -36,10 +35,7 @@ module WebSocket =
                     Async.StartImmediate (obv.OnNextAsync msg)
 
                 let onOpen _ =
-                    printfn "onOpen"
-
                     let action = async {
-                        printfn "Subscribing upstream"
                         let! disposable' = source.SubscribeAsync _obv
                         disposable <- disposable'
                     }
@@ -47,13 +43,10 @@ module WebSocket =
                     Async.StartImmediate action
 
                 let onError ev =
-                    printfn "onError: %A" ev
-
                     let ex = WSError (ev.ToString ())
                     Async.StartImmediate (obv.OnErrorAsync ex)
 
                 let onClose ev =
-                    printfn "onClose: %A" ev
                     Async.StartImmediate (obv.OnCompletedAsync ())
 
                 websocket.onmessage <- onMessage
@@ -78,3 +71,13 @@ module WebSocket =
         |> map encode
         |> channel uri
         |> choose decode
+
+    /// Websocket message channel operator. Items {'msg} will be encoded
+    /// to JSON using `encode` and passed as over the ws channel to the server.
+    /// Data received on the ws channel as strings (JSON) will be
+    /// decoded using `decode` and forwarded down stream as messages {Result<'msg, exn>}.
+    let msgResultChannel<'msg> (uri: string) (encode: 'msg -> string) (decode: string -> Result<'msg, exn>) (source: IAsyncObservable<'msg>) : IAsyncObservable<Result<'msg, exn>> =
+        source
+        |> map encode
+        |> channel uri
+        |> map decode
