@@ -47,11 +47,11 @@ module Program =
 
     /// Experimental!
     /// Attach a named Reaction query to the message (Msg) stream of an Elmish program.
-    /// The supplied query function will be called every time the model has been updated.
-    /// The returned query must be named using the operator `named`. If the query
-    /// function changes the name of the returned query, then the previous query will
+    /// The supplied query function will be called every time the model is updated.
+    /// The returned query must be named using the `named` operator. If the query
+    /// function retures a query with a new name, then the previous query will
     /// be disposed and the new query will be subscribed. This makes it possible to
-    /// dynamically change the query based on the current state (Model).
+    /// dynamically change the query at runtime based on the current state (Model).
     let withNamedQuery (query: 'model -> IAsyncObservable<'msg> -> INamedAsyncObservable<'msg>) (program: Elmish.Program<_,_,_,_>) =
         let mutable dispatch' : Dispatch<'msg> = ignore
         let mutable currentMsgs = empty () |> named "noop"
