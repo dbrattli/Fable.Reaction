@@ -18,7 +18,7 @@ The Elm(ish) way of structuring applications solves most scenarios, and for many
 
 - Your update function gets very complicated and handles messages paired as "do" and "done", e.g `DoFetchResults/DoneFetchResults`. Fable Reaction helps you keep the update function clean and simple.
 
-- You need to combine and orchestrate *multiple* sources of events, e.g mouse moves, clicks, fetch results, websocket events.
+- You need to combine and orchestrate *multiple* sources of events, e.g mouse moves, clicks, fetch results, websocket messages.
 
 - You need to time-shift events, e.g delay, throttle, debounce or set timeouts for actions.
 
