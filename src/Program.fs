@@ -6,44 +6,41 @@ open Elmish
 open Reaction
 open Reaction.AsyncObservable
 open Reaction.Streams
+open Reaction
 
 [<RequireQualifiedAccess>]
 module Program =
     /// Attach a Reaction query to the message (Msg) stream of an Elmish program.
     /// The supplied query function is called once by the Elmish runtime.
     let withQuery (query: IAsyncObservable<'msg> -> IAsyncObservable<'msg>) (program: Elmish.Program<_,_,_,_>) =
-        let mutable dispatch' : Dispatch<'msg> = ignore
         let mb, stream = mbStream<'msg> ()
-        let mutable running = false
-        let post = OnNext >> mb.Post
 
-        let main = async {
-            let msgObserver =
-                { new IAsyncObserver<'msg> with
-                    member this.OnNextAsync x = async {
-                        dispatch' x
-                    }
-                    member this.OnErrorAsync err = async {
-                        program.onError ("Reaction query error", err)
-                    }
-                    member this.OnCompletedAsync () = async {
-                        program.onError ("Reaction query completed", Exception ())
-                    }
+        let subscribe model : Cmd<'msg> =
+            let sub dispatch =
+                let main = async {
+                    let msgObserver =
+                        { new IAsyncObserver<'msg> with
+                            member this.OnNextAsync x = async {
+                                dispatch x
+                            }
+                            member this.OnErrorAsync err = async {
+                                program.onError ("Reaction query error", err)
+                            }
+                            member this.OnCompletedAsync () = async {
+                                program.onError ("Reaction query completed", Exception ())
+                            }
+                        }
+
+                    let msgs = query stream
+                    do! msgs.RunAsync msgObserver
                 }
-
-            let msgs = query stream
-            do! msgs.RunAsync msgObserver
-        }
-
-        let view model dispatch =
-            if not running then
-                running <- true
                 Async.StartImmediate main
+            Cmd.ofSub sub
 
-            dispatch' <- dispatch
-            program.view model post
+        let view model _ =
+            program.view model (OnNext >> mb.Post)
 
-        { program with view = view }
+        { program with view = view; subscribe = subscribe }
 
     /// Experimental!
     /// Attach a named Reaction query to the message (Msg) stream of an Elmish program.
