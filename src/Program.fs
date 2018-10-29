@@ -68,9 +68,10 @@ module Program =
                     }
                 }
 
-            let resubscribe (msgs: IAsyncObservable<'msg>) =
+            let resubscribe (msgs: INamedAsyncObservable<'msg>) =
                 async {
                     do! subscription.DisposeAsync ()
+                    currentName <- msgs.Name
                     let! disposable = msgs.SubscribeAsync msgObserver
                     subscription <- disposable
                 }
