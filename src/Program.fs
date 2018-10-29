@@ -15,7 +15,7 @@ module Program =
     let withQuery (query: IAsyncObservable<'msg> -> IAsyncObservable<'msg>) (program: Elmish.Program<_,_,_,_>) =
         let mb, stream = mbStream<'msg> ()
 
-        let subscribe model : Cmd<'msg> =
+        let subscribe _ : Cmd<'msg> =
             let sub dispatch =
                 let main = async {
                     let msgObserver =
@@ -50,40 +50,35 @@ module Program =
     /// be disposed and the new query will be subscribed. This makes it possible to
     /// dynamically change the query at runtime based on the current state (Model).
     let withNamedQuery (query: 'model -> IAsyncObservable<'msg> -> INamedAsyncObservable<'msg>) (program: Elmish.Program<_,_,_,_>) =
-        let mutable dispatch' : Dispatch<'msg> = ignore
-        let mutable currentMsgs = empty () |> named "noop"
         let mutable subscription = AsyncDisposable.Empty
-        let mutable running = false
+        let mutable currentName = String.Empty
         let mb, stream = mbStream<'msg> ()
-        let post = OnNext >> mb.Post
 
         let view model dispatch =
-            let msgs = query model stream
-
-            let main = async {
-                let msgObserver =
-                    { new IAsyncObserver<'msg> with
-                        member this.OnNextAsync x = async {
-                            dispatch' x
-                        }
-                        member this.OnErrorAsync err = async {
-                            program.onError ("Reaction query error", err)
-                        }
-                        member this.OnCompletedAsync () = async {
-                            program.onError ("Reaction query completed", Exception ())
-                        }
+            let msgObserver =
+                { new IAsyncObserver<'msg> with
+                    member this.OnNextAsync x = async {
+                        dispatch x
                     }
+                    member this.OnErrorAsync err = async {
+                        program.onError ("Reaction query error", err)
+                    }
+                    member this.OnCompletedAsync () = async {
+                        program.onError ("Reaction query completed", Exception ())
+                    }
+                }
 
-                do! subscription.DisposeAsync ()
-                currentMsgs <- msgs
-                let! disposable = msgs.SubscribeAsync msgObserver
-                subscription <- disposable
-            }
-            if not running || msgs.Name <> currentMsgs.Name then
-                running <- true
-                Async.StartImmediate main
+            let resubscribe (msgs: IAsyncObservable<'msg>) =
+                async {
+                    do! subscription.DisposeAsync ()
+                    let! disposable = msgs.SubscribeAsync msgObserver
+                    subscription <- disposable
+                }
 
-            dispatch' <- dispatch
-            program.view model post
+            let msgs = query model stream
+            if msgs.Name <> currentName then
+                Async.StartImmediate (resubscribe msgs)
+
+            program.view model (OnNext >> mb.Post)
 
         { program with view = view }
