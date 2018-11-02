@@ -14,7 +14,8 @@ module Program =
     /// query function will be called every time the model is updated. The returned query is tupled
     /// with a key that identifies the query. If a new key is returned, then the previous query will
     /// be disposed and the new query will be subscribed. This makes it possible to dynamically
-    /// change the query at runtime based on the current state (Model).
+    /// change the query at runtime based on the current state (Model). Returns tuple of
+    /// (query, key) i.e. `IAsyncObservable<'msg>*'key`.
     let withQuery (query: 'model -> IAsyncObservable<'msg> -> IAsyncObservable<'msg>*'key) (program: Elmish.Program<_,_,_,_>) =
         let mutable subscription = AsyncDisposable.Empty
         let mutable currentKey = Unchecked.defaultof<'key>
@@ -55,7 +56,7 @@ module Program =
 
     /// Helper function to call a sub-query for a page or component. It will help with extracting
     /// the sub-message using `AsyncObservable.choose` and also wrapping back to msg using
-    /// `AsyncObservable.map`. Returns tuple of (subquery, key) i.e. `IAsyncObservable<'msg>, 'key`.
+    /// `AsyncObservable.map`. Returns tuple of (subquery, key) i.e. `IAsyncObservable<'msg>*'key`.
     let withSubQuery subquery submodel msgs wrapMsg unwrapMsg : IAsyncObservable<_> * string =
         let msgs', name = subquery submodel (msgs |> AsyncObservable.choose unwrapMsg)
         (msgs' |> AsyncObservable.map wrapMsg, name)
