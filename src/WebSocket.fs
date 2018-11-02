@@ -56,6 +56,7 @@ module WebSocket =
 
                 let cancel () = async {
                     do! disposable.DisposeAsync ()
+                    websocket.close ()
                 }
                 return AsyncDisposable.Create cancel
             }
