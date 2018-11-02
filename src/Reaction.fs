@@ -7,17 +7,6 @@ open Reaction
 
 [<AutoOpen>]
 module ReactionExtension =
-    type INamedAsyncObservable<'a> =
-        inherit IAsyncObservable<'a>
-
-        abstract member Name : string
-
-    let named (name: string) (source: IAsyncObservable<'a>) : INamedAsyncObservable<'a> =
-        { new INamedAsyncObservable<'a> with
-            member __.SubscribeAsync o = source.SubscribeAsync o
-            member __.Name = name
-        }
-
     /// Returns an observable that produces a notification when the
     /// promise resolves. The observable will also complete after
     /// producing an event.
