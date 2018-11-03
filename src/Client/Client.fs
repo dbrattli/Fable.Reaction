@@ -161,7 +161,7 @@ let viewLetters model =
     | CounterAvailable appModel ->
         match appModel.Letters with
         | None ->
-              div [] [ str "Counter must be greater than 45 to release magic" ]
+              str ""
 
         | Remote letters | Local letters ->
             div []
@@ -169,12 +169,53 @@ let viewLetters model =
                     yield span [ Style [Top pos.Y; Left (offsetX pos.X i); Position "absolute"] ]
                         [ str pos.Letter ] ]
 
-
-
     |> List.singleton
     |> div [ Style [ FontFamily "Consolas, monospace"; FontWeight "Bold"; Height "100%"] ]
 
 
+let letterSubscription appModel =
+    match appModel.Letters with
+    | Remote letters | Local letters ->
+        "yes"
+
+    | _ ->
+        "no"
+
+let letterSubscriptionOverWebsockets appModel =
+    match appModel.Letters with
+    | Remote letters ->
+        "yes"
+
+    | _ ->
+        "no"
+
+
+
+let viewStatus model =
+    match model with
+    | Loading ->
+        div [] [ str "Initial Counter not loaded" ]
+
+    | CounterAvailable appModel ->
+        Table.table [ Table.IsHoverable ; Table.IsStriped ]
+            [
+                thead [ ]
+                    [
+                        tr [ ]
+                            [
+                                th [ ] [ str "Feature" ]
+                                th [ ] [ str "Active" ]
+                            ]
+                    ]
+
+                tbody [ ]
+                    [ tr [ ]
+                         [ td [ ] [ str "Letter Subscription (counter > 45)" ]
+                           td [ ] [ str <| letterSubscription appModel ] ]
+                      tr [  ]
+                         [ td [ ] [ str "Letters over Websockets (counter > 50)" ]
+                           td [ ] [ str <| letterSubscriptionOverWebsockets appModel ] ] ]
+              ]
 
 let view (model : Model) (dispatch : Msg -> unit) =
     div []
@@ -182,14 +223,19 @@ let view (model : Model) (dispatch : Msg -> unit) =
           Navbar.navbar [ Navbar.Color IsPrimary ]
             [ Navbar.Item.div [ ]
                 [ Heading.h2 [ ]
-                    [ str "SAFE Template" ] ] ]
+                    [ str "SAFE Template with Fable.Reaction" ] ] ]
 
           Container.container []
               [ Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ]
-                    [ Heading.h3 [] [ str ("Press buttons to manipulate counter: " + show model) ] ]
+                    [ Heading.h4 [] [ str ("Counter must be > 45 to release magic. Current: " + show model) ] ]
                 Columns.columns []
-                    [ Column.column [] [ button "-" (fun _ -> dispatch Decrement) ]
-                      Column.column [] [ button "+" (fun _ -> dispatch Increment) ] ]
+                    [
+                        Column.column [] [ button "-" (fun _ -> dispatch Decrement) ]
+                        Column.column [] [ button "+" (fun _ -> dispatch Increment) ]
+                    ]
+
+                Columns.columns []
+                    [ Column.column [] [ viewStatus model ] ]
 
                 Columns.columns []
                     [ Column.column [] [ viewLetters model ] ] ]

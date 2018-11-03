@@ -30,7 +30,7 @@ let webApp =
 
 let query (connectionId: ConnectionId) (msgs: IAsyncObservable<Msg*ConnectionId>) : IAsyncObservable<Msg*ConnectionId> =
     msgs
-    |> AsyncObservable.filter (fun (msg, ci) -> ci = connectionId)
+    // |> AsyncObservable.filter (fun (msg, ci) -> ci = connectionId)
 
 let configureApp (app : IApplicationBuilder) =
     app.UseWebSockets()
