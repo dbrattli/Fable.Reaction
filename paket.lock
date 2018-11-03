@@ -913,6 +913,10 @@ NUGET
     Fulma (1.0)
       Fable.Core (>= 2.0) - restriction: >= netstandard2.0
       Fable.React (>= 4.0.1) - restriction: >= netstandard2.0
+    Fulma.Extensions (1.0)
+      Fable.Core (>= 2.0) - restriction: >= netstandard2.0
+      Fable.React (>= 4.0.1) - restriction: >= netstandard2.0
+      Fulma (>= 1.0) - restriction: >= netstandard2.0
     Microsoft.NETCore.App (2.1.5) - restriction: >= netcoreapp2.0
       Microsoft.NETCore.DotNetHostPolicy (>= 2.1.5) - restriction: >= netcoreapp2.1
       Microsoft.NETCore.Platforms (>= 2.1.1) - restriction: >= netcoreapp2.1

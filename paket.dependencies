@@ -1,3 +1,5 @@
+source https://www.nuget.org/api/v2
+
 group Server
     storage: none
     source https://api.nuget.org/v3/index.json
@@ -23,6 +25,7 @@ group Client
     nuget Fable.Elmish.HMR ~> 2
     nuget Fable.React ~> 4
     nuget Fulma ~> 1
+    nuget Fulma.Extensions
 
     clitool dotnet-fable ~> 2
 

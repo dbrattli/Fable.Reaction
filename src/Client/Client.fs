@@ -3,6 +3,7 @@ module Client
 open Elmish
 open Elmish.React
 
+open Fable.Core.JsInterop
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fable.PowerPack.Fetch
@@ -12,6 +13,7 @@ open Thoth.Json
 open Shared
 
 open Fulma
+open Fulma.Extensions
 
 open Fable.Reaction
 open Fable.Reaction.WebSocket
@@ -29,15 +31,17 @@ type AppModel =
     {
         Counter: Counter
         Letters : LetterSource
+        LetterString : string
     }
 
 type Model =
     | Loading
-    | CounterAvailable of AppModel
+    | App of AppModel
 
 type Msg =
-    | Increment
-    | Decrement
+    | ToggleLetters
+    | ToggleRemoteLetters
+    | LetterStringChanged of string
     | InitialCountLoaded of Result<Counter, exn>
     | Letter of int * LetterPos
     | RemoteMsg of Shared.Msg
@@ -47,35 +51,32 @@ let init () : Model =
 
 
 let loadCountCmd () =
-    ofPromise (fetchAs<int> "/api/init" Decode.int [])
-        |> AsyncObservable.map (Ok >> InitialCountLoaded)
-        |> AsyncObservable.catch (Error >> InitialCountLoaded >> AsyncObservable.single)
+  ofPromise (fetchAs<int> "/api/init" Decode.int [])
+  |> AsyncObservable.map (Ok >> InitialCountLoaded)
+  |> AsyncObservable.catch (Error >> InitialCountLoaded >> AsyncObservable.single)
 
 
-let withLetterSource model =
-    if model.Counter > 50 then
-        match model.Letters with
-        | None ->
-            { model with Letters = Remote Map.empty }
+let withToggledLetters model =
+  match model.Letters with
+  | None ->
+      { model with Letters = Local Map.empty }
 
-        | Remote _ ->
-            model
+  | Remote letters ->
+      { model with Letters = Local letters }
 
-        | Local letters ->
-            { model with Letters = Remote letters }
+  | Local _ ->
+      { model with Letters = None }
 
-    elif model.Counter > 45 then
-        match model.Letters with
-        | None ->
-            { model with Letters = Local Map.empty }
+let withToggledRemoterLetters model =
+  match model.Letters with
+  | None ->
+      { model with Letters = Remote Map.empty }
 
-        | Remote letters ->
-            { model with Letters = Local letters }
+  | Remote _ ->
+      { model with Letters = None }
 
-        | Local _ ->
-            model
-
-    else  { model with Letters = None }
+  | Local letters ->
+      { model with Letters = Remote letters }
 
 
 
@@ -83,204 +84,250 @@ let withLetterSource model =
 // It can also run side-effects (encoded as commands) like calling the server via Http.
 // these commands in turn, can dispatch messages to which the update function will react.
 let update (msg : Msg) (model : Model) : Model =
+  match model, msg with
+  | App appModel, LetterStringChanged str ->
+      { appModel with LetterString = str}
+      |> App
 
-    match model, msg with
-    | CounterAvailable appModel, Increment ->
-        Fable.Import.Browser.console.log appModel.Counter
-        Fable.Import.Browser.console.log msg
-        { appModel with Counter = appModel.Counter + 1 }
-        |> withLetterSource
-        |> CounterAvailable
+  | App appModel, ToggleLetters ->
+      appModel
+      |> withToggledLetters
+      |> App
 
-    | CounterAvailable appModel, Decrement ->
-        Fable.Import.Browser.console.log msg
-        { appModel with Counter = appModel.Counter - 1 }
-        |> withLetterSource
-        |> CounterAvailable
+  | App appModel, ToggleRemoteLetters ->
+      appModel
+      |> withToggledRemoterLetters
+      |> App
 
-    | Loading, InitialCountLoaded (Ok initialCount)->
-        { Counter = initialCount ; Letters = None }
-        |> withLetterSource
-        |> CounterAvailable
+  | Loading, InitialCountLoaded (Ok initialCount)->
+      { Counter = initialCount ; Letters = None ; LetterString = "Magic Released!" }
+      |> App
 
-    | CounterAvailable appModel, RemoteMsg (Shared.Letter (index, pos)) ->
-        match appModel.Letters with
-        | Remote letters ->
-            CounterAvailable { appModel with Letters = Remote <| letters.Add (index, pos) }
+  | App appModel, RemoteMsg (Shared.Letter (index, pos)) ->
+      match appModel.Letters with
+      | Remote letters ->
+          App { appModel with Letters = Remote <| letters.Add (index, pos) }
 
-        | _ -> CounterAvailable appModel
-
-
-    | CounterAvailable appModel, Letter (index, pos) ->
-        match appModel.Letters with
-        | Local letters ->
-            CounterAvailable { appModel with Letters = Local <| letters.Add (index, pos) }
-
-        | _ -> CounterAvailable appModel
+      | _ -> App appModel
 
 
-    | _ -> model
+  | App appModel, Letter (index, pos) ->
+      match appModel.Letters with
+      | Local letters ->
+          App { appModel with Letters = Local <| letters.Add (index, pos) }
+
+      | _ -> App appModel
+
+
+  | _ -> model
 
 
 let safeComponents =
-    let components =
-        span [ ]
-           [
-             a [ Href "https://github.com/giraffe-fsharp/Giraffe" ] [ str "Giraffe" ]
-             str ", "
-             a [ Href "http://fable.io" ] [ str "Fable" ]
-             str ", "
-             a [ Href "https://elmish.github.io/elmish/" ] [ str "Elmish" ]
-             str ", "
-             a [ Href "https://mangelmaxime.github.io/Fulma" ] [ str "Fulma" ]
-           ]
+  let components =
+    span [ ]
+       [
+         a [ Href "https://github.com/giraffe-fsharp/Giraffe" ] [ str "Giraffe" ]
+         str ", "
+         a [ Href "http://fable.io" ] [ str "Fable" ]
+         str ", "
+         a [ Href "https://elmish.github.io/elmish/" ] [ str "Elmish" ]
+         str ", "
+         a [ Href "https://mangelmaxime.github.io/Fulma" ] [ str "Fulma" ]
+       ]
 
-    p [ ]
-        [ strong [] [ str "SAFE Template" ]
-          str " powered by: "
-          components ]
+  p [ ]
+    [ strong [] [ str "SAFE Template" ]
+      str " powered by: "
+      components ]
 
 let show = function
-| CounterAvailable { Counter = x } -> string x
+| App { Counter = x } -> string x
 | Loading -> "Loading..."
 
-let button txt onClick =
-    Button.button
-        [ Button.IsFullWidth
-          Button.Color IsPrimary
-          Button.OnClick onClick ]
-        [ str txt ]
 
-let offsetX x i = (int x) + i * 10 + 15
+let offsetX x i =
+  (int x) + i * 10 + 15
+
+
+let drawLetters letters =
+  [
+    for KeyValue(i, pos) in letters do
+      yield span [ Style [Top pos.Y; Left (offsetX pos.X i); Position "absolute"] ]
+          [ str pos.Letter ]
+  ]
 
 let viewLetters model =
-    match model with
-    | Loading ->
-        div [] [ str "Initial Counter not loaded" ]
+  match model.Letters with
+  | None ->
+        str ""
 
-    | CounterAvailable appModel ->
-        match appModel.Letters with
-        | None ->
-              str ""
+  | Local letters ->
+      letters |> drawLetters |> div []
 
-        | Remote letters | Local letters ->
-            div []
-                [ for KeyValue(i, pos) in letters do
-                    yield span [ Style [Top pos.Y; Left (offsetX pos.X i); Position "absolute"] ]
-                        [ str pos.Letter ] ]
+  | Remote letters ->
+      letters |> drawLetters |> div []
 
-    |> List.singleton
-    |> div [ Style [ FontFamily "Consolas, monospace"; FontWeight "Bold"; Height "100%"] ]
+  |> List.singleton
+  |> div [ Style [ FontFamily "Consolas, monospace"; FontWeight "Bold"; Height "100%"] ]
 
 
 let letterSubscription appModel =
-    match appModel.Letters with
-    | Remote letters | Local letters ->
-        "yes"
+  match appModel.Letters with
+  | Local _ ->
+      true
 
-    | _ ->
-        "no"
+  | _ ->
+      false
 
 let letterSubscriptionOverWebsockets appModel =
-    match appModel.Letters with
-    | Remote letters ->
-        "yes"
+  match appModel.Letters with
+  | Remote _ ->
+      true
 
-    | _ ->
-        "no"
+  | _ ->
+      false
 
-
-
-let viewStatus model =
-    match model with
-    | Loading ->
-        div [] [ str "Initial Counter not loaded" ]
-
-    | CounterAvailable appModel ->
-        Table.table [ Table.IsHoverable ; Table.IsStriped ]
+let viewStatus dispatch model =
+  Table.table [ Table.IsHoverable ; Table.IsStriped ]
+    [
+      thead []
+        [
+          tr []
             [
-                thead [ ]
-                    [
-                        tr [ ]
-                            [
-                                th [ ] [ str "Feature" ]
-                                th [ ] [ str "Active" ]
-                            ]
-                    ]
+              th [] [ str "Feature" ]
+              th [] [ str "Active" ]
+            ]
+        ]
 
-                tbody [ ]
-                    [ tr [ ]
-                         [ td [ ] [ str "Letter Subscription (counter > 45)" ]
-                           td [ ] [ str <| letterSubscription appModel ] ]
-                      tr [  ]
-                         [ td [ ] [ str "Letters over Websockets (counter > 50)" ]
-                           td [ ] [ str <| letterSubscriptionOverWebsockets appModel ] ] ]
+      tbody [ ]
+        [
+          tr []
+           [
+             td [] [ str "Letters" ]
+             td []
+              [
+                Switch.switch
+                  [
+                    Switch.Checked <| letterSubscription model
+                    Switch.OnChange (fun _ -> dispatch ToggleLetters)
+                  ] []
               ]
+           ]
+
+          tr []
+             [
+               td [] [ str "Letters over Websockets" ]
+               td []
+                [
+                  Switch.switch
+                    [
+                      Switch.Checked <| letterSubscriptionOverWebsockets model
+                      Switch.OnChange (fun _ -> dispatch ToggleRemoteLetters)
+                    ] []
+                ]
+             ]
+        ]
+    ]
+
+
+let viewApp model dispatch =
+  Container.container []
+    [
+      Columns.columns []
+        [
+          Column.column []
+            [
+              form []
+                [
+                  Field.div []
+                    [
+                      Label.label [] [ str "Magic String" ]
+                      Control.div []
+                        [
+                          Input.text
+                            [
+                              Input.Placeholder "Magic String"
+                              Input.DefaultValue model.LetterString
+                              Input.Props [ OnChange (fun event -> LetterStringChanged (!!event.target?value) |> dispatch) ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]
+
+      Columns.columns []
+          [ Column.column [] [ viewStatus dispatch model ] ]
+
+      Columns.columns []
+          [ Column.column [] [ viewLetters model ] ]
+    ]
+
+let view2 model dispatch =
+  match model with
+  | Loading ->
+      div [] [ str "Initial Values not loaded" ]
+
+  | App appModel ->
+      viewApp appModel dispatch
 
 let view (model : Model) (dispatch : Msg -> unit) =
-    div []
+  div []
+    [
+      Navbar.navbar [ Navbar.Color IsPrimary ]
         [
-          Navbar.navbar [ Navbar.Color IsPrimary ]
-            [ Navbar.Item.div [ ]
-                [ Heading.h2 [ ]
-                    [ str "SAFE Template with Fable.Reaction" ] ] ]
+          Navbar.Item.div []
+            [ Heading.h2 []
+                [ str "SAFE Template with Fable.Reaction" ]
+            ]
+        ]
 
-          Container.container []
-              [ Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ]
-                    [ Heading.h4 [] [ str ("Counter must be > 45 to release magic. Current: " + show model) ] ]
-                Columns.columns []
-                    [
-                        Column.column [] [ button "-" (fun _ -> dispatch Decrement) ]
-                        Column.column [] [ button "+" (fun _ -> dispatch Increment) ]
-                    ]
+      view2 model dispatch
 
-                Columns.columns []
-                    [ Column.column [] [ viewStatus model ] ]
-
-                Columns.columns []
-                    [ Column.column [] [ viewLetters model ] ] ]
-
-
-
-          Footer.footer [ ]
-                [ Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ]
-                    [ safeComponents ] ] ]
+      Footer.footer []
+        [
+          Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ]
+            [ safeComponents ]
+        ]
+    ]
 
 let server source =
-    msgChannel<Shared.Msg>
-        "ws://localhost:8085/ws"
-        Shared.Msg.Encode
-        Shared.Msg.Decode
-        source
+  msgChannel<Shared.Msg>
+    "ws://localhost:8085/ws"
+    Shared.Msg.Encode
+    Shared.Msg.Decode
+    source
 
-let letterStream =
-    "Magic - Released!"
-    |> Seq.toList // Split into list of characters
-    |> Seq.mapi (fun i c -> i, c) // Create a tuple with the index
-    |> AsyncObservable.ofSeq // Make this an observable
-    |> AsyncObservable.flatMap (fun (i, letter) ->
-        ofMouseMove ()
-        |> AsyncObservable.delay (100 * i)
-        |> AsyncObservable.map (fun ev -> (i, { Letter= string letter; X=ev.clientX; Y=ev.clientY}))
-    )
+let letterStream letterString =
+  letterString
+  |> Seq.toList // Split into list of characters
+  |> Seq.mapi (fun i c -> i, c) // Create a tuple with the index
+  |> AsyncObservable.ofSeq // Make this an observable
+  |> AsyncObservable.flatMap (fun (i, letter) ->
+      ofMouseMove ()
+      |> AsyncObservable.delay (100 * i)
+      |> AsyncObservable.map (fun ev -> (i, { Letter = string letter; X = ev.clientX; Y = ev.clientY }))
+  )
 
 let query (model : Model) msgs =
     match model with
-    | CounterAvailable appModel ->
+    | App appModel ->
         match appModel.Letters with
         | Local letters ->
-            letterStream
+            appModel.LetterString
+            |> letterStream
             |> AsyncObservable.map Letter
             |> AsyncObservable.merge msgs
-            ,"local"
+            , (appModel.LetterString + "_local")
 
          | Remote _ ->
-            letterStream
+            appModel.LetterString
+            |> letterStream
             |> AsyncObservable.map Shared.Msg.Letter
             |> server
             |> AsyncObservable.map RemoteMsg
             |> AsyncObservable.merge msgs
-            ,"remote"
+            , (appModel.LetterString + "_remote")
 
         | _ ->
               msgs,"none"
