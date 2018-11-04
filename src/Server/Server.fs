@@ -21,15 +21,15 @@ let port = 8085us
 let getInitCounter () : Task<Counter> = task { return 42 }
 
 let webApp =
-    route "/api/init" >=>
-        fun next ctx ->
-            task {
-                let! counter = getInitCounter()
-                return! Successful.OK counter next ctx
-            }
+  route "/api/init" >=>
+    fun next ctx ->
+        task {
+            let! counter = getInitCounter()
+            return! Successful.OK counter next ctx
+        }
 
 let query (connectionId: ConnectionId) (msgs: IAsyncObservable<Msg*ConnectionId>) : IAsyncObservable<Msg*ConnectionId> =
-    msgs
+  msgs
     // |> AsyncObservable.filter (fun (msg, ci) -> ci = connectionId)
 
 let configureApp (app : IApplicationBuilder) =

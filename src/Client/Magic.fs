@@ -26,11 +26,11 @@ type LetterSource =
 | Remote of Map<int,LetterPos>
 
 type AppModel =
-    {
-      Counter: Counter
-      Letters : LetterSource
-      LetterString : string
-    }
+  {
+    Counter: Counter
+    Letters : LetterSource
+    LetterString : string
+  }
 
 type Model =
 | Loading
@@ -46,14 +46,13 @@ type Msg =
 | Letter of int * LetterPos
 | RemoteMsg of Shared.Msg
 
-let init () =
+let init =
   Loading
 
 let loadCountCmd () =
-    ofPromise (fetchAs<int> "/api/init" Decode.int [])
-    |> AsyncObservable.map (Ok >> InitialCountLoaded)
-    |> AsyncObservable.catch (Error >> InitialCountLoaded >> AsyncObservable.single)
-
+  ofPromise (fetchAs<int> "/api/init" Decode.int [])
+  |> AsyncObservable.map (Ok >> InitialCountLoaded)
+  |> AsyncObservable.catch (Error >> InitialCountLoaded >> AsyncObservable.single)
 
 let withToggledLetters model =
   match model.Letters with
@@ -208,7 +207,7 @@ let viewStatus dispatch model =
 
 
 let viewApp model dispatch =
-  Container.container []
+  div []
     [
       Columns.columns []
         [
@@ -249,7 +248,6 @@ let view model dispatch =
       viewApp appModel dispatch
 
 
-
 let server source =
   msgChannel<Shared.Msg>
     "ws://localhost:8085/ws"
@@ -269,30 +267,39 @@ let letterStream letterString =
   )
 
 let query (model : Model) msgs =
-    match model with
-    | App appModel ->
-        match appModel.Letters with
-        | Local letters ->
+  match model with
+  | App appModel ->
+      match appModel.Letters with
+      | Local letters ->
+          appModel.LetterString
+          |> letterStream
+          |> AsyncObservable.map Letter
+          |> AsyncObservable.merge msgs
+          , (appModel.LetterString + "_local")
+
+       | Remote _ ->
+          let letterQuery =
             appModel.LetterString
-            |> letterStream
-            |> AsyncObservable.map Letter
-            |> AsyncObservable.merge msgs
-            , (appModel.LetterString + "_local")
+              |> letterStream
+              |> AsyncObservable.map Shared.Msg.Letter
 
-         | Remote _ ->
-            appModel.LetterString
-            |> letterStream
-            |> AsyncObservable.map Shared.Msg.Letter
-            |> server
-            |> AsyncObservable.map RemoteMsg
-            |> AsyncObservable.merge msgs
-            , (appModel.LetterString + "_remote")
+          let letterStringQuery =
+            msgs
+            |> AsyncObservable.choose (function | LetterStringChanged str -> Some str | _ -> Option.None)
+            |> AsyncObservable.map Shared.Msg.LetterString
 
-        | _ ->
-              msgs,"none"
+          letterStringQuery
+          |> AsyncObservable.merge letterQuery
+          |> server
+          |> AsyncObservable.map RemoteMsg
+          |> AsyncObservable.merge msgs
+          , (appModel.LetterString + "_remote")
 
-    | Loading ->
-        loadCountCmd (),"loading"
+      | _ ->
+            msgs,"none"
+
+  | Loading ->
+      loadCountCmd (),"loading"
 
 
 

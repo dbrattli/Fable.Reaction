@@ -22,45 +22,29 @@ open Shared
 
 
 
-// module SideApp =
-
-//   type Model =
-//     {
-//       LetterString : string
-//       Msgs : int
-//       Remote : bool
-//     }
-
-//   type Msg =
-//     | RemoteToggled
-
-
-//   let init : Model =
-//     {
-//       LetterString = ""
-//       Msgs = 0
-//       Remote = false
-//     }
-
-
-
 type Model =
   {
     Magic : Magic.Model
+    Info : Info.Model
   }
 
 type Msg =
   | MagicMsg of Magic.Msg
+  | InfoMsg of Info.Msg
 
 let init () =
   {
-    Magic = Magic.init();
+    Magic = Magic.init
+    Info = Info.init
   }
 
 let update (msg : Msg) model =
   match msg with
   | MagicMsg msg ->
       { model with Magic = Magic.update msg model.Magic }
+
+  | InfoMsg msg ->
+      { model with Info = Info.update msg model.Info }
 
 
 
@@ -95,7 +79,12 @@ let view (model : Model) (dispatch : Msg -> unit) =
             ]
         ]
 
-      Magic.view model.Magic (MagicMsg >> dispatch)
+      Container.container []
+        [
+          Magic.view model.Magic (MagicMsg >> dispatch)
+          Info.view model.Info (InfoMsg >> dispatch)
+        ]
+
 
       Footer.footer []
         [
@@ -112,12 +101,24 @@ let asMagicMsg msg =
   | _ ->
       None
 
+let asInfoMsg msg =
+  match msg with
+  | InfoMsg msg ->
+      Some msg
+
+  | _ ->
+      None
+
 
 let query (model: Model) (msgs: IAsyncObservable<Msg>) =
-  let magicMsgs =
+  let magicMsgs, magicKey =
     Program.withSubQuery Magic.query model.Magic msgs MagicMsg asMagicMsg
 
+  let infoMsgs, infoKey =
+    Program.withSubQuery Info.query model.Info msgs InfoMsg asInfoMsg
+
   magicMsgs
+  |> AsyncObservable.merge infoMsgs, magicKey + infoKey
 
 
 #if DEBUG
