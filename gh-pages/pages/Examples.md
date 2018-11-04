@@ -8,7 +8,7 @@ Examples of how to use Fable Reaction with Elmish can be found in the examples f
 
 The Timeflies example ([source code](https://github.com/dbrattli/Re-action/tree/master/examples/Timeflies)) implements the classic [Time Flies](https://blogs.msdn.microsoft.com/jeffva/2010/03/17/reactive-extensions-for-javascript-the-time-flies-like-an-arrow-sample/) example from [RxJS](https://rxjs-dev.firebaseapp.com/).
 
-```f#
+```fs
 // The model holds data that you want to keep track of while the
 // application is running
 type Model = {

@@ -17,6 +17,14 @@
     
             
                 
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-insert-logo/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight-code/website.css">
+                
+            
+                
                 <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
                 
             
@@ -220,53 +228,53 @@
 <li><a href="https://github.com/dbrattli/Fable.Reaction/tree/master/examples/Autocomplete" target="_blank">Autocomplete</a></li>
 </ul>
 <p>The Timeflies example (<a href="https://github.com/dbrattli/Re-action/tree/master/examples/Timeflies" target="_blank">source code</a>) implements the classic <a href="https://blogs.msdn.microsoft.com/jeffva/2010/03/17/reactive-extensions-for-javascript-the-time-flies-like-an-arrow-sample/" target="_blank">Time Flies</a> example from <a href="https://rxjs-dev.firebaseapp.com/" target="_blank">RxJS</a>.</p>
-<pre><code class="lang-f#">// The model holds data that you want to keep track of while the
-// application is running
-type Model = {
+<pre><code class="lang-fs"><span class="hljs-comment">// The model holds data that you want to keep track of while the</span>
+<span class="hljs-comment">// application is running</span>
+<span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">Model</span> </span>= {
     Letters: Map&lt;int, string * int * int&gt;
 }
 
-// The Msg type defines what events/actions can occur while the
-// application is running. The state of the application changes *only*
-// in reaction to these events
-type Msg =
-    | Letter of int * string * int * int
+<span class="hljs-comment">// The Msg type defines what events/actions can occur while the</span>
+<span class="hljs-comment">// application is running. The state of the application changes *only*</span>
+<span class="hljs-comment">// in reaction to these events</span>
+<span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">Msg</span> </span>=
+    | Letter <span class="hljs-keyword">of</span> int * string * int * int
 
-// The update function computes the next state of the application based
-// on the current state and the incoming messages
-let update (msg : Msg) (currentModel : Model) : Model =
-    match currentModel.Letters, msg with
+<span class="hljs-comment">// The update function computes the next state of the application based</span>
+<span class="hljs-comment">// on the current state and the incoming messages</span>
+<span class="hljs-keyword">let</span> update (msg : Msg) (currentModel : Model) : Model =
+    <span class="hljs-keyword">match</span> currentModel.Letters, msg <span class="hljs-keyword">with</span>
     | _, Letter (i, c, x, y) -&gt;
-        { currentModel with Letters = currentModel.Letters.Add (i, (c, x, y)) }
+        { currentModel <span class="hljs-keyword">with</span> Letters = currentModel.Letters.Add (i, (c, x, y)) }
 
-let view (dispatch : Dispatch&lt;Msg&gt;) (model : Model)  =
-    let letters = model.Letters
-    let offsetX x i = x + i * 10 + 15
+<span class="hljs-keyword">let</span> view (dispatch : Dispatch&lt;Msg&gt;) (model : Model)  =
+    <span class="hljs-keyword">let</span> letters = model.Letters
+    <span class="hljs-keyword">let</span> offsetX x i = x + i * <span class="hljs-number">10</span> + <span class="hljs-number">15</span>
 
-    div [ Style [ FontFamily &quot;Consolas, monospace&quot;]] [
-        for KeyValue(i, (c, x, y)) in letters do
-            yield span [ Style [Top y; Left (offsetX x i); Position &quot;absolute&quot;] ] [
+    div [ Style [ FontFamily <span class="hljs-string">&quot;Consolas, monospace&quot;</span>]] [
+        <span class="hljs-keyword">for</span> KeyValue(i, (c, x, y)) <span class="hljs-keyword">in</span> letters <span class="hljs-keyword">do</span>
+            <span class="hljs-keyword">yield</span> span [ Style [Top y; Left (offsetX x i); Position <span class="hljs-string">&quot;absolute&quot;</span>] ] [
                 str c
             ]
     ]
 
-let init () : Model = { Letters = Map.empty }
+<span class="hljs-keyword">let</span> init () : Model = { Letters = Map.empty }
 
-// Message stream transformation using Reaction
-let query (msgs : IAsyncObservable&lt;Msg&gt;) : IAsyncObservable&lt;Msg&gt;) =
+<span class="hljs-comment">// Message stream transformation using Reaction</span>
+<span class="hljs-keyword">let</span> query (msgs : IAsyncObservable&lt;Msg&gt;) : IAsyncObservable&lt;Msg&gt;) =
     rx {
-        let! i, c = Seq.toList &quot;TIME FLIES LIKE AN ARROW&quot;
-                    |&gt; Seq.mapi (fun i c -&gt; i, c)
+        <span class="hljs-keyword">let!</span> i, c = Seq.toList <span class="hljs-string">&quot;TIME FLIES LIKE AN ARROW&quot;</span>
+                    |&gt; Seq.mapi (<span class="hljs-keyword">fun</span> i c -&gt; i, c)
                     |&gt; ofSeq
 
-        let ms = fromMouseMoves () |&gt; delay (100 * i)
-        for m in ms do
-            yield Letter (i, string c, int m.clientX, int m.clientY)
+        <span class="hljs-keyword">let</span> ms = fromMouseMoves () |&gt; delay (<span class="hljs-number">100</span> * i)
+        <span class="hljs-keyword">for</span> m <span class="hljs-keyword">in</span> ms <span class="hljs-keyword">do</span>
+            <span class="hljs-keyword">yield</span> Letter (i, string c, int m.clientX, int m.clientY)
     }
 
 Program.mkSimple init update view
 |&gt; Program.withQuery query
-|&gt; Program.withReact &quot;elmish-app&quot;
+|&gt; Program.withReact <span class="hljs-string">&quot;elmish-app&quot;</span>
 |&gt; Program.run
 </code></pre>
 
@@ -312,7 +320,7 @@ Program.mkSimple init update view
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Examples","level":"1.5","depth":1,"next":{"title":"Message Channels","level":"1.6","depth":1,"path":"pages/WebSocket.md","ref":"pages/WebSocket.md","articles":[]},"previous":{"title":"Operators","level":"1.4","depth":1,"path":"pages/Operators.md","ref":"pages/Operators.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"pages/Examples.md","mtime":"2018-10-13T10:09:45.045Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-10-19T12:29:41.336Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Examples","level":"1.5","depth":1,"next":{"title":"Message Channels","level":"1.6","depth":1,"path":"pages/WebSocket.md","ref":"pages/WebSocket.md","articles":[]},"previous":{"title":"Operators","level":"1.4","depth":1,"path":"pages/Operators.md","ref":"pages/Operators.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["insert-logo","highlight-code"],"pluginsConfig":{"insert-logo":{"style":"background: none; width: 150px","url":"../logo.png"},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"highlight-code":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"pages/Examples.md","mtime":"2018-11-04T08:49:39.780Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-11-04T11:35:01.488Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
@@ -320,6 +328,10 @@ Program.mkSimple init update view
         
     <script src="../gitbook/gitbook.js"></script>
     <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-insert-logo/plugin.js"></script>
+        
     
         
         <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>

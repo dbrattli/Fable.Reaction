@@ -2,7 +2,7 @@
 
 To use Fable Reaction with Elmish you need to call the `Program.withQuery` with your reactive query. The query function takes an `IAsyncObservable<'msg>` and returns a possibibly transformed `IAsyncObservable<'msg>`.
 
-```f#
+```fs
 open Reaction.AsyncObservable // 1. Open AsyncObserable for operators such as delay.
 open Fable.Reaction  // 2. Open Fable.Reaction
 
@@ -21,7 +21,7 @@ Program.mkSimple init update view
 
 To load initial state from the server without using commands (`Cmd`) you create an Async Observable using `ofPromise` and then concat the result into the message stream. Thus the message stream in the example below will start with the initialCountLoaded message.
 
-```f#
+```fs
 // Add open statements to top of file
 open Reaction.AsyncObservable
 open Fable.Reaction
@@ -41,7 +41,7 @@ In the example below we flat map (map and merge) the result of querying Wikipedi
 The `flatMapLatest` operator is a combination of the `map` and `switchLatest` operators. This operator works like
 `flatMap` but will auto-cancel any ongoing fetch operation if a new query is made before the previous result is ready.
 
-```f#
+```fs
 // Add open statements to top of file
 open Reaction.AsyncObservable
 open Fable.Reaction
