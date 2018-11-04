@@ -21,105 +21,47 @@ open Reaction
 open Shared
 
 
-type LetterSource =
- | None
- | Local of Map<int,LetterPos>
- | Remote of Map<int,LetterPos>
+
+// module SideApp =
+
+//   type Model =
+//     {
+//       LetterString : string
+//       Msgs : int
+//       Remote : bool
+//     }
+
+//   type Msg =
+//     | RemoteToggled
 
 
-type AppModel =
-    {
-        Counter: Counter
-        Letters : LetterSource
-        LetterString : string
-    }
+//   let init : Model =
+//     {
+//       LetterString = ""
+//       Msgs = 0
+//       Remote = false
+//     }
+
+
 
 type Model =
-    | Loading
-    | App of AppModel
+  {
+    Magic : Magic.Model
+  }
 
 type Msg =
-    | ToggleLetters
-    | ToggleRemoteLetters
-    | LetterStringChanged of string
-    | InitialCountLoaded of Result<Counter, exn>
-    | Letter of int * LetterPos
-    | RemoteMsg of Shared.Msg
+  | MagicMsg of Magic.Msg
 
-let init () : Model =
-    Loading
+let init () =
+  {
+    Magic = Magic.init();
+  }
 
+let update (msg : Msg) model =
+  match msg with
+  | MagicMsg msg ->
+      { model with Magic = Magic.update msg model.Magic }
 
-let loadCountCmd () =
-  ofPromise (fetchAs<int> "/api/init" Decode.int [])
-  |> AsyncObservable.map (Ok >> InitialCountLoaded)
-  |> AsyncObservable.catch (Error >> InitialCountLoaded >> AsyncObservable.single)
-
-
-let withToggledLetters model =
-  match model.Letters with
-  | None ->
-      { model with Letters = Local Map.empty }
-
-  | Remote letters ->
-      { model with Letters = Local letters }
-
-  | Local _ ->
-      { model with Letters = None }
-
-let withToggledRemoterLetters model =
-  match model.Letters with
-  | None ->
-      { model with Letters = Remote Map.empty }
-
-  | Remote _ ->
-      { model with Letters = None }
-
-  | Local letters ->
-      { model with Letters = Remote letters }
-
-
-
-// The update function computes the next state of the application based on the current state and the incoming events/messages
-// It can also run side-effects (encoded as commands) like calling the server via Http.
-// these commands in turn, can dispatch messages to which the update function will react.
-let update (msg : Msg) (model : Model) : Model =
-  match model, msg with
-  | App appModel, LetterStringChanged str ->
-      { appModel with LetterString = str}
-      |> App
-
-  | App appModel, ToggleLetters ->
-      appModel
-      |> withToggledLetters
-      |> App
-
-  | App appModel, ToggleRemoteLetters ->
-      appModel
-      |> withToggledRemoterLetters
-      |> App
-
-  | Loading, InitialCountLoaded (Ok initialCount)->
-      { Counter = initialCount ; Letters = None ; LetterString = "Magic Released!" }
-      |> App
-
-  | App appModel, RemoteMsg (Shared.Letter (index, pos)) ->
-      match appModel.Letters with
-      | Remote letters ->
-          App { appModel with Letters = Remote <| letters.Add (index, pos) }
-
-      | _ -> App appModel
-
-
-  | App appModel, Letter (index, pos) ->
-      match appModel.Letters with
-      | Local letters ->
-          App { appModel with Letters = Local <| letters.Add (index, pos) }
-
-      | _ -> App appModel
-
-
-  | _ -> model
 
 
 let safeComponents =
@@ -140,136 +82,7 @@ let safeComponents =
       str " powered by: "
       components ]
 
-let show = function
-| App { Counter = x } -> string x
-| Loading -> "Loading..."
 
-
-let offsetX x i =
-  (int x) + i * 10 + 15
-
-
-let drawLetters letters =
-  [
-    for KeyValue(i, pos) in letters do
-      yield span [ Style [Top pos.Y; Left (offsetX pos.X i); Position "absolute"] ]
-          [ str pos.Letter ]
-  ]
-
-let viewLetters model =
-  match model.Letters with
-  | None ->
-        str ""
-
-  | Local letters ->
-      letters |> drawLetters |> div []
-
-  | Remote letters ->
-      letters |> drawLetters |> div []
-
-  |> List.singleton
-  |> div [ Style [ FontFamily "Consolas, monospace"; FontWeight "Bold"; Height "100%"] ]
-
-
-let letterSubscription appModel =
-  match appModel.Letters with
-  | Local _ ->
-      true
-
-  | _ ->
-      false
-
-let letterSubscriptionOverWebsockets appModel =
-  match appModel.Letters with
-  | Remote _ ->
-      true
-
-  | _ ->
-      false
-
-let viewStatus dispatch model =
-  Table.table [ Table.IsHoverable ; Table.IsStriped ]
-    [
-      thead []
-        [
-          tr []
-            [
-              th [] [ str "Feature" ]
-              th [] [ str "Active" ]
-            ]
-        ]
-
-      tbody [ ]
-        [
-          tr []
-           [
-             td [] [ str "Letters" ]
-             td []
-              [
-                Switch.switch
-                  [
-                    Switch.Checked <| letterSubscription model
-                    Switch.OnChange (fun _ -> dispatch ToggleLetters)
-                  ] []
-              ]
-           ]
-
-          tr []
-             [
-               td [] [ str "Letters over Websockets" ]
-               td []
-                [
-                  Switch.switch
-                    [
-                      Switch.Checked <| letterSubscriptionOverWebsockets model
-                      Switch.OnChange (fun _ -> dispatch ToggleRemoteLetters)
-                    ] []
-                ]
-             ]
-        ]
-    ]
-
-
-let viewApp model dispatch =
-  Container.container []
-    [
-      Columns.columns []
-        [
-          Column.column []
-            [
-              form []
-                [
-                  Field.div []
-                    [
-                      Label.label [] [ str "Magic String" ]
-                      Control.div []
-                        [
-                          Input.text
-                            [
-                              Input.Placeholder "Magic String"
-                              Input.DefaultValue model.LetterString
-                              Input.Props [ OnChange (fun event -> LetterStringChanged (!!event.target?value) |> dispatch) ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ]
-
-      Columns.columns []
-          [ Column.column [] [ viewStatus dispatch model ] ]
-
-      Columns.columns []
-          [ Column.column [] [ viewLetters model ] ]
-    ]
-
-let view2 model dispatch =
-  match model with
-  | Loading ->
-      div [] [ str "Initial Values not loaded" ]
-
-  | App appModel ->
-      viewApp appModel dispatch
 
 let view (model : Model) (dispatch : Msg -> unit) =
   div []
@@ -282,7 +95,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
             ]
         ]
 
-      view2 model dispatch
+      Magic.view model.Magic (MagicMsg >> dispatch)
 
       Footer.footer []
         [
@@ -291,50 +104,20 @@ let view (model : Model) (dispatch : Msg -> unit) =
         ]
     ]
 
-let server source =
-  msgChannel<Shared.Msg>
-    "ws://localhost:8085/ws"
-    Shared.Msg.Encode
-    Shared.Msg.Decode
-    source
+let asMagicMsg msg =
+  match msg with
+  | MagicMsg msg ->
+      Some msg
 
-let letterStream letterString =
-  letterString
-  |> Seq.toList // Split into list of characters
-  |> Seq.mapi (fun i c -> i, c) // Create a tuple with the index
-  |> AsyncObservable.ofSeq // Make this an observable
-  |> AsyncObservable.flatMap (fun (i, letter) ->
-      ofMouseMove ()
-      |> AsyncObservable.delay (100 * i)
-      |> AsyncObservable.map (fun ev -> (i, { Letter = string letter; X = ev.clientX; Y = ev.clientY }))
-  )
+  | _ ->
+      None
 
-let query (model : Model) msgs =
-    match model with
-    | App appModel ->
-        match appModel.Letters with
-        | Local letters ->
-            appModel.LetterString
-            |> letterStream
-            |> AsyncObservable.map Letter
-            |> AsyncObservable.merge msgs
-            , (appModel.LetterString + "_local")
 
-         | Remote _ ->
-            appModel.LetterString
-            |> letterStream
-            |> AsyncObservable.map Shared.Msg.Letter
-            |> server
-            |> AsyncObservable.map RemoteMsg
-            |> AsyncObservable.merge msgs
-            , (appModel.LetterString + "_remote")
+let query (model: Model) (msgs: IAsyncObservable<Msg>) =
+  let magicMsgs =
+    Program.withSubQuery Magic.query model.Magic msgs MagicMsg asMagicMsg
 
-        | _ ->
-              msgs,"none"
-
-    | Loading ->
-        loadCountCmd (),"loading"
-
+  magicMsgs
 
 
 #if DEBUG
