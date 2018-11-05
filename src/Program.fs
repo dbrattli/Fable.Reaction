@@ -104,7 +104,7 @@ module Program =
                 let resultMap = result |> List.map (fun (x, y) -> (y, x)) |> Map.ofList
                 Async.StartImmediate (subscribe resultMap dispatch addSet)
             if removeSet.Count > 0 then
-                Async.StartImmediate (dispose dispatch addSet)
+                Async.StartImmediate (dispose dispatch removeSet)
 
             program.view model dispatch'
 
