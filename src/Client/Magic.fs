@@ -270,11 +270,10 @@ let query (model : Model) msgs =
   match model with
   | App appModel ->
       match appModel.Letters with
-      | Local letters ->
+      | Local _ ->
           appModel.LetterString
           |> letterStream
           |> AsyncObservable.map Letter
-          |> AsyncObservable.merge msgs
           , (appModel.LetterString + "_local")
 
        | Remote _ ->
@@ -292,11 +291,10 @@ let query (model : Model) msgs =
           |> AsyncObservable.merge letterQuery
           |> server
           |> AsyncObservable.map RemoteMsg
-          |> AsyncObservable.merge msgs
           , (appModel.LetterString + "_remote")
 
       | _ ->
-            msgs,"none"
+            AsyncObservable.empty (),"none"
 
   | Loading ->
       loadCountCmd (),"loading"

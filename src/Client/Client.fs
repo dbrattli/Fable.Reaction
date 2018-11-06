@@ -110,15 +110,12 @@ let asInfoMsg msg =
       None
 
 
-let query (model: Model) (msgs: IAsyncObservable<Msg>) =
-  let magicMsgs, magicKey =
+let queries (model: Model) (msgs: IAsyncObservable<Msg>) =
+  [
     Program.withSubQuery Magic.query model.Magic msgs MagicMsg asMagicMsg
-
-  let infoMsgs, infoKey =
     Program.withSubQuery Info.query model.Info msgs InfoMsg asInfoMsg
-
-  magicMsgs
-  |> AsyncObservable.merge infoMsgs, magicKey + infoKey
+    msgs,"none"
+  ]
 
 
 #if DEBUG
@@ -127,7 +124,7 @@ open Elmish.HMR
 #endif
 
 Program.mkSimple init update view
-|> Program.withQuery query
+|> Program.withQueries queries
 #if DEBUG
 // |> Program.withConsoleTrace
 // |> Program.withHMR

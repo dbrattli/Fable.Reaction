@@ -114,7 +114,7 @@ let query (model : Model) (msgs : IAsyncObservable<Msg>) =
   if model.Remote then
     let ws =
       msgs
-        |> AsyncObservable.filter (fun _ -> true = false)
+        |> AsyncObservable.filter (fun _ -> false)
         |> AsyncObservable.map (fun _ -> Shared.Msg.LetterString "dont understand")
         |> server
 
@@ -124,7 +124,6 @@ let query (model : Model) (msgs : IAsyncObservable<Msg>) =
 
     ws
     |> AsyncObservable.map (fun _ -> MsgAdded)
-    |> AsyncObservable.merge letterStringQuery
-    |> AsyncObservable.merge msgs, "remote"
+    |> AsyncObservable.merge letterStringQuery, "remote"
   else
-    msgs, "local"
+    AsyncObservable.empty (), "local"
