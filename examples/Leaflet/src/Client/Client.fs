@@ -133,14 +133,14 @@ let view model dispatch =
 let loadCountCmd =
     let decoder = Thoth.Json.Decode.float
     ofPromise (fetchAs<float> "/api/init" decoder [])
-        |> AsyncObservable.map (Ok >> InitialCountLoaded)
+        |> AsyncRx.map (Ok >> InitialCountLoaded)
         |> catch (Error >> InitialCountLoaded >> single)
 
 let query msgs =
     let msgs =
         msgs
         |> flatMap (fun msg ->
-            AsyncObservable.ofSeq [1..10]
+            AsyncRx.ofSeq [1..10]
             |> flatMap (fun x ->
                 single msg
                 |> delay (100 * x))

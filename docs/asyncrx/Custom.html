@@ -1,0 +1,572 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Custom Observables · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-insert-logo/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight-code/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="../aspnetcore/Giraffe.md" />
+    
+    
+    <link rel="prev" href="Errors.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../elmish/introducton.md">
+            
+                <span>
+            
+                    
+                    Fable.Elmish.Reaction
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="../elmish/ReactiveMvu.html">
+            
+                <a href="../elmish/ReactiveMvu.html">
+            
+                    
+                    Reactive MVU
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="../elmish/GettingStarted.html">
+            
+                <a href="../elmish/GettingStarted.html">
+            
+                    
+                    Getting Started
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.3" data-path="../elmish/Operators.html">
+            
+                <a href="../elmish/Operators.html">
+            
+                    
+                    Operators
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.4" data-path="../elmish/Examples.html">
+            
+                <a href="../elmish/Examples.html">
+            
+                    
+                    Examples
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.5" data-path="../elmish/WebSocket.html">
+            
+                <a href="../elmish/WebSocket.html">
+            
+                    
+                    Message Channels
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="introduction.html">
+            
+                <a href="introduction.html">
+            
+                    
+                    AsyncRx
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="Install.html">
+            
+                <a href="Install.html">
+            
+                    
+                    Installing
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="GettingStarted.html">
+            
+                <a href="GettingStarted.html">
+            
+                    
+                    Getting Started
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="Types.html">
+            
+                <a href="Types.html">
+            
+                    
+                    Core Types and Interfaces
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="Observers.html">
+            
+                <a href="Observers.html">
+            
+                    
+                    Observers
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.5" data-path="Observables.html">
+            
+                <a href="Observables.html">
+            
+                    
+                    Observables
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.6" data-path="Disposables.html">
+            
+                <a href="Disposables.html">
+            
+                    
+                    Disposables
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.7" data-path="Streams.html">
+            
+                <a href="Streams.html">
+            
+                    
+                    Streams
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.8" data-path="Operators.html">
+            
+                <a href="Operators.html">
+            
+                    
+                    Operators
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.9" data-path="Query.html">
+            
+                <a href="Query.html">
+            
+                    
+                    Query Builder
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.10" data-path="Errors.html">
+            
+                <a href="Errors.html">
+            
+                    
+                    Error Handling
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.3.11" data-path="Custom.html">
+            
+                <a href="Custom.html">
+            
+                    
+                    Custom Observables
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="2.1" data-path="../aspnetcore/Giraffe.md">
+            
+                <span>
+            
+                    
+                    AspNetCore Middleware
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Custom Observables</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="creating-custom-observables">Creating Custom Observables</h1>
+<p>There are many ways to create custom observble streams. Note that the goal is to have some kind of
+create function that returns an <code>IAsyncObservable&lt;&apos;a&gt;</code>. We will go through a few options for
+creating such a custom stream.</p>
+<h2 id="1-use-a-stream">1. Use a Stream</h2>
+<p>A Stream in Reaction return both an observer (<code>IAsyncObserver</code>) and an observable (<code>IAsyncObservable</code>). Note that
+we need to use <code>Async.Start</code> to start the worker function so it runs concurrently.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">open</span> Reaction.Streams
+
+<span class="hljs-keyword">let</span> myStream () =
+    <span class="hljs-keyword">let</span> dispatch, obs = stream&lt;Msg&gt; ()
+
+    <span class="hljs-keyword">let</span> worker () = async {
+        <span class="hljs-keyword">while</span> <span class="hljs-keyword">true</span> <span class="hljs-keyword">do</span>
+            <span class="hljs-keyword">let!</span> msg = getMessageAsync ()
+            <span class="hljs-keyword">do!</span> dispatch.OnNextAsync msg
+    }
+
+    Async.Start (worker ())
+    obs
+</code></pre>
+<h2 id="2-use-create">2. Use Create</h2>
+<p>The <code>AsyncObservable.Create</code> function takes an <code>Async</code> subscribe function and returns an <code>IAsyncObservable</code>. Note that
+we need to use <code>Async.Start</code> to start the worker function so it runs concurrently.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">open</span> Reation.AsyncObservable
+
+<span class="hljs-keyword">let</span> myStream () =
+    <span class="hljs-keyword">let</span> subscribeAsync (obs: IAsyncObserver&lt;Msg&gt;) : Async&lt;IAsyncDisposable&gt; =
+        <span class="hljs-keyword">let</span> <span class="hljs-keyword">mutable</span> running = <span class="hljs-keyword">true</span>
+
+        async {
+            <span class="hljs-keyword">let</span> worker () = async {
+                <span class="hljs-keyword">while</span> running <span class="hljs-keyword">do</span>
+                    <span class="hljs-keyword">let!</span> msg = getMessageAsync ()
+                    <span class="hljs-keyword">do!</span> obs.OnNextAsync msg
+                }
+
+            Async.Start (worker ())
+
+            <span class="hljs-keyword">let</span> cancel () = async {
+                running &lt;- <span class="hljs-keyword">false</span>
+            }
+
+            <span class="hljs-keyword">return</span> AsyncDisposable.Create(cancel)
+        }
+
+    AsyncObservable.create(subscribeAsync)
+</code></pre>
+<h2 id="3-use-ofasyncworker">3. Use ofAsyncWorker</h2>
+<p>The <code>ofAsyncWorker</code> is a handy utility function for creating an <code>IAsyncObservable</code> from
+an async worker function, where the worker function has the type
+<code>IAsyncObserver&lt;&apos;a&gt; -&gt; CancellationToken -&gt; Async&lt;unit&gt;</code>. Thus the worker will receive a cancellation token
+that can be used to detect if cancellation (dispose) have been requested.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">open</span> Reaction
+<span class="hljs-keyword">open</span> System.Threading
+
+<span class="hljs-keyword">let</span> myStream&apos; () =
+    <span class="hljs-keyword">let</span> worker (obv: IAsyncObserver&lt;Msg&gt;) (token: CancellationToken)  = async {
+        <span class="hljs-keyword">while</span> not token.IsCancellationRequested <span class="hljs-keyword">do</span>
+            <span class="hljs-keyword">let!</span> msg = getMessageAsync ()
+            <span class="hljs-keyword">do!</span> obv.OnNextAsync msg
+    }
+
+    Create.ofAsyncWorker(worker)
+</code></pre>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="Errors.html" class="navigation navigation-prev " aria-label="Previous page: Error Handling">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="../aspnetcore/Giraffe.md" class="navigation navigation-next " aria-label="Next page: AspNetCore Middleware">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Custom Observables","level":"1.3.11","depth":2,"next":{"title":"AspNetCore Middleware","level":"2.1","depth":1,"path":"aspnetcore/Giraffe.md","ref":"aspnetcore/Giraffe.md","articles":[]},"previous":{"title":"Error Handling","level":"1.3.10","depth":2,"path":"asyncrx/Errors.md","ref":"asyncrx/Errors.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["insert-logo","highlight-code"],"pluginsConfig":{"insert-logo":{"style":"background: none; width: 150px","url":"/Reaction/logo.png"},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"highlight-code":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"asyncrx/Custom.md","mtime":"2018-11-07T20:53:04.013Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-11-07T21:02:00.057Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-insert-logo/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

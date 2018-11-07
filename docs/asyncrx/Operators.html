@@ -1,0 +1,678 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Operators · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-insert-logo/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight-code/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="Query.html" />
+    
+    
+    <link rel="prev" href="Streams.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../elmish/introducton.md">
+            
+                <span>
+            
+                    
+                    Fable.Elmish.Reaction
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="../elmish/ReactiveMvu.html">
+            
+                <a href="../elmish/ReactiveMvu.html">
+            
+                    
+                    Reactive MVU
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="../elmish/GettingStarted.html">
+            
+                <a href="../elmish/GettingStarted.html">
+            
+                    
+                    Getting Started
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.3" data-path="../elmish/Operators.html">
+            
+                <a href="../elmish/Operators.html">
+            
+                    
+                    Operators
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.4" data-path="../elmish/Examples.html">
+            
+                <a href="../elmish/Examples.html">
+            
+                    
+                    Examples
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.5" data-path="../elmish/WebSocket.html">
+            
+                <a href="../elmish/WebSocket.html">
+            
+                    
+                    Message Channels
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="introduction.html">
+            
+                <a href="introduction.html">
+            
+                    
+                    AsyncRx
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="Install.html">
+            
+                <a href="Install.html">
+            
+                    
+                    Installing
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="GettingStarted.html">
+            
+                <a href="GettingStarted.html">
+            
+                    
+                    Getting Started
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="Types.html">
+            
+                <a href="Types.html">
+            
+                    
+                    Core Types and Interfaces
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="Observers.html">
+            
+                <a href="Observers.html">
+            
+                    
+                    Observers
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.5" data-path="Observables.html">
+            
+                <a href="Observables.html">
+            
+                    
+                    Observables
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.6" data-path="Disposables.html">
+            
+                <a href="Disposables.html">
+            
+                    
+                    Disposables
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.7" data-path="Streams.html">
+            
+                <a href="Streams.html">
+            
+                    
+                    Streams
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.3.8" data-path="Operators.html">
+            
+                <a href="Operators.html">
+            
+                    
+                    Operators
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.9" data-path="Query.html">
+            
+                <a href="Query.html">
+            
+                    
+                    Query Builder
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.10" data-path="Errors.html">
+            
+                <a href="Errors.html">
+            
+                    
+                    Error Handling
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.11" data-path="Custom.html">
+            
+                <a href="Custom.html">
+            
+                    
+                    Custom Observables
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+        
+        <li class="divider"></li>
+        
+        
+    
+        <li class="chapter " data-level="2.1" data-path="../aspnetcore/Giraffe.md">
+            
+                <span>
+            
+                    
+                    AspNetCore Middleware
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Operators</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="operators">Operators</h1>
+<p>The following parameterized async observerable returning functions (operators) are
+currently supported. Other operators may be implemented on-demand, but the goal is to keep it simple and not make this into a full featured <a href="http://reactivex.io/" target="_blank">ReactiveX</a> implementation (if possible).</p>
+<p>To use the operators open either the <code>Reaction</code> namespace.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">open</span> Reaction
+
+xs = AsyncObserable.single <span class="hljs-number">42</span>
+</code></pre>
+<p>You can also open the <code>Reaction.AsyncObserable</code> module if you don&apos;t want to prepend every operator with <code>AsyncObservable</code>. Be aware of possible namespace conflicts with operators such as <code>map</code>.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">open</span> Reaction.AsyncObserable
+
+xs = single <span class="hljs-number">42</span>
+</code></pre>
+<p>For the examples below we assume that <code>Reaction.AsyncObservale</code> is opened.</p>
+<h2 id="creating">Creating</h2>
+<p>Functions for creating (<code>&apos;a -&gt; IAsyncObservable&lt;&apos;a&gt;</code>) an async observable.</p>
+<h3 id="empty">empty</h3>
+<p>Returns an async observable sequence with no elements. You must usually indicate which type the resulting observable should be since empty itself doesn&apos;t produce any values.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">val</span> empty : unit : IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt;
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = empty&lt;int&gt; ()
+</code></pre>
+<h3 id="single">single</h3>
+<p>Returns an observable sequence containing the single specified
+element.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">val</span> single : x: <span class="hljs-symbol">&apos;a</span> -&gt; IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt; =
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = single <span class="hljs-number">42</span>
+</code></pre>
+<h3 id="fail">fail</h3>
+<p>Returns the observable sequence that terminates exceptionally
+with the specified exception.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">val</span> fail error: exn -&gt; IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt; =
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code class="lang-fs"><span class="hljs-keyword">exception</span> MyError <span class="hljs-keyword">of</span> string
+
+<span class="hljs-keyword">let</span> error = MyError <span class="hljs-string">&quot;error&quot;</span>
+<span class="hljs-keyword">let</span> xs = fail&lt;int&gt; error
+</code></pre>
+<h3 id="defer">defer</h3>
+<p>Returns an observable sequence that invokes the specified factory
+function whenever a new observer subscribes.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">val</span> defer : factory: (unit -&gt; IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt;) -&gt; IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt;
+</code></pre>
+<h3 id="create">create</h3>
+<p>Creates an async observable (<code>AsyncObservable&lt;&apos;a&gt;</code>) from the
+given subscribe function.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">val</span> create : subscribe: (IAsyncObserver&lt;<span class="hljs-symbol">&apos;a</span>&gt; -&gt; Async&lt;IAsyncDisposable&gt;) -&gt; IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt;
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code class="lang-fs"><span class="hljs-keyword">exception</span> MyError <span class="hljs-keyword">of</span> string
+
+<span class="hljs-keyword">let</span> error = MyError <span class="hljs-string">&quot;error&quot;</span>
+<span class="hljs-keyword">let</span> xs = fail error
+</code></pre>
+<ul>
+<li><strong>ofSeq</strong> : <code>seq&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a&gt;</code>, Returns the async observable sequence whose elements are pulled
+  from the given enumerable sequence.</li>
+<li><strong>ofAsyncSeq</strong> : <code>AsyncSeq&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a&gt;</code>, Convert async sequence into an async observable <em>(Not available in Fable)</em>.</li>
+<li><strong>timer</strong> : <code>int -&gt; IAsyncObservable&lt;int&gt;</code>, Returns an observable sequence that triggers the value 0
+  after the given duetime.</li>
+<li><strong>interval</strong> <code>int -&gt; IAsyncObservable&lt;int&gt;</code>, Returns an observable sequence that triggers the increasing
+  sequence starting with 0 after the given period.</li>
+</ul>
+<h2 id="transforming">Transforming</h2>
+<p>Functions for transforming (<code>IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;b&gt;</code>) an async observable.</p>
+<h2 id="map">map</h2>
+<p>Returns an observable sequence whose elements are the result of
+invoking the mapper function on each element of the source.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">val</span> map : mapper: (<span class="hljs-symbol">&apos;a</span> -&gt; <span class="hljs-symbol">&apos;b</span>) -&gt; source: IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt; -&gt; IAsyncObservable&lt;<span class="hljs-symbol">&apos;b</span>&gt;
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code class="lang-fs"><span class="hljs-keyword">let</span> mapper x = x * <span class="hljs-number">10</span>
+
+<span class="hljs-keyword">let</span> xs = single <span class="hljs-number">42</span> |&gt; map mapper
+</code></pre>
+<ul>
+<li><strong>mapi</strong> : (&apos;a*int -&gt; &apos;b) -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;b&gt;</li>
+<li><strong>mapAsync</strong> : (&apos;a -&gt; Async&lt;&apos;b&gt;) -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;b&gt;</li>
+<li><strong>mapiAsync</strong> : (&apos;a*int -&gt; Async&lt;&apos;b&gt;) -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;b&gt;</li>
+<li><strong>flatMap</strong> : (&apos;a -&gt; IAsyncObservable&lt;&apos;b&gt;) -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;b&gt;</li>
+<li><strong>flatMapi</strong> : (&apos;a*int -&gt; IAsyncObservable&lt;&apos;b&gt;) -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;b&gt;</li>
+<li><strong>flatMapAsync</strong> : (&apos;a -&gt; Async\<iasyncobservable\<'b\>\&gt;) -&gt; IAsyncObservable<'a> -&gt; IAsyncObservable&lt;&apos;b&gt;</'a></iasyncobservable\<'b\></li>
+<li><strong>flatMapiAsync</strong> : (&apos;a*int -&gt; Async<iasyncobservable\<'b\>\&gt;) -&gt; IAsyncObservable<'a> -&gt; IAsyncObservable&lt;&apos;b&gt;</'a></iasyncobservable\<'b\></li>
+<li><strong>flatMapLatest</strong> : (&apos;a -&gt; IAsyncObservable&lt;&apos;b&gt;) -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;b&gt;</li>
+<li><strong>flatMapLatestAsync</strong> : (&apos;a -&gt; Async<iasyncobservable\<'b\>\&gt;) -&gt; IAsyncObservable<'a> -&gt; IAsyncObservable&lt;&apos;b&gt;</'a></iasyncobservable\<'b\></li>
+<li><strong>catch</strong> : (exn -&gt; IAsyncObservable&lt;&apos;a&gt;) -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a&gt;</li>
+</ul>
+<h2 id="filtering">Filtering</h2>
+<p>Functions for filtering (<code>IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a&gt;</code>) an async observable.</p>
+<h3 id="filter">filter</h3>
+<p>Filters the elements of an observable sequence based on a
+predicate. Returns an observable sequence that contains elements
+from the input sequence that satisfy the condition.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">val</span> filter : predicate: (<span class="hljs-symbol">&apos;a</span> -&gt; bool) -&gt; IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt; -&gt; IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt;
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code class="lang-fs"><span class="hljs-keyword">let</span> predicate x = x &lt; <span class="hljs-number">3</span>
+
+<span class="hljs-keyword">let</span> xs = ofSeq &lt;| seq { <span class="hljs-number">1.</span><span class="hljs-number">.5</span> } |&gt; filter predicate
+</code></pre>
+<ul>
+<li><strong>filterAsync</strong> : (&apos;a -&gt; Async\<bool\>) -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a&gt;</bool\></li>
+<li><strong>distinctUntilChanged</strong> : IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a&gt;</li>
+<li><strong>takeUntil</strong> : IAsyncObservable&lt;&apos;b&gt; -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a&gt;</li>
+<li><strong>choose</strong> : (&apos;a -&gt; &apos;b option) -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;b&gt;</li>
+<li><strong>chooseAsync</strong> : (&apos;a -&gt; Async&lt;&apos;b option&gt;) -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;b&gt;</li>
+</ul>
+<h2 id="aggregating">Aggregating</h2>
+<h3 id="scan">scan</h3>
+<p>Applies an accumulator function over an observable sequence for every value <code>&apos;a</code> and returns each intermediate result <code>&apos;s</code>. The <code>initial</code> seed value is used as the initial accumulator value. Returns an observable sequence containing the accumulated values <code>&apos;s</code>.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">val</span> scan : initial: <span class="hljs-symbol">&apos;s</span> -&gt; accumulator: (<span class="hljs-symbol">&apos;s</span> -&gt; <span class="hljs-symbol">&apos;a</span> -&gt; <span class="hljs-symbol">&apos;s</span>) -&gt; source: IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt; -&gt; IAsyncObservable&lt;<span class="hljs-symbol">&apos;s</span>&gt;
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code class="lang-fs"><span class="hljs-keyword">let</span> scanner a x = a + x
+
+<span class="hljs-keyword">let</span> xs = ofSeq &lt;| seq { <span class="hljs-number">1.</span><span class="hljs-number">.5</span> } |&gt; scan <span class="hljs-number">0</span> scanner
+</code></pre>
+<h3 id="scanasync">scanAsync</h3>
+<p>Applies an async accumulator function over an observable
+sequence and returns each intermediate result. The seed value is
+used as the initial accumulator value. Returns an observable
+sequence containing the accumulated values.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">val</span> scan : initial: <span class="hljs-symbol">&apos;s</span> -&gt; accumulator: (<span class="hljs-symbol">&apos;s</span> -&gt; <span class="hljs-symbol">&apos;a</span> -&gt; Async&lt;<span class="hljs-symbol">&apos;s</span>&gt;) -&gt; source: IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt; -&gt; IAsyncObservable&lt;<span class="hljs-symbol">&apos;s</span>&gt;
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code class="lang-fs"><span class="hljs-keyword">let</span> scannerAsync a x = async { <span class="hljs-keyword">return</span> a + x }
+
+<span class="hljs-keyword">let</span> xs = ofSeq &lt;| seq { <span class="hljs-number">1.</span><span class="hljs-number">.5</span> } |&gt; scanAsync <span class="hljs-number">0</span> scannerAsync
+</code></pre>
+<h3 id="groupby">groupBy</h3>
+<p>Groups the elements of an observable sequence according to a
+specified key mapper function. Returns a sequence of observable
+groups, each of which corresponds to a given key.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">val</span> groupBy : keyMapper: (<span class="hljs-symbol">&apos;a</span> -&gt; <span class="hljs-symbol">&apos;g</span>) -&gt; source: IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt; -&gt; IAsyncObservable&lt;IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt;&gt;
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = ofSeq [<span class="hljs-number">1</span>; <span class="hljs-number">2</span>; <span class="hljs-number">3</span>; <span class="hljs-number">4</span>; <span class="hljs-number">5</span>; <span class="hljs-number">6</span>]
+        |&gt; groupBy (<span class="hljs-keyword">fun</span> x -&gt; x % <span class="hljs-number">2</span>)
+        |&gt; flatMap (<span class="hljs-keyword">fun</span> x -&gt; x)
+</code></pre>
+<h2 id="combining">Combining</h2>
+<p>Functions for combining multiple async observables into one.</p>
+<ul>
+<li><strong>merge</strong> : IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a&gt;</li>
+<li><strong>mergeInner</strong> : IAsyncObservable\<iasyncobservable<'a>\&gt; -&gt; IAsyncObservable<'a></'a></iasyncobservable<'a></li>
+<li><strong>switchLatest</strong> : IAsyncObservable<iasyncobservable<'a>&gt; -&gt; IAsyncObservable<'a></'a></iasyncobservable<'a></li>
+<li><strong>concat</strong> : seq<iasyncobservable<'a>&gt; -&gt; IAsyncObservable<'a></'a></iasyncobservable<'a></li>
+<li><strong>startWith</strong> : seq&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a&gt;</li>
+<li><strong>combineLatest</strong> : IAsyncObservable&lt;&apos;b&gt; -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a*&apos;b&gt;</li>
+<li><strong>withLatestFrom</strong> : IAsyncObservable&lt;&apos;b&gt; -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a*&apos;b&gt;</li>
+<li><strong>zipSeq</strong> : seq&lt;&apos;b&gt; -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a*&apos;b&gt;</li>
+</ul>
+<h2 id="time-shifting">Time-shifting</h2>
+<p>Functions for time-shifting (<code>IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a&gt;</code>) an async observable.</p>
+<ul>
+<li><strong>delay</strong> : int -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a&gt;</li>
+<li><strong>debounce</strong> : int -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a&gt;</li>
+</ul>
+<h3 id="sample">sample</h3>
+<p>Samples the observable sequence at each interval.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">val</span> sample : msecs: int source: IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt; -&gt; IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt;
+</code></pre>
+<h2 id="leaving">Leaving</h2>
+<p>Functions for leaving (<code>IAsyncObservable&lt;&apos;a&gt; -&gt; &apos;a</code>) the async observable.</p>
+<ul>
+<li><strong>toAsyncSeq</strong> : IAsyncObservable&lt;&apos;a&gt; -&gt; AsyncSeq&lt;&apos;a&gt; <em>(Not available in Fable)</em></li>
+</ul>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="Streams.html" class="navigation navigation-prev " aria-label="Previous page: Streams">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="Query.html" class="navigation navigation-next " aria-label="Next page: Query Builder">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Operators","level":"1.3.8","depth":2,"next":{"title":"Query Builder","level":"1.3.9","depth":2,"path":"asyncrx/Query.md","ref":"asyncrx/Query.md","articles":[]},"previous":{"title":"Streams","level":"1.3.7","depth":2,"path":"asyncrx/Streams.md","ref":"asyncrx/Streams.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["insert-logo","highlight-code"],"pluginsConfig":{"insert-logo":{"style":"background: none; width: 150px","url":"/Reaction/logo.png"},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"highlight-code":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"asyncrx/Operators.md","mtime":"2018-11-07T20:53:04.010Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-11-07T21:02:00.057Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-insert-logo/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
