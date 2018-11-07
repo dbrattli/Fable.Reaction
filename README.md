@@ -4,4 +4,4 @@ Reaction is a collection of projects that combines the power of asynchronous rea
 
 ## Documentation
 
-Please check out the [documentation](https://dbrattli.github.io/Fable.Reaction/)
+Please check out the [documentation](https://dbrattli.github.io/Reaction/)
