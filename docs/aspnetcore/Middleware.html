@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>Operators · GitBook</title>
+        <title>AspNetCore Middleware · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.3">
@@ -65,10 +65,8 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="Examples.html" />
     
-    
-    <link rel="prev" href="GettingStarted.html" />
+    <link rel="prev" href="../asyncrx/Custom.html" />
     
 
     </head>
@@ -110,7 +108,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.2" data-path="introducton.md">
+        <li class="chapter " data-level="1.2" data-path="../elmish/introducton.md">
             
                 <span>
             
@@ -124,9 +122,9 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="1.2.1" data-path="ReactiveMvu.html">
+        <li class="chapter " data-level="1.2.1" data-path="../elmish/ReactiveMvu.html">
             
-                <a href="ReactiveMvu.html">
+                <a href="../elmish/ReactiveMvu.html">
             
                     
                     Reactive MVU
@@ -137,9 +135,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.2.2" data-path="GettingStarted.html">
+        <li class="chapter " data-level="1.2.2" data-path="../elmish/GettingStarted.html">
             
-                <a href="GettingStarted.html">
+                <a href="../elmish/GettingStarted.html">
             
                     
                     Getting Started
@@ -150,9 +148,9 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.2.3" data-path="Operators.html">
+        <li class="chapter " data-level="1.2.3" data-path="../elmish/Operators.html">
             
-                <a href="Operators.html">
+                <a href="../elmish/Operators.html">
             
                     
                     Operators
@@ -163,9 +161,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.2.4" data-path="Examples.html">
+        <li class="chapter " data-level="1.2.4" data-path="../elmish/Examples.html">
             
-                <a href="Examples.html">
+                <a href="../elmish/Examples.html">
             
                     
                     Examples
@@ -176,9 +174,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.2.5" data-path="WebSocket.html">
+        <li class="chapter " data-level="1.2.5" data-path="../elmish/WebSocket.html">
             
-                <a href="WebSocket.html">
+                <a href="../elmish/WebSocket.html">
             
                     
                     Message Channels
@@ -363,9 +361,9 @@
         
         
     
-        <li class="chapter " data-level="2.1" data-path="../aspnetcore/Middleware.html">
+        <li class="chapter active" data-level="2.1" data-path="Middleware.html">
             
-                <a href="../aspnetcore/Middleware.html">
+                <a href="Middleware.html">
             
                     
                     AspNetCore Middleware
@@ -406,7 +404,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >Operators</a>
+        <a href=".." >AspNetCore Middleware</a>
     </h1>
 </div>
 
@@ -421,18 +419,62 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="fableelmishreaction-operators">Fable.Elmish.Reaction Operators</h1>
-<p>Fable.Elmish.Reaction may use any operator from <a href="https://dbrattli.github.io/Reaction/asyncrx/Operators.html" target="_blank">AsyncRx</a>.
-In addition the following Fable.Elmish.Reaction specific operators have been defined.</p>
-<h2 id="asyncrxofpromise">AsyncRx.ofPromise</h2>
-<p>The operator <code>AsyncRx.ofPromise</code> converts a Promise to an Async Observable. If the promise resolves with a value,
-then the observable will produce a single value (<code>OnNext</code>) and then complete with <code>OnCompleted</code>.</p>
-<p>This operator is very handy for merging (<code>flatMap</code>) web request responses into the reactive pipeline.</p>
-<h2 id="asyncrxofmousemove">AsyncRx.ofMouseMove</h2>
-<p>The operator <code>AsyncRx.ofMouseMove</code> produces events of type <code>Fable.Import.Browser.MouseEvent</code>  by attaching
-an event listener on the <code>Window</code>. Thus you want to use this to get mouse moves independent of
-any HTML elements. To mouse moves from a particular HTML element you should probably use the <code>OnMouseMove</code>
-property and dispatch a message instead.</p>
+                                <h1 id="reaction-middleware-for-aspnet-core">Reaction Middleware for AspNet Core</h1>
+<p>The Reaction Middleware for AspNet Core is an experimental support for server side WebSocket message handling.</p>
+<h2 id="install">Install</h2>
+<pre><code class="lang-sh">&gt; paket add Reaction.AspNet.Middleware --project &lt;project&gt;
+</code></pre>
+<h2 id="getting-started">Getting Started</h2>
+<p>You add the Reaction middleware to Giraffe using the <code>UseReaction&lt;&apos;msg&gt;</code> method on the <code>IApplicationBuilder</code> in the <code>configureApp</code> function of the Giraffe setup.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">let</span> query (connectionId: ConnectionId) (msgs: IAsyncObservable&lt;Msg*ConnectionId&gt;) : IAsyncObservable&lt;Msg*ConnectionId&gt; =
+    msgs
+    |&gt; filter (<span class="hljs-keyword">fun</span> (msg, cId) -&gt; cId = connectionId)
+
+<span class="hljs-keyword">let</span> configureApp (app : IApplicationBuilder) =
+    app.UseWebSockets()
+       .UseReaction&lt;Msg&gt;(<span class="hljs-keyword">fun</span> options -&gt;
+       { options <span class="hljs-keyword">with</span>
+           Query = query
+           Encode = Msg.Encode
+           Decode = Msg.Decode
+       })
+       .UseDefaultFiles()
+       .UseStaticFiles()
+       .UseGiraffe webApp
+</code></pre>
+<h2 id="options">Options</h2>
+<p>Options may be overrided by <code>UseReaction</code>.</p>
+<pre><code class="lang-fs"><span class="hljs-meta">[&lt;CLIMutable&gt;]</span>
+<span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">ReactionConfig</span>&lt;<span class="hljs-title">&apos;msg</span>&gt; </span>=
+    {
+        QueryAll: IAsyncObservable&lt;&apos;msg*ConnectionId&gt; -&gt; IAsyncObservable&lt;&apos;msg*ConnectionId&gt;
+        Query: ConnectionId -&gt; IAsyncObservable&lt;&apos;msg*ConnectionId&gt; -&gt; IAsyncObservable&lt;&apos;msg*ConnectionId&gt;
+        Encode: &apos;msg -&gt; string
+        Decode: string -&gt; &apos;msg option
+        RequestPath: string
+    }
+</code></pre>
+<h3 id="query">Query</h3>
+<p>A query for the stream of messages to a given client. The type of the query is <code>ConnectionId -&gt; IAsyncObservable&lt;&apos;msg*ConnectionId&gt; -&gt; IAsyncObservable&lt;&apos;msg*ConnectionId&gt;</code>.</p>
+<p>The <code>query</code> function takes a <code>connectionId</code> and an <code>AsyncObservable&lt;&apos;msg*ConnectionId&gt;</code>. The <code>connectionId</code> is the id for a particular clients connection. Messages that leaves in the returned observable will only go to that particular client. Notifications will be a tuple <code>&apos;msg*ConnectionId</code> where <code>&apos;msg</code> is the message being handled and the <code>connectionId</code> is the client connection where this message was received.</p>
+<p>Thus this query will only send messages back to the same client that sent them. Messages for other clients will be filtered.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">let</span> query (connectionId: ConnectionId) (msgs: IAsyncObservable&lt;Msg*ConnectionId&gt;) : IAsyncObservable&lt;Msg*ConnectionId&gt; =
+    msgs
+    |&gt; filter (<span class="hljs-keyword">fun</span> (msg, cId) -&gt; cId = connectionId)
+</code></pre>
+<p>This query will only send back messages from other clients. Messages that the client sent itself will be filtered.</p>
+<pre><code class="lang-fs"><span class="hljs-keyword">let</span> query (connectionId: ConnectionId) (msgs: IAsyncObservable&lt;Msg*ConnectionId&gt;) : IAsyncObservable&lt;Msg*ConnectionId&gt; =
+    msgs
+    |&gt; filter (<span class="hljs-keyword">fun</span> (msg, cId) -&gt; cId &lt;&gt; connectionId)
+</code></pre>
+<h3 id="queryall">QueryAll</h3>
+<p>This query is of type <code>IAsyncObservable&lt;&apos;msg*ConnectionId&gt; -&gt; IAsyncObservable&lt;&apos;msg*ConnectionId&gt;</code> and is a query for the single stream of all messages to and from all clients. This query is processed first, and enables us to send messages that needs to be received by all clients. Thus we may produce messages out of thin air (timers etc) and send them to all connected clients.</p>
+<h3 id="encode">Encode</h3>
+<p>Encoder for serializing a message to JSON string. The type of encoder is <code>&apos;msg -&gt; string</code>.</p>
+<h3 id="decode">Decode</h3>
+<p>Decoder for deserializing a JSON string to a message. The type of decoder is <code>string -&gt; &apos;msg option</code>.</p>
+<h3 id="requestpath">RequestPath</h3>
+<p>Request path where the server will liste for websocket requests. Default is <code>/ws</code>. You will usually not need to change this.</p>
 
                                 
                                 </section>
@@ -460,14 +502,10 @@ property and dispatch a message instead.</p>
 
             
                 
-                <a href="GettingStarted.html" class="navigation navigation-prev " aria-label="Previous page: Getting Started">
+                <a href="../asyncrx/Custom.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page: Custom Observables">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
-                
-                <a href="Examples.html" class="navigation navigation-next " aria-label="Next page: Examples">
-                    <i class="fa fa-angle-right"></i>
-                </a>
                 
             
         
@@ -476,7 +514,7 @@ property and dispatch a message instead.</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Operators","level":"1.2.3","depth":2,"next":{"title":"Examples","level":"1.2.4","depth":2,"path":"elmish/Examples.md","ref":"elmish/Examples.md","articles":[]},"previous":{"title":"Getting Started","level":"1.2.2","depth":2,"path":"elmish/GettingStarted.md","ref":"elmish/GettingStarted.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["insert-logo","highlight-code"],"pluginsConfig":{"insert-logo":{"style":"background: none; width: 150px","url":"/Reaction/logo.png"},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"highlight-code":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"elmish/Operators.md","mtime":"2018-11-07T21:08:22.664Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-11-07T21:12:22.696Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"AspNetCore Middleware","level":"2.1","depth":1,"previous":{"title":"Custom Observables","level":"1.3.11","depth":2,"path":"asyncrx/Custom.md","ref":"asyncrx/Custom.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["insert-logo","highlight-code"],"pluginsConfig":{"insert-logo":{"style":"background: none; width: 150px","url":"/Reaction/logo.png"},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"highlight-code":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"aspnetcore/Middleware.md","mtime":"2018-11-07T20:58:05.562Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-11-07T21:12:22.696Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

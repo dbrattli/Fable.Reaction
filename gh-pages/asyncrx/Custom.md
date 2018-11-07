@@ -10,7 +10,7 @@ A Stream in Reaction return both an observer (`IAsyncObserver`) and an observabl
 we need to use `Async.Start` to start the worker function so it runs concurrently.
 
 ```fs
-open Reaction.Streams
+open Reaction.AsyncRx.Streams
 
 let myStream () =
     let dispatch, obs = stream<Msg> ()

@@ -363,9 +363,9 @@
         
         
     
-        <li class="chapter " data-level="2.1" data-path="../aspnetcore/Giraffe.md">
+        <li class="chapter " data-level="2.1" data-path="../aspnetcore/Middleware.html">
             
-                <span>
+                <a href="../aspnetcore/Middleware.html">
             
                     
                     AspNetCore Middleware
@@ -425,16 +425,16 @@
 <p>The following parameterized async observerable returning functions (operators) are
 currently supported. Other operators may be implemented on-demand, but the goal is to keep it simple and not make this into a full featured <a href="http://reactivex.io/" target="_blank">ReactiveX</a> implementation (if possible).</p>
 <p>To use the operators open either the <code>Reaction</code> namespace.</p>
-<pre><code class="lang-fs"><span class="hljs-keyword">open</span> Reaction
+<pre><code class="lang-fs"><span class="hljs-keyword">open</span> Reaction.AsyncRx
 
-xs = AsyncObserable.single <span class="hljs-number">42</span>
+xs = AsyncRx.single <span class="hljs-number">42</span>
 </code></pre>
 <p>You can also open the <code>Reaction.AsyncObserable</code> module if you don&apos;t want to prepend every operator with <code>AsyncObservable</code>. Be aware of possible namespace conflicts with operators such as <code>map</code>.</p>
-<pre><code class="lang-fs"><span class="hljs-keyword">open</span> Reaction.AsyncObserable
+<pre><code class="lang-fs"><span class="hljs-keyword">open</span> Reaction.AsyncRx
 
-xs = single <span class="hljs-number">42</span>
+xs = AsyncRx.single <span class="hljs-number">42</span>
 </code></pre>
-<p>For the examples below we assume that <code>Reaction.AsyncObservale</code> is opened.</p>
+<p>For the examples below we assume that <code>Reaction.AsyncRx</code> is opened.</p>
 <h2 id="creating">Creating</h2>
 <p>Functions for creating (<code>&apos;a -&gt; IAsyncObservable&lt;&apos;a&gt;</code>) an async observable.</p>
 <h3 id="empty">empty</h3>
@@ -442,7 +442,7 @@ xs = single <span class="hljs-number">42</span>
 <pre><code class="lang-fs"><span class="hljs-keyword">val</span> empty : unit : IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt;
 </code></pre>
 <p><strong>Example:</strong></p>
-<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = empty&lt;int&gt; ()
+<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = AsyncRx.empty&lt;int&gt; ()
 </code></pre>
 <h3 id="single">single</h3>
 <p>Returns an observable sequence containing the single specified
@@ -450,7 +450,7 @@ element.</p>
 <pre><code class="lang-fs"><span class="hljs-keyword">val</span> single : x: <span class="hljs-symbol">&apos;a</span> -&gt; IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt; =
 </code></pre>
 <p><strong>Example:</strong></p>
-<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = single <span class="hljs-number">42</span>
+<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = AsyncRx.single <span class="hljs-number">42</span>
 </code></pre>
 <h3 id="fail">fail</h3>
 <p>Returns the observable sequence that terminates exceptionally
@@ -461,7 +461,7 @@ with the specified exception.</p>
 <pre><code class="lang-fs"><span class="hljs-keyword">exception</span> MyError <span class="hljs-keyword">of</span> string
 
 <span class="hljs-keyword">let</span> error = MyError <span class="hljs-string">&quot;error&quot;</span>
-<span class="hljs-keyword">let</span> xs = fail&lt;int&gt; error
+<span class="hljs-keyword">let</span> xs = AsyncRx.fail&lt;int&gt; error
 </code></pre>
 <h3 id="defer">defer</h3>
 <p>Returns an observable sequence that invokes the specified factory
@@ -477,7 +477,7 @@ given subscribe function.</p>
 <pre><code class="lang-fs"><span class="hljs-keyword">exception</span> MyError <span class="hljs-keyword">of</span> string
 
 <span class="hljs-keyword">let</span> error = MyError <span class="hljs-string">&quot;error&quot;</span>
-<span class="hljs-keyword">let</span> xs = fail error
+<span class="hljs-keyword">let</span> xs = AsyncRx.fail error
 </code></pre>
 <ul>
 <li><strong>ofSeq</strong> : <code>seq&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a&gt;</code>, Returns the async observable sequence whose elements are pulled
@@ -498,7 +498,7 @@ invoking the mapper function on each element of the source.</p>
 <p><strong>Example:</strong></p>
 <pre><code class="lang-fs"><span class="hljs-keyword">let</span> mapper x = x * <span class="hljs-number">10</span>
 
-<span class="hljs-keyword">let</span> xs = single <span class="hljs-number">42</span> |&gt; map mapper
+<span class="hljs-keyword">let</span> xs = AsyncRx.single <span class="hljs-number">42</span> |&gt; AsyncRx.map mapper
 </code></pre>
 <ul>
 <li><strong>mapi</strong> : (&apos;a*int -&gt; &apos;b) -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;b&gt;</li>
@@ -523,7 +523,7 @@ from the input sequence that satisfy the condition.</p>
 <p><strong>Example:</strong></p>
 <pre><code class="lang-fs"><span class="hljs-keyword">let</span> predicate x = x &lt; <span class="hljs-number">3</span>
 
-<span class="hljs-keyword">let</span> xs = ofSeq &lt;| seq { <span class="hljs-number">1.</span><span class="hljs-number">.5</span> } |&gt; filter predicate
+<span class="hljs-keyword">let</span> xs = AsyncRx.ofSeq &lt;| seq { <span class="hljs-number">1.</span><span class="hljs-number">.5</span> } |&gt; AsyncRx.filter predicate
 </code></pre>
 <ul>
 <li><strong>filterAsync</strong> : (&apos;a -&gt; Async\<bool\>) -&gt; IAsyncObservable&lt;&apos;a&gt; -&gt; IAsyncObservable&lt;&apos;a&gt;</bool\></li>
@@ -540,7 +540,7 @@ from the input sequence that satisfy the condition.</p>
 <p><strong>Example:</strong></p>
 <pre><code class="lang-fs"><span class="hljs-keyword">let</span> scanner a x = a + x
 
-<span class="hljs-keyword">let</span> xs = ofSeq &lt;| seq { <span class="hljs-number">1.</span><span class="hljs-number">.5</span> } |&gt; scan <span class="hljs-number">0</span> scanner
+<span class="hljs-keyword">let</span> xs = AsyncRx.ofSeq &lt;| seq { <span class="hljs-number">1.</span><span class="hljs-number">.5</span> } |&gt; AsyncRx.scan <span class="hljs-number">0</span> scanner
 </code></pre>
 <h3 id="scanasync">scanAsync</h3>
 <p>Applies an async accumulator function over an observable
@@ -552,7 +552,7 @@ sequence containing the accumulated values.</p>
 <p><strong>Example:</strong></p>
 <pre><code class="lang-fs"><span class="hljs-keyword">let</span> scannerAsync a x = async { <span class="hljs-keyword">return</span> a + x }
 
-<span class="hljs-keyword">let</span> xs = ofSeq &lt;| seq { <span class="hljs-number">1.</span><span class="hljs-number">.5</span> } |&gt; scanAsync <span class="hljs-number">0</span> scannerAsync
+<span class="hljs-keyword">let</span> xs = AsyncRx.ofSeq &lt;| seq { <span class="hljs-number">1.</span><span class="hljs-number">.5</span> } |&gt; AsyncRx.scanAsync <span class="hljs-number">0</span> scannerAsync
 </code></pre>
 <h3 id="groupby">groupBy</h3>
 <p>Groups the elements of an observable sequence according to a
@@ -561,9 +561,9 @@ groups, each of which corresponds to a given key.</p>
 <pre><code class="lang-fs"><span class="hljs-keyword">val</span> groupBy : keyMapper: (<span class="hljs-symbol">&apos;a</span> -&gt; <span class="hljs-symbol">&apos;g</span>) -&gt; source: IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt; -&gt; IAsyncObservable&lt;IAsyncObservable&lt;<span class="hljs-symbol">&apos;a</span>&gt;&gt;
 </code></pre>
 <p><strong>Example:</strong></p>
-<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = ofSeq [<span class="hljs-number">1</span>; <span class="hljs-number">2</span>; <span class="hljs-number">3</span>; <span class="hljs-number">4</span>; <span class="hljs-number">5</span>; <span class="hljs-number">6</span>]
-        |&gt; groupBy (<span class="hljs-keyword">fun</span> x -&gt; x % <span class="hljs-number">2</span>)
-        |&gt; flatMap (<span class="hljs-keyword">fun</span> x -&gt; x)
+<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = AsyncRx.ofSeq [<span class="hljs-number">1</span>; <span class="hljs-number">2</span>; <span class="hljs-number">3</span>; <span class="hljs-number">4</span>; <span class="hljs-number">5</span>; <span class="hljs-number">6</span>]
+        |&gt; AsyncRx.groupBy (<span class="hljs-keyword">fun</span> x -&gt; x % <span class="hljs-number">2</span>)
+        |&gt; AsyncRx.flatMap (<span class="hljs-keyword">fun</span> x -&gt; x)
 </code></pre>
 <h2 id="combining">Combining</h2>
 <p>Functions for combining multiple async observables into one.</p>
@@ -635,7 +635,7 @@ groups, each of which corresponds to a given key.</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Operators","level":"1.3.8","depth":2,"next":{"title":"Query Builder","level":"1.3.9","depth":2,"path":"asyncrx/Query.md","ref":"asyncrx/Query.md","articles":[]},"previous":{"title":"Streams","level":"1.3.7","depth":2,"path":"asyncrx/Streams.md","ref":"asyncrx/Streams.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["insert-logo","highlight-code"],"pluginsConfig":{"insert-logo":{"style":"background: none; width: 150px","url":"/Reaction/logo.png"},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"highlight-code":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"asyncrx/Operators.md","mtime":"2018-11-07T20:53:04.010Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-11-07T21:02:00.057Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Operators","level":"1.3.8","depth":2,"next":{"title":"Query Builder","level":"1.3.9","depth":2,"path":"asyncrx/Query.md","ref":"asyncrx/Query.md","articles":[]},"previous":{"title":"Streams","level":"1.3.7","depth":2,"path":"asyncrx/Streams.md","ref":"asyncrx/Streams.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["insert-logo","highlight-code"],"pluginsConfig":{"insert-logo":{"style":"background: none; width: 150px","url":"/Reaction/logo.png"},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"highlight-code":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"asyncrx/Operators.md","mtime":"2018-11-07T21:11:41.116Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-11-07T21:12:22.696Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

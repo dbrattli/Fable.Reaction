@@ -1,6 +1,6 @@
 # Reactive MVU Architecture
 
-Fable Reaction is very similar to [Elm](http://elm-lang.org/) and [Elmish](https://elmish.github.io/) in regards to the [MVU architecture](https://guide.elm-lang.org/architecture/). But when using Fable Reaction, we do not need any commands (`Cmd`) or subscriptions with Elmish. Instead we use a [ReactiveX](http://reactivex.io/) (Rx) style query that transforms the stream of messages (`Msg`).
+Elmish.Reaction is very similar to [Elm](http://elm-lang.org/) and [Elmish](https://elmish.github.io/) in regards to the [MVU architecture](https://guide.elm-lang.org/architecture/). But when using Elmish.Reaction, we do not need any commands (`Cmd`) or subscriptions with Elmish. Instead we use a [ReactiveX](http://reactivex.io/) (AsyncRx) style query that transforms the stream of messages (`Msg`).
 
 <img src="https://raw.githubusercontent.com/dbrattli/Fable.Reaction/master/gh-pages/images/R-MVU.png" width="550">
 

@@ -6,20 +6,20 @@ currently supported. Other operators may be implemented on-demand, but the goal 
 To use the operators open either the `Reaction` namespace.
 
 ```fs
-open Reaction
+open Reaction.AsyncRx
 
-xs = AsyncObserable.single 42
+xs = AsyncRx.single 42
 ```
 
 You can also open the `Reaction.AsyncObserable` module if you don't want to prepend every operator with `AsyncObservable`. Be aware of possible namespace conflicts with operators such as `map`.
 
 ```fs
-open Reaction.AsyncObserable
+open Reaction.AsyncRx
 
-xs = single 42
+xs = AsyncRx.single 42
 ```
 
-For the examples below we assume that `Reaction.AsyncObservale` is opened.
+For the examples below we assume that `Reaction.AsyncRx` is opened.
 
 ## Creating
 
@@ -36,7 +36,7 @@ val empty : unit : IAsyncObservable<'a>
 **Example:**
 
 ```fs
-let xs = empty<int> ()
+let xs = AsyncRx.empty<int> ()
 ```
 
 ### single
@@ -51,7 +51,7 @@ val single : x: 'a -> IAsyncObservable<'a> =
 **Example:**
 
 ```fs
-let xs = single 42
+let xs = AsyncRx.single 42
 ```
 
 ### fail
@@ -69,7 +69,7 @@ val fail error: exn -> IAsyncObservable<'a> =
 exception MyError of string
 
 let error = MyError "error"
-let xs = fail<int> error
+let xs = AsyncRx.fail<int> error
 ```
 
 ### defer
@@ -96,7 +96,7 @@ val create : subscribe: (IAsyncObserver<'a> -> Async<IAsyncDisposable>) -> IAsyn
 exception MyError of string
 
 let error = MyError "error"
-let xs = fail error
+let xs = AsyncRx.fail error
 ```
 
 - **ofSeq** : `seq<'a> -> IAsyncObservable<'a>`, Returns the async observable sequence whose elements are pulled
@@ -125,7 +125,7 @@ val map : mapper: ('a -> 'b) -> source: IAsyncObservable<'a> -> IAsyncObservable
 ```fs
 let mapper x = x * 10
 
-let xs = single 42 |> map mapper
+let xs = AsyncRx.single 42 |> AsyncRx.map mapper
 ```
 
 - **mapi** : ('a*int -> 'b) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
@@ -158,7 +158,7 @@ val filter : predicate: ('a -> bool) -> IAsyncObservable<'a> -> IAsyncObservable
 ```fs
 let predicate x = x < 3
 
-let xs = ofSeq <| seq { 1..5 } |> filter predicate
+let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.filter predicate
 ```
 
 - **filterAsync** : ('a -> Async\<bool\>) -> IAsyncObservable<'a> -> IAsyncObservable<'a>
@@ -182,7 +182,7 @@ val scan : initial: 's -> accumulator: ('s -> 'a -> 's) -> source: IAsyncObserva
 ```fs
 let scanner a x = a + x
 
-let xs = ofSeq <| seq { 1..5 } |> scan 0 scanner
+let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scan 0 scanner
 ```
 
 ### scanAsync
@@ -201,7 +201,7 @@ val scan : initial: 's -> accumulator: ('s -> 'a -> Async<'s>) -> source: IAsync
 ```fs
 let scannerAsync a x = async { return a + x }
 
-let xs = ofSeq <| seq { 1..5 } |> scanAsync 0 scannerAsync
+let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scanAsync 0 scannerAsync
 ```
 
 ### groupBy
@@ -217,9 +217,9 @@ val groupBy : keyMapper: ('a -> 'g) -> source: IAsyncObservable<'a> -> IAsyncObs
 **Example:**
 
 ```fs
-let xs = ofSeq [1; 2; 3; 4; 5; 6]
-        |> groupBy (fun x -> x % 2)
-        |> flatMap (fun x -> x)
+let xs = AsyncRx.ofSeq [1; 2; 3; 4; 5; 6]
+        |> AsyncRx.groupBy (fun x -> x % 2)
+        |> AsyncRx.flatMap (fun x -> x)
 ```
 
 ## Combining
