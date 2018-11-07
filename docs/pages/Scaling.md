@@ -37,4 +37,4 @@ type Msg =
         | _ -> None
 ```
 
-Pages with multiple components (or Programs with concurrently active Pages) will need to compose the returned async observables from each sub-component together using e.g. `AsyncObservable.merge` and join the keys to keep them unique, e.g. (+) for strings. We can make helper functions for this as well.
+Pages with multiple components (or Programs with concurrently active Pages) will need to compose the returned async observables from each sub-component together using e.g. `AsyncRx.merge` and join the keys to keep them unique, e.g. (+) for strings. We can make helper functions for this as well.

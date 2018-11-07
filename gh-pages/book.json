@@ -2,7 +2,7 @@
     "plugins": ["insert-logo", "highlight-code"],
     "pluginsConfig": {
         "insert-logo": {
-            "url": "/Fable.Reaction/logo.png",
+            "url": "/Reaction/logo.png",
             "style": "background: none; width: 150px"
         },
         "sharing": {
