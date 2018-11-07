@@ -3,11 +3,10 @@ module Client
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 
-open Fable.Reaction
-open Reaction
+open Reaction.AsyncRx
+open Elmish.Reaction
 open Elmish
 open Elmish.React
-open Fable.Helpers
 
 // The model holds data that you want to keep track of while the
 // application is running
@@ -27,42 +26,36 @@ let update (msg : Msg) (currentModel : Model) : Model =
     match currentModel.Letters, msg with
     | _, Letter (i, c, x, y) ->
         { currentModel with Letters = currentModel.Letters.Add (i, (c, x, y)) }
+    | _ -> currentModel
+
+let renderLetter c x y =
+    span [ Style [Top y; Left x; Position "absolute"] ] [
+        str c
+    ]
 
 let view (model : Model) (dispatch : Dispatch<Msg>) =
     let letters = model.Letters
-    let offsetX x i = x + i * 10 + 15
 
-    div [ Style [ FontFamily "Consolas, monospace"]] [
+    div [ Style [ FontFamily "Consolas, monospace"; Height "100%"] ] [
         for KeyValue(i, (c, x, y)) in letters do
-            yield span [ Style [Top y; Left (offsetX x i); Position "absolute"] ] [
-                str c
-            ]
+            yield renderLetter c x y
     ]
 
 let init () : Model =
     { Letters = Map.empty }
 
-// Query for message stream transformation (same as below)
-let query' msgs =
-    Seq.toList "TIME FLIES LIKE AN ARROW"
-    |> Seq.mapi (fun i c -> i, c)
-    |> AsyncObservable.ofSeq
-    |> AsyncObservable.flatMap (fun (i, c) ->
-        fromMouseMoves ()
-        |> AsyncObservable.delay (100 * i)
-        |> AsyncObservable.map (fun m -> Letter (i, string c, int m.clientX, int m.clientY)))
-
 // Query for message stream transformation (expression style)
-let query msgs =
-    reaction {
-        let! i, c = Seq.toList "TIME FLIES LIKE AN ARROW"
-                    |> Seq.mapi (fun i c -> i, c)
-                    |> AsyncObservable.ofSeq
+let query model msgs =
+    Subscribe (asyncRx {
+        let chars =
+            Seq.toList "TIME FLIES LIKE AN ARROW"
+            |> Seq.mapi (fun i c -> i, c)
 
-        let ms = fromMouseMoves () |> AsyncObservable.delay (100 * i)
-        for m in ms do
-            yield Letter (i, string c, int m.clientX, int m.clientY)
-    }
+        for i, c in chars do
+            yield! AsyncRx.ofMouseMove ()
+                |> AsyncRx.delay (100 * i)
+                |> AsyncRx.map (fun m -> Letter (i, string c, int m.clientX + i * 10 + 15, int m.clientY))
+    }, "msgs")
 
 Program.mkSimple init update view
 |> Program.withQuery query

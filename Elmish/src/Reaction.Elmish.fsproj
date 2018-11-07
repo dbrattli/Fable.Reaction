@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard1.6;net461</TargetFrameworks>
+    <PackageId>Reaction.Elmish</PackageId>
+    <Version>2.0.0</Version>
+    <Authors>Dag Brattli</Authors>
+    <Company>Brattli Labs</Company>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../../Reaction.Fable.Elmish/src/Program.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="*.fsproj; *.fs" PackagePath="fable\" />
+  </ItemGroup>
+  <Import Project="..\.paket\Paket.Restore.targets" />
+</Project>

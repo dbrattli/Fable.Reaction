@@ -1,0 +1,6 @@
+coverlet.msbuild
+FSharp.Core
+Microsoft.NET.Test.Sdk
+NUnit
+NUnit3TestAdapter
+FsUnit

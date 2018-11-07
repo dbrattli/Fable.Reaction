@@ -1,12 +1,13 @@
-namespace Fable.Reaction
+namespace Elmish.Reaction
 
 open Fable.Core
 open Fable.Import.Browser
 
-open Reaction
+open Reaction.AsyncRx
 
-[<AutoOpen>]
-module ReactionExtension =
+//[<RequireQualifiedAccess>]
+//[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+module AsyncRx =
     /// Returns an observable that produces a notification when the
     /// promise resolves. The observable will also complete after
     /// producing an event.
@@ -37,7 +38,4 @@ module ReactionExtension =
                 return AsyncDisposable.Create cancel
             }
 
-        AsyncObservable.create subscribe
-
-    /// Deprecated. Use ofMouseMove instead.
-    let fromMouseMoves = ofMouseMove
+        AsyncRx.create subscribe

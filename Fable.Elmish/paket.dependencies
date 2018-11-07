@@ -1,0 +1,7 @@
+source https://www.nuget.org/api/v2
+storage: none
+
+nuget Fable.Core ~> 2
+nuget Fable.React ~> 2
+nuget Fable.Elmish ~> 2
+nuget Reaction.AsyncRx prerelease

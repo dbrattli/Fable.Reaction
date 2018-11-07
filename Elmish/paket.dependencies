@@ -1,0 +1,7 @@
+source https://www.nuget.org/api/v2
+source /Users/dbrattli/Developer/packages
+
+storage: none
+
+nuget Elmish ~> 2
+nuget Reaction.AsyncRx ~> 1

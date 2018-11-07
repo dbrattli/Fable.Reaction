@@ -1,0 +1,6 @@
+FSharp.Core
+Giraffe
+Microsoft.AspNetCore
+Microsoft.AspNetCore.StaticFiles
+Microsoft.AspNetCore.WebSockets
+Reaction.AsyncRx

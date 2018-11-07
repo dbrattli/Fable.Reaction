@@ -1,9 +1,8 @@
-namespace Fable.Reaction
+namespace Elmish.Reaction
 
 open Fable.Import.Browser
 
-open Reaction
-open Reaction.AsyncObservable
+open Reaction.AsyncRx
 
 module WebSocket =
 
@@ -61,7 +60,7 @@ module WebSocket =
                 return AsyncDisposable.Create cancel
             }
 
-        AsyncObservable.create subscribe
+        AsyncRx.create subscribe
 
     /// Websocket message channel operator. Items {'msg} will be encoded
     /// to JSON using `encode` and passed as over the ws channel to the server.
@@ -69,9 +68,9 @@ module WebSocket =
     /// decoded using `decode` and forwarded down stream as messages {'msg}.
     let msgChannel<'msg> (uri: string) (encode: 'msg -> string) (decode: string -> 'msg option) (source: IAsyncObservable<'msg>) : IAsyncObservable<'msg> =
         source
-        |> map encode
+        |> AsyncRx.map encode
         |> channel uri
-        |> choose decode
+        |> AsyncRx.choose decode
 
     /// Websocket message channel operator. Items {'msg} will be encoded
     /// to JSON using `encode` and passed as over the ws channel to the server.
@@ -79,6 +78,6 @@ module WebSocket =
     /// decoded using `decode` and forwarded down stream as messages {Result<'msg, exn>}.
     let msgResultChannel<'msg> (uri: string) (encode: 'msg -> string) (decode: string -> Result<'msg, exn>) (source: IAsyncObservable<'msg>) : IAsyncObservable<Result<'msg, exn>> =
         source
-        |> map encode
+        |> AsyncRx.map encode
         |> channel uri
-        |> map decode
+        |> AsyncRx.map decode
