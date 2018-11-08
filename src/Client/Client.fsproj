@@ -8,6 +8,7 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="..\Shared\Shared.fs" />
+        <Compile Include="Utils.fs" />
         <Compile Include="Magic.fs" />
         <Compile Include="Info.fs" />
         <Compile Include="Client.fs" />

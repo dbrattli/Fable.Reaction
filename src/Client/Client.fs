@@ -1,28 +1,14 @@
 module Client
 
-open System.Collections.Generic
 open Elmish
 open Elmish.React
 
-open Fable.Core.JsInterop
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
-open Fable.PowerPack.Fetch
-
-open Thoth.Json
-
-open Shared
 
 open Fulma
-open Fulma.Extensions
-
 open Reaction.AsyncRx
 open Elmish.Reaction
-open Shared
-open System.Threading
-open Fable.Helpers.React.ReactiveComponents
-
-
 
 type Model =
   {
@@ -52,22 +38,23 @@ let update (msg : Msg) model =
 
 let safeComponents =
   let components =
-    span [ ]
-       [
-         a [ Href "https://github.com/giraffe-fsharp/Giraffe" ] [ str "Giraffe" ]
-         str ", "
-         a [ Href "http://fable.io" ] [ str "Fable" ]
-         str ", "
-         a [ Href "https://elmish.github.io/elmish/" ] [ str "Elmish" ]
-         str ", "
-         a [ Href "https://mangelmaxime.github.io/Fulma" ] [ str "Fulma" ]
-       ]
+    span []
+     [
+       a [ Href "https://github.com/giraffe-fsharp/Giraffe" ] [ str "Giraffe" ]
+       str ", "
+       a [ Href "http://fable.io" ] [ str "Fable" ]
+       str ", "
+       a [ Href "https://elmish.github.io/elmish/" ] [ str "Elmish" ]
+       str ", "
+       a [ Href "https://mangelmaxime.github.io/Fulma" ] [ str "Fulma" ]
+     ]
 
-  p [ ]
-    [ strong [] [ str "SAFE Template" ]
+  p []
+    [
+      strong [] [ str "SAFE Template" ]
       str " powered by: "
-      components ]
-
+      components
+    ]
 
 
 let view (model : Model) (dispatch : Msg -> unit) =

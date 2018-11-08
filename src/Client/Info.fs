@@ -1,16 +1,7 @@
 module Info
 
 open Elmish
-open Elmish.React
-
-open Fable.Core.JsInterop
 open Fable.Helpers.React
-open Fable.Helpers.React.Props
-open Fable.PowerPack.Fetch
-
-open Thoth.Json
-
-open Shared
 
 open Fulma
 open Fulma.Extensions
@@ -18,8 +9,7 @@ open Fulma.Extensions
 open Reaction.AsyncRx
 open Elmish.Reaction
 open Elmish.Reaction.WebSocket
-open Shared
-
+open Utils
 
 type Model =
   {
@@ -103,19 +93,10 @@ let view model dispatch =
     ]
 
 
-let server source =
-  msgChannel<Shared.Msg>
-    "ws://localhost:8085/ws"
-    Shared.Msg.Encode
-    Shared.Msg.Decode
-    source
-
 let query (model : Model) (msgs : IAsyncObservable<Msg>) =
   if model.Remote then
     let ws =
-      msgs
-        |> AsyncRx.filter (fun _ -> false)
-        |> AsyncRx.map (fun _ -> Shared.Msg.LetterString "dont understand")
+      AsyncRx.never()
         |> server
         |> AsyncRx.share
 
@@ -125,8 +106,8 @@ let query (model : Model) (msgs : IAsyncObservable<Msg>) =
 
     let xs =
       ws
-        |> AsyncRx.map (fun _ -> MsgAdded)
-        |> AsyncRx.merge letterStringQuery
+      |> AsyncRx.map (fun _ -> MsgAdded)
+      |> AsyncRx.merge letterStringQuery
 
     Subscribe (xs, "remote")
   else

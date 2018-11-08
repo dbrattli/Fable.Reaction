@@ -1,7 +1,6 @@
 module Magic
 
 open Elmish
-open Elmish.React
 
 open Fable.Core.JsInterop
 open Fable.Helpers.React
@@ -17,8 +16,7 @@ open Fulma.Extensions
 
 open Reaction.AsyncRx
 open Elmish.Reaction
-open Elmish.Reaction.WebSocket
-open Shared
+open Utils
 
 type LetterSource =
 | None
@@ -94,7 +92,6 @@ let update (msg : Msg) (model : Model) : Model =
       |> App
 
   | App appModel, ToggleRemoteLetters ->
-      printfn "model.Letters %A" appModel.Letters
       appModel
       |> withToggledRemoterLetters
       |> App
@@ -126,10 +123,8 @@ let show = function
 | App { Counter = x } -> string x
 | Loading -> "Loading..."
 
-
 let offsetX x i =
   (int x) + i * 10 + 15
-
 
 let drawLetters letters =
   [
@@ -197,17 +192,17 @@ let viewStatus dispatch model =
            ]
 
           tr []
-             [
-               td [] [ str "Letters over Websockets" ]
-               td []
-                [
-                  Switch.switch
-                    [
-                      Switch.Checked <| letterSubscriptionOverWebsockets model
-                      Switch.OnChange (fun _ -> dispatch ToggleRemoteLetters)
-                    ] []
-                ]
-             ]
+           [
+             td [] [ str "Letters over Websockets" ]
+             td []
+              [
+                Switch.switch
+                  [
+                    Switch.Checked <| letterSubscriptionOverWebsockets model
+                    Switch.OnChange (fun _ -> dispatch ToggleRemoteLetters)
+                  ] []
+              ]
+           ]
         ]
     ]
 
@@ -252,14 +247,6 @@ let view model dispatch =
 
   | App appModel ->
       viewApp appModel dispatch
-
-
-let server source =
-  msgChannel<Shared.Msg>
-    "ws://localhost:8085/ws"
-    Shared.Msg.Encode
-    Shared.Msg.Decode
-    source
 
 let letterStream letterString =
   letterString
