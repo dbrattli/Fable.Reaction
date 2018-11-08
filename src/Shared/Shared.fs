@@ -6,8 +6,6 @@ open Thoth.Json
 open Thoth.Json.Net
 #endif
 
-type Counter = int
-
 type LetterPos = {
     Letter: string
     X: float

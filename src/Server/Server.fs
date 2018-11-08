@@ -18,19 +18,18 @@ open Giraffe.Serialization
 let publicPath = Path.GetFullPath "../Client/public"
 let port = 8085us
 
-let getInitCounter () : Task<Counter> = task { return 42 }
+let getInitLetterString () : Task<string> = task { return "Magic Released!" }
 
 let webApp =
   route "/api/init" >=>
     fun next ctx ->
-        task {
-            let! counter = getInitCounter()
-            return! Successful.OK counter next ctx
-        }
+      task {
+          let! letterString = getInitLetterString()
+          return! Successful.OK letterString next ctx
+      }
 
 let query (connectionId: ConnectionId) (msgs: IAsyncObservable<Msg*ConnectionId>) : IAsyncObservable<Msg*ConnectionId> =
   msgs
-    // |> AsyncObservable.filter (fun (msg, ci) -> ci = connectionId)
 
 let configureApp (app : IApplicationBuilder) =
     app.UseWebSockets()

@@ -9,37 +9,58 @@ open Fable.Helpers.React.Props
 open Fulma
 open Reaction.AsyncRx
 open Elmish.Reaction
+open Fable.PowerPack.Fetch
 
-type Model =
+open Thoth.Json
+
+type AppModel =
   {
     Magic : Magic.Model
     Info : Info.Model
   }
 
+type Model =
+  | Loading
+  | Error of string
+  | App of AppModel
+
+
 type Msg =
+  | InitialLetterStringLoaded of Result<string, exn>
   | MagicMsg of Magic.Msg
   | InfoMsg of Info.Msg
 
 let init () =
-  {
-    Magic = Magic.init
-    Info = Info.init
-  }
+  Loading
 
 let update (msg : Msg) model =
-  match msg with
-  | MagicMsg msg ->
+  match model, msg with
+  | Loading, InitialLetterStringLoaded (Ok letterString) ->
+      App <|
+        {
+          Magic = Magic.init letterString
+          Info = Info.init letterString
+        }
+
+  | Loading, InitialLetterStringLoaded (Result.Error exn) ->
+      Error exn.Message
+
+  | App model, MagicMsg msg ->
       { model with Magic = Magic.update msg model.Magic }
+      |> App
 
-  | InfoMsg msg ->
+  | App model, InfoMsg msg ->
       { model with Info = Info.update msg model.Info }
+      |> App
 
-
+  | _ -> model
 
 let safeComponents =
   let components =
     span []
      [
+       a [ Href "https://github.com/dbrattli/Reaction" ] [ str "Reaction" ]
+       str ", "
        a [ Href "https://github.com/giraffe-fsharp/Giraffe" ] [ str "Giraffe" ]
        str ", "
        a [ Href "http://fable.io" ] [ str "Fable" ]
@@ -57,23 +78,34 @@ let safeComponents =
     ]
 
 
+let viewApp model dispatch =
+  match model with
+  | Loading ->
+      div [] [ str "Initial Values not loaded" ]
+
+  | Error error ->
+      div [] [ str <| "Something went wrong: " + error ]
+
+  | App model ->
+     div []
+      [
+        Magic.view model.Magic (MagicMsg >> dispatch)
+        Info.view model.Info (InfoMsg >> dispatch)
+      ]
+
 let view (model : Model) (dispatch : Msg -> unit) =
   div []
     [
       Navbar.navbar [ Navbar.Color IsPrimary ]
         [
           Navbar.Item.div []
-            [ Heading.h2 []
+            [
+              Heading.h2 []
                 [ str "SAFE Template with Fable.Reaction" ]
             ]
         ]
 
-      Container.container []
-        [
-          Magic.view model.Magic (MagicMsg >> dispatch)
-          Info.view model.Info (InfoMsg >> dispatch)
-        ]
-
+      Container.container []  [ viewApp model dispatch ]
 
       Footer.footer []
         [
@@ -100,15 +132,34 @@ let asInfoMsg msg =
       None
 
 let toInfoMsgs msgs =
-    msgs |> AsyncRx.choose asInfoMsg
+  msgs |> AsyncRx.choose asInfoMsg
+
+
+let loadLetterString () =
+  ofPromise (fetchAs<string> "/api/init" Decode.string [])
+  |> AsyncRx.map (Ok >> InitialLetterStringLoaded)
+  |> AsyncRx.catch (Result.Error >> InitialLetterStringLoaded >> AsyncRx.single)
+
 
 let query (model: Model) (msgs: IAsyncObservable<Msg>) =
-    Queries [
-        Subscribe (msgs, "msgs")
+  match model with
+  | Loading ->
+      Queries
+        [
+          Subscribe (msgs, "msgs")
+          Subscribe (loadLetterString (), "loading")
+        ]
 
-        Magic.query model.Magic (toMagicMsgs msgs) |> Query.map MagicMsg
-        Info.query model.Info (toInfoMsgs msgs) |> Query.map InfoMsg
-    ]
+  | Error exn ->
+      Subscribe (msgs, "msgs")
+
+  | App model ->
+      Queries
+        [
+          Subscribe (msgs, "msgs")
+          Magic.query model.Magic (toMagicMsgs msgs) |> Query.map MagicMsg
+          Info.query model.Info (toInfoMsgs msgs) |> Query.map InfoMsg
+        ]
 
 #if DEBUG
 open Elmish.Debug

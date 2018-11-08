@@ -24,9 +24,9 @@ type Msg =
   | LetterStringChanged of string
 
 
-let init : Model =
+let init letterString =
   {
-    LetterString = ""
+    LetterString = letterString
     Msgs = 0
     Remote = false
   }
@@ -42,7 +42,6 @@ let update msg model =
   | LetterStringChanged str ->
       { model with LetterString = str }
 
-
 let viewStatus dispatch model =
   Table.table [ Table.IsHoverable ; Table.IsStriped ]
     [
@@ -53,7 +52,7 @@ let viewStatus dispatch model =
               th [] [ str "Remote" ]
               th []
                 [
-                   Switch.switch
+                  Switch.switch
                     [
                       Switch.Checked model.Remote
                       Switch.OnChange (fun _ -> dispatch RemoteToggled)
@@ -62,7 +61,7 @@ let viewStatus dispatch model =
             ]
         ]
 
-      tbody [ ]
+      tbody []
         [
           tr []
            [
@@ -92,20 +91,19 @@ let view model dispatch =
         [ Column.column [] [ viewStatus dispatch model ] ]
     ]
 
-
 let query (model : Model) (msgs : IAsyncObservable<Msg>) =
   if model.Remote then
-    let ws =
+    let websocket =
       AsyncRx.never()
-        |> server
-        |> AsyncRx.share
+      |> server
+      |> AsyncRx.share
 
     let letterStringQuery =
-      ws
+      websocket
       |> AsyncRx.choose (function | Shared.Msg.LetterString str -> Some (LetterStringChanged str) | _ -> None)
 
     let xs =
-      ws
+      websocket
       |> AsyncRx.map (fun _ -> MsgAdded)
       |> AsyncRx.merge letterStringQuery
 
