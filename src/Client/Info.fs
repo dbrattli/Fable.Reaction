@@ -15,9 +15,9 @@ open Shared
 open Fulma
 open Fulma.Extensions
 
-open Fable.Reaction
-open Fable.Reaction.WebSocket
-open Reaction
+open Reaction.AsyncRx
+open Elmish.Reaction
+open Elmish.Reaction.WebSocket
 open Shared
 
 
@@ -114,16 +114,20 @@ let query (model : Model) (msgs : IAsyncObservable<Msg>) =
   if model.Remote then
     let ws =
       msgs
-        |> AsyncObservable.filter (fun _ -> false)
-        |> AsyncObservable.map (fun _ -> Shared.Msg.LetterString "dont understand")
+        |> AsyncRx.filter (fun _ -> false)
+        |> AsyncRx.map (fun _ -> Shared.Msg.LetterString "dont understand")
         |> server
+        |> AsyncRx.share
 
     let letterStringQuery =
       ws
-      |> AsyncObservable.choose (function | Shared.Msg.LetterString str -> Some (LetterStringChanged str) | _ -> None)
+      |> AsyncRx.choose (function | Shared.Msg.LetterString str -> Some (LetterStringChanged str) | _ -> None)
 
-    ws
-    |> AsyncObservable.map (fun _ -> MsgAdded)
-    |> AsyncObservable.merge letterStringQuery, "remote"
+    let xs =
+      ws
+        |> AsyncRx.map (fun _ -> MsgAdded)
+        |> AsyncRx.merge letterStringQuery
+
+    Subscribe (xs, "remote")
   else
-    AsyncObservable.empty (), "local"
+    Dispose

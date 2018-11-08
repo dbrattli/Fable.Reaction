@@ -1,5 +1,6 @@
 module Client
 
+open System.Collections.Generic
 open Elmish
 open Elmish.React
 
@@ -15,10 +16,11 @@ open Shared
 open Fulma
 open Fulma.Extensions
 
-open Fable.Reaction
-open Fable.Reaction.WebSocket
-open Reaction
+open Reaction.AsyncRx
+open Elmish.Reaction
 open Shared
+open System.Threading
+open Fable.Helpers.React.ReactiveComponents
 
 
 
@@ -97,26 +99,29 @@ let asMagicMsg msg =
   match msg with
   | MagicMsg msg ->
       Some msg
-
   | _ ->
       None
+
+let toMagicMsgs msgs =
+    msgs |> AsyncRx.choose asMagicMsg
 
 let asInfoMsg msg =
   match msg with
   | InfoMsg msg ->
       Some msg
-
   | _ ->
       None
 
+let toInfoMsgs msgs =
+    msgs |> AsyncRx.choose asInfoMsg
 
-let queries (model: Model) (msgs: IAsyncObservable<Msg>) =
-  [
-    Program.withSubQuery Magic.query model.Magic msgs MagicMsg asMagicMsg
-    Program.withSubQuery Info.query model.Info msgs InfoMsg asInfoMsg
-    msgs,"none"
-  ]
+let query (model: Model) (msgs: IAsyncObservable<Msg>) =
+    Queries [
+        Subscribe (msgs, "msgs")
 
+        Magic.query model.Magic (toMagicMsgs msgs) |> Query.map MagicMsg
+        Info.query model.Info (toInfoMsgs msgs) |> Query.map InfoMsg
+    ]
 
 #if DEBUG
 open Elmish.Debug
@@ -124,10 +129,10 @@ open Elmish.HMR
 #endif
 
 Program.mkSimple init update view
-|> Program.withQueries queries
+|> Program.withQuery query
 #if DEBUG
-// |> Program.withConsoleTrace
-// |> Program.withHMR
+//|> Program.withConsoleTrace
+|> Program.withHMR
 #endif
 |> Program.withReact "elmish-app"
 #if DEBUG
