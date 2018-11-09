@@ -238,8 +238,8 @@ let query (model : Model) msgs =
    | Remote _ ->
       let letterQuery =
         model.LetterString
-          |> letterStream
-          |> AsyncRx.map Shared.Msg.Letter
+        |> letterStream
+        |> AsyncRx.map Shared.Msg.Letter
 
       let letterStringQuery =
         msgs

@@ -9,8 +9,8 @@ open Microsoft.Extensions.DependencyInjection
 
 open FSharp.Control.Tasks.V2
 open Giraffe
-open Reaction
-open Reaction.Giraffe.Middleware
+open Reaction.AsyncRx
+open Reaction.AspNetCore.Middleware.Middleware
 open Shared
 
 open Giraffe.Serialization
@@ -18,17 +18,64 @@ open Giraffe.Serialization
 let publicPath = Path.GetFullPath "../Client/public"
 let port = 8085us
 
-let getInitLetterString () : Task<string> = task { return "Magic Released!" }
+
+type LetterMsg =
+  | Set of string
+  | Get of AsyncReplyChannel<string>
+
+let mailbox =
+  MailboxProcessor.Start(fun inbox ->
+    let rec loop letterString =
+      async {
+        let! msg = inbox.Receive()
+
+        match msg with
+        | Set letterString ->
+            return! loop letterString
+
+        | Get reply ->
+            reply.Reply letterString
+
+            return! loop letterString
+      }
+
+    loop "Magic Released!"
+  )
+
+let getInitLetterString () : Task<string> =
+  Get
+  |> mailbox.PostAndAsyncReply
+  |> Async.StartAsTask
 
 let webApp =
   route "/api/init" >=>
     fun next ctx ->
       task {
-          let! letterString = getInitLetterString()
-          return! Successful.OK letterString next ctx
+        let! letterString = getInitLetterString()
+        return! Successful.OK letterString next ctx
       }
 
+let letterObserver =
+  { new IAsyncObserver<string> with
+      member __.OnNextAsync letterString = async {
+        printfn "next letter string: %s" letterString
+        do mailbox.Post (Set letterString)
+      }
+      member __.OnErrorAsync err = async {
+        do printfn "Reaction error: %A" err
+      }
+      member __.OnCompletedAsync () = async {
+        do printfn "Reaction query completed"
+      }
+  }
+
 let query (connectionId: ConnectionId) (msgs: IAsyncObservable<Msg*ConnectionId>) : IAsyncObservable<Msg*ConnectionId> =
+  let letterStringChanged =
+    msgs
+    |> AsyncRx.choose (fun (msg, _) -> match msg with Msg.LetterString letterString -> Some letterString | _ -> None)
+
+  letterStringChanged.SubscribeAsync letterObserver |> ignore
+
   msgs
 
 let configureApp (app : IApplicationBuilder) =

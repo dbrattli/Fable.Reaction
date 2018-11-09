@@ -9,7 +9,7 @@ group Server
     nuget Microsoft.AspNetCore
     nuget Microsoft.AspNetCore.StaticFiles
     nuget Fable.JsonConverter
-
+    nuget Reaction.AsyncRx prerelease
     nuget Reaction.Giraffe ~> 0
     nuget Microsoft.AspNetCore.WebSockets
     nuget Thoth.Json.Net ~> 2

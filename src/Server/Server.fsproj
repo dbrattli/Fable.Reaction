@@ -5,6 +5,9 @@
         <TargetFramework>netcoreapp2.1</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
+        <ProjectReference Include="C:\src\libraries\Reaction\AspNetCore.Middleware\Reaction.AspNetCore.Middleware.fsproj" />
+    </ItemGroup>
+    <ItemGroup>
         <Compile Include="..\Shared\Shared.fs" />
         <Compile Include="Server.fs" />
     </ItemGroup>

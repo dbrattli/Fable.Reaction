@@ -1508,6 +1508,9 @@ NUGET
     Reaction (1.0) - restriction: >= netstandard2.0
       FSharp.Control.AsyncSeq (>= 2.0.21) - restriction: >= netstandard2.0
       FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
+    Reaction.AsyncRx (2.0.0-alpha1)
+      FSharp.Control.AsyncSeq (>= 2.0.21) - restriction: >= netstandard2.0
+      FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
     Reaction.Giraffe (0.2)
       FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
       Giraffe (>= 1.1) - restriction: >= netstandard2.0
