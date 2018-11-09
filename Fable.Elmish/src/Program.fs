@@ -1,11 +1,10 @@
-namespace Elmish.Reaction
+namespace Reaction
 
 open System
 open System.Collections.Generic
 
 open Elmish
-open Reaction.AsyncRx
-open Reaction.AsyncRx.Streams
+open Reaction.Streams
 
 type Query<'msg, 'name> =
     | Subscribe of IAsyncObservable<'msg>*'name

@@ -1,8 +1,6 @@
-namespace Elmish.Reaction
+namespace Reaction
 
 open Fable.Import.Browser
-
-open Reaction.AsyncRx
 
 module WebSocket =
 

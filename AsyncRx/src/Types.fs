@@ -1,4 +1,4 @@
-namespace Reaction.AsyncRx
+namespace Reaction
 
 type Notification<'a> =
     | OnNext of 'a

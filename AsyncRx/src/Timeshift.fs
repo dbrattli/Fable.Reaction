@@ -1,8 +1,8 @@
-namespace Reaction.AsyncRx
+namespace Reaction
 
 open System
 
-open Reaction.AsyncRx.Core
+open Reaction.Core
 
 
 [<RequireQualifiedAccess>]

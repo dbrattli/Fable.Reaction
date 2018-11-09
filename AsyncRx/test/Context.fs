@@ -5,7 +5,7 @@ open System.Collections.Concurrent
 open System.Threading;
 open System.Threading.Tasks
 
-open Reaction.AsyncRx
+open Reaction
 
 // A single thread test synchronization context.
 // Inspired by: https://blogs.msdn.microsoft.com/pfxteam/2012/01/20/await-synchronizationcontext-and-console-apps/

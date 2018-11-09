@@ -1,7 +1,7 @@
-namespace Reaction.AsyncRx
+namespace Reaction
 
 open System.Threading
-open Reaction.AsyncRx.Core
+open Reaction.Core
 
 [<RequireQualifiedAccess>]
 module Aggregation =

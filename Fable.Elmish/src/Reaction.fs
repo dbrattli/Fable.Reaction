@@ -1,12 +1,12 @@
-namespace Elmish.Reaction
+namespace Reaction
 
 open Fable.Core
 open Fable.Import.Browser
 
-open Reaction.AsyncRx
+open Reaction
 
-//[<RequireQualifiedAccess>]
-//[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+[<RequireQualifiedAccess>]
+[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module AsyncRx =
     /// Returns an observable that produces a notification when the
     /// promise resolves. The observable will also complete after

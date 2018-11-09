@@ -2,7 +2,7 @@ module Tests.Catch
 
 open System.Threading.Tasks
 
-open Reaction.AsyncRx
+open Reaction
 
 open NUnit.Framework
 open FsUnit

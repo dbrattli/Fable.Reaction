@@ -2,7 +2,7 @@ module Tests.Debounce
 
 open System.Threading.Tasks
 
-open Reaction.AsyncRx
+open Reaction
 open Test.Reaction.Context
 
 open NUnit.Framework

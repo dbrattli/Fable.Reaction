@@ -1,4 +1,4 @@
-namespace Reaction.AsyncRx
+namespace Reaction
 
 type QueryBuilder() =
     member this.Zero () : IAsyncObservable<_> = Create.empty ()
@@ -21,6 +21,6 @@ type QueryBuilder() =
         |> Transformation.flatMap func
 
 [<AutoOpen>]
-module Query =
+module QueryBuilder =
     /// Query builder for an async reactive event source
     let asyncRx = new QueryBuilder ()

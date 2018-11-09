@@ -1,4 +1,4 @@
-namespace Reaction.AsyncRx
+namespace Reaction
 
 type AsyncDisposable (cancel) =
     interface IAsyncDisposable with

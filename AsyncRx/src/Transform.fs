@@ -1,4 +1,4 @@
-namespace Reaction.AsyncRx
+namespace Reaction
 
 open Types
 open Core

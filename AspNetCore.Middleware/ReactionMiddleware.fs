@@ -1,4 +1,4 @@
-namespace Reaction.AspNetCore.Middleware
+namespace Reaction.AspNetCore
 
 open System
 open System.Collections.Generic

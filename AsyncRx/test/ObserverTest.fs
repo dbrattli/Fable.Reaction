@@ -2,8 +2,8 @@ module Tests.Observer
 
 open System.Threading.Tasks
 
-open Reaction.AsyncRx
-open Reaction.AsyncRx.Core
+open Reaction
+open Reaction.Core
 
 open NUnit.Framework
 open FsUnit

@@ -1,4 +1,4 @@
-namespace Reaction.AsyncRx
+namespace Reaction
 
 open System
 open System.Threading

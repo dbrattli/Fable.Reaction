@@ -7,7 +7,7 @@ open System.Threading.Tasks
 open NUnit.Framework
 open FsUnit
 
-open Reaction.AsyncRx
+open Reaction
 open Test.Reaction.Context
 
 let toTask computation : Task = Async.StartAsTask computation :> _

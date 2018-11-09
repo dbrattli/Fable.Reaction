@@ -4,7 +4,7 @@ open System
 open System.Collections.Generic
 open System.Threading.Tasks
 
-open Reaction.AsyncRx
+open Reaction
 
 type TestObserver<'a>() =
     let notifications = new List<Notification<'a>>()

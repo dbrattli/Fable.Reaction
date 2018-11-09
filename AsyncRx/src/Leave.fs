@@ -1,4 +1,4 @@
-namespace Reaction.AsyncRx
+namespace Reaction
 
 #if !FABLE_COMPILER
 open System.Threading

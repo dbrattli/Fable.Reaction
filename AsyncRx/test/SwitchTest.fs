@@ -1,8 +1,8 @@
 module Tests.Switch
 
 open System.Threading.Tasks
-open Reaction.AsyncRx
-open Reaction.AsyncRx.Streams
+open Reaction
+open Reaction.Streams
 
 open NUnit.Framework
 open FsUnit

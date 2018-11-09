@@ -1,4 +1,4 @@
-namespace Reaction.AsyncRx
+namespace Reaction
 
 type AsyncObserver<'a> (fn: Notification<'a> -> Async<unit>) =
 
