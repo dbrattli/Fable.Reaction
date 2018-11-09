@@ -2,15 +2,11 @@ module Client
 
 open Elmish
 open Elmish.React
-
-open Fable.Reaction
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fable.Core.JsInterop
-open Reaction
-
 open Fulma
-open Fable
+open Reaction
 
 type Project = { Name: string; Logo: string }
 
@@ -110,14 +106,14 @@ let view (model : Model) (dispatch : Msg -> unit) =
 open Fable.Import.Browser
 
 let query (msgs : IAsyncObservable<Msg>) : IAsyncObservable<Msg> =
-    let mouseMove = ofMouseMove ()
+    let mouseMove = AsyncRx.ofMouseMove ()
     let mouseUp =
         msgs
-        |> AsyncObservable.choose Msg.asMouseUpEvent
+        |> AsyncRx.choose Msg.asMouseUpEvent
 
     let mouseDown =
         msgs
-        |> AsyncObservable.choose Msg.asMouseDownEvent
+        |> AsyncRx.choose Msg.asMouseDownEvent
 
     (*
     mouseDown
@@ -126,19 +122,19 @@ let query (msgs : IAsyncObservable<Msg>) : IAsyncObservable<Msg> =
         let startX, startY = (ev.clientX - rect.left, ev.clientY - rect.top)
 
         mouseMove
-        |> AsyncObservable.map (fun ev ->
+        |> AsyncRx.map (fun ev ->
             MouseDragEvent ev.clientX - startX, ev.clientY - startY)
-        |> takeUntil mouseUp)
+        |> AsyncRx.takeUntil mouseUp)
     *)
-    reaction {
+    asyncRx {
         let! ev, project = mouseDown
         let rect : ClientRect = !!ev.target?getBoundingClientRect ()
         let startX, startY = ev.clientX - rect.left, ev.clientY - rect.top
 
         yield! mouseMove
-            |> AsyncObservable.map (fun ev ->
+            |> AsyncRx.map (fun ev ->
                 MouseDragEvent (ev.clientX - startX, ev.clientY - startY, project))
-            |> AsyncObservable.takeUntil mouseUp
+            |> AsyncRx.takeUntil mouseUp
     }
 
 #if DEBUG
@@ -147,7 +143,7 @@ open Elmish.HMR
 #endif
 
 Program.mkSimple init update view
-|> Program.withQuery query
+|> Program.withSimpleQuery query
 #if DEBUG
 |> Program.withConsoleTrace
 |> Program.withHMR
