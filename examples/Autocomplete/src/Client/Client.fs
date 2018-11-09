@@ -4,9 +4,7 @@ open Fable.Core.JsInterop
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fable.PowerPack.Fetch
-open Fable.Reaction
 open Reaction
-open Reaction.AsyncObservable
 open Elmish
 open Elmish.React
 open Fulma
@@ -133,39 +131,41 @@ let searchWikipedia (term: string) =
     ]
 
     if term.Length = 0 then
-        QueryResult (Ok Msg.EmptyResult) |> single
+        QueryResult (Ok Msg.EmptyResult) |> AsyncRx.single
     else
-        ofPromise (fetch url props)
-        |> flatMap (fun res -> res.text() |> ofPromise)
-        |> map jsonDecode
-        |> map QueryResult
-        |> catch (sprintf "%A" >> Error >> QueryResult >> single)
+        AsyncRx.ofPromise (fetch url props)
+        |> AsyncRx.flatMap (fun res -> res.text () |> AsyncRx.ofPromise)
+        |> AsyncRx.map jsonDecode
+        |> AsyncRx.map QueryResult
+        |> AsyncRx.catch (sprintf "%A" >> Error >> QueryResult >> AsyncRx.single)
 
-let query msgs =
-    let targetValue (ev: Fable.Import.React.KeyboardEvent) : string =
-        try
-            let target = !!ev.target?value : string
-            target.Trim ()
-        with _ -> ""
+let query model msgs =
+    Queries [
+        let targetValue (ev: Fable.Import.React.KeyboardEvent) : string =
+            try
+                let target = !!ev.target?value : string
+                target.Trim ()
+            with _ -> ""
 
-    let terms =
-        msgs
-        |> choose Msg.asKeyboardEvent
-        |> map targetValue       // Map keyboard event to input value
-        |> filter (fun term -> term.Length > 2 || term.Length = 0)
-        |> debounce 750          // Pause for 750ms
-        |> distinctUntilChanged  // Only if the value has changed
+        let terms =
+            msgs
+            |> AsyncRx.choose Msg.asKeyboardEvent
+            |> AsyncRx.map targetValue       // Map keyboard event to input value
+            |> AsyncRx.filter (fun term -> term.Length > 2 || term.Length = 0)
+            |> AsyncRx.debounce 750          // Pause for 750ms
+            |> AsyncRx.distinctUntilChanged  // Only if the value has changed
 
-    let loading =
-        terms
-        |> filter (fun x -> x.Length > 0)
-        |> map (fun _ -> Loading)
+        let loading =
+            terms
+            |> AsyncRx.filter (fun x -> x.Length > 0)
+            |> AsyncRx.map (fun _ -> Loading)
+        yield Subscribe (loading, "loading")
 
-    let results =
-        terms
-        |> flatMapLatest searchWikipedia
-
-    results |> merge loading
+        let results =
+            terms
+            |> AsyncRx.flatMapLatest searchWikipedia
+        yield Subscribe (results, "search")
+    ]
 
 Program.mkSimple init update view
 |> Program.withQuery query
