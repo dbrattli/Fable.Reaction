@@ -101,9 +101,9 @@ let offsetX x i =
 
 let drawLetters letters =
   [
-    for KeyValue(i, pos) in letters do
-      yield span [ Style [Top pos.Y; Left (offsetX pos.X i); Position "absolute"] ]
-          [ str pos.Letter ]
+    [ for KeyValue(i, pos) in letters do
+       yield span [ Key (string i); Style [Top pos.Y; Left (offsetX pos.X i); Position "fixed"] ]
+          [ str pos.Letter ]] |> ofList
   ]
 
 let viewLetters model =
