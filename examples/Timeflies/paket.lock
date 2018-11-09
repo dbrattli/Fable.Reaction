@@ -877,6 +877,12 @@ NUGET
       Fable.PowerPack (>= 2.0.1) - restriction: >= netstandard2.0
       Fable.React (>= 4.0.1) - restriction: >= netstandard2.0
       FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
+    Fable.Elmish.Reaction (2.0.0-alpha3)
+      Fable.Core (>= 2.0.1) - restriction: >= netstandard2.0
+      Fable.Elmish (>= 2.0.3) - restriction: >= netstandard2.0
+      Fable.React (>= 2.1) - restriction: >= netstandard2.0
+      FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
+      Reaction.AsyncRx (>= 2.0.0-alpha3) - restriction: >= netstandard2.0
     Fable.Import.Browser (1.3)
       Fable.Core (>= 1.3.17) - restriction: >= netstandard1.6
     Fable.PowerPack (2.0.1)
@@ -928,6 +934,9 @@ NUGET
     NETStandard.Library (2.0.3) - restriction: >= netcoreapp2.1
       Microsoft.NETCore.Platforms (>= 1.1) - restriction: || (&& (>= net45) (< netstandard1.3)) (&& (< net45) (>= netstandard1.1) (< netstandard1.2) (< win8)) (&& (< net45) (>= netstandard1.2) (< netstandard1.3) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.3) (< netstandard1.4) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.4) (< netstandard1.5) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.5) (< netstandard1.6) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.6) (< netstandard2.0) (< win8) (< wpa81)) (&& (< net45) (>= netstandard2.0) (< win8) (< wpa81)) (&& (>= net46) (< netstandard1.4)) (>= net461) (>= netcoreapp2.0) (&& (>= netstandard1.0) (< portable-net45+win8+wpa81)) (&& (< netstandard1.0) (>= portable-net45+win8) (< win8)) (&& (< netstandard1.0) (< portable-net45+win8) (>= portable-net45+win8+wpa81)) (&& (< netstandard1.0) (>= portable-net45+win8+wp8+wpa81) (< portable-net45+win8+wpa81)) (&& (< netstandard1.0) (>= win8)) (&& (< netstandard1.3) (< win8) (>= wpa81)) (>= uap10.0) (>= wp8)
     Newtonsoft.Json (11.0.2) - restriction: >= netcoreapp2.0
+    Reaction.AsyncRx (2.0.0-alpha3) - restriction: >= netstandard2.0
+      FSharp.Control.AsyncSeq (>= 2.0.21) - restriction: >= netstandard2.0
+      FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
     runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl (4.3.3) - restriction: >= netcoreapp2.0
     runtime.debian.9-x64.runtime.native.System.Security.Cryptography.OpenSsl (4.3.3) - restriction: >= netcoreapp2.0
     runtime.fedora.23-x64.runtime.native.System.Security.Cryptography.OpenSsl (4.3.3) - restriction: >= netcoreapp2.0
@@ -1169,18 +1178,8 @@ NUGET
     System.Threading.ThreadPool (4.3) - restriction: >= netcoreapp2.0
       System.Runtime (>= 4.3) - restriction: && (< monoandroid) (< monotouch) (< net46) (>= netstandard1.3) (< xamarinios) (< xamarinmac) (< xamarintvos) (< xamarinwatchos)
       System.Runtime.Handles (>= 4.3) - restriction: && (< monoandroid) (< monotouch) (< net46) (>= netstandard1.3) (< xamarinios) (< xamarinmac) (< xamarintvos) (< xamarinwatchos)
-    Thoth.Json (2.4) - restriction: >= netstandard2.0
+    Thoth.Json (2.5) - restriction: >= netstandard2.0
       Fable.Core (>= 2.0) - restriction: >= netstandard2.0
-      FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
-  remote: /Users/dbrattli/Developer/packages
-    Fable.Elmish.Reaction (2.0.0)
-      Fable.Core (>= 2.0.1) - restriction: >= netstandard2.0
-      Fable.Elmish (>= 2.0.3) - restriction: >= netstandard2.0
-      Fable.React (>= 2.1) - restriction: >= netstandard2.0
-      FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
-      Reaction.AsyncRx (>= 2.0) - restriction: >= netstandard2.0
-    Reaction.AsyncRx (2.0.0) - restriction: >= netstandard2.0
-      FSharp.Control.AsyncSeq (>= 2.0.21) - restriction: >= netstandard2.0
       FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
 
 GROUP Server

@@ -3,8 +3,8 @@ module Client
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 
-open Reaction.AsyncRx
-open Elmish.Reaction
+open Fable.Import
+open Reaction
 open Elmish
 open Elmish.React
 
@@ -26,23 +26,33 @@ let update (msg : Msg) (currentModel : Model) : Model =
     match currentModel.Letters, msg with
     | _, Letter (i, c, x, y) ->
         { currentModel with Letters = currentModel.Letters.Add (i, (c, x, y)) }
-    | _ -> currentModel
-
-let renderLetter c x y =
-    span [ Style [Top y; Left x; Position "absolute"] ] [
-        str c
-    ]
 
 let view (model : Model) (dispatch : Dispatch<Msg>) =
     let letters = model.Letters
 
-    div [ Style [ FontFamily "Consolas, monospace"; Height "100%"] ] [
-        for KeyValue(i, (c, x, y)) in letters do
-            yield renderLetter c x y
-    ]
+    div [ Style [ FontFamily "Consolas, monospace"; Height "100%"] ]
+        [
+            [ for KeyValue(i, (c, x, y)) in letters do
+                yield span [ Key (c + string i); Style [Top y; Left x; Position "fixed"] ]
+                    [ str c ] ] |> ofList
+        ]
 
 let init () : Model =
     { Letters = Map.empty }
+
+let getOffset (element: Browser.Element) =
+    let doc = element.ownerDocument
+    let docElem = doc.documentElement
+    let body = doc.body
+    let clientTop  = docElem.clientTop
+    let clientLeft = docElem.clientLeft
+    let scrollTop  = Browser.window.pageYOffset
+    let scrollLeft = Browser.window.pageXOffset
+
+    int (scrollTop - clientTop), int (scrollLeft - clientLeft)
+
+let container = Browser.document.querySelector("#elmish-app")
+let top, left = getOffset container
 
 // Query for message stream transformation (expression style)
 let query model msgs =
@@ -54,10 +64,10 @@ let query model msgs =
         for i, c in chars do
             yield! AsyncRx.ofMouseMove ()
                 |> AsyncRx.delay (100 * i)
-                |> AsyncRx.map (fun m -> Letter (i, string c, int m.clientX + i * 10 + 15, int m.clientY))
+                |> AsyncRx.map (fun m -> Letter (i, string c, int m.clientX + i * 10 + 15 - left, int m.clientY - top))
     }, "msgs")
 
 Program.mkSimple init update view
 |> Program.withQuery query
-|> Program.withReactUnoptimized "elmish-app"
+|> Program.withReact "elmish-app"
 |> Program.run
