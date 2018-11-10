@@ -1,6 +1,6 @@
 module Utils
 
-open Elmish.Reaction.WebSocket
+open Reaction.WebSocket
 
 let server source =
   msgChannel<Shared.Msg>
