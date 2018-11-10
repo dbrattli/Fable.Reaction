@@ -4,7 +4,7 @@ open System
 open System.Collections.Generic
 
 open Elmish
-open Reaction.Streams
+open Reaction
 
 type Query<'msg, 'name> =
     | Subscribe of IAsyncObservable<'msg>*'name
@@ -31,7 +31,7 @@ module Program =
     /// change the query at runtime based on the current state (Model).
     let withQuery (query: 'model -> IAsyncObservable<'msg> -> Query<'msg, 'name>) (program: Elmish.Program<_,_,_,_>) =
         let subscriptions = new Dictionary<'name, IAsyncDisposable> ()
-        let mb, stream = mbStream<'msg> ()
+        let mb, stream = AsyncRx.mbStream<'msg> ()
         let dispatch' = OnNext >> mb.Post
 
         let msgObserver name dispatch =
@@ -106,7 +106,7 @@ module Program =
     /// Attach a simple Reaction query to the message (Msg) stream of an Elmish program. The
     /// supplied query function is called once by the Elmish runtime.
     let withSimpleQuery (query: IAsyncObservable<'msg> -> IAsyncObservable<'msg>) (program: Elmish.Program<_,_,_,_>) =
-        let mb, stream = mbStream<'msg> ()
+        let mb, stream = AsyncRx.mbStream<'msg> ()
 
         let subscribe _ : Cmd<'msg> =
             let sub dispatch =
