@@ -1,5 +1,7 @@
 namespace Reaction
 
+/// Overloads and extensions for AsyncDisposable
+
 type AsyncDisposable (cancel) =
     interface IAsyncDisposable with
         member this.DisposeAsync () =

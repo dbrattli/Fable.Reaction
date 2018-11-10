@@ -4,6 +4,7 @@ namespace Reaction
 open FSharp.Control
 #endif
 
+/// Overloads and extensions for AsyncObservable
 [<AutoOpen>]
 module AsyncObservable =
     type IAsyncObservable<'a> with
@@ -32,8 +33,11 @@ module AsyncObservable =
     /// the given sequences.
     let inline (++) source other = Combine.concat [source; other]
 
+/// A single module that contains all the operators. Nicer and shorter way than writing
+/// AsyncObservable. We want to prefix our operators so we don't mix e.g. `map` with other modules.
 module AsyncRx =
-    // Aggregate
+
+  // AggregateRegion
 
     /// Groups the elements of an observable sequence according to a
     /// specified key mapper function. Returns a sequence of observable
@@ -55,7 +59,7 @@ module AsyncRx =
     let inline scanAsync (initial: 's) (accumulator: 's -> 'a -> Async<'s>) (source: IAsyncObservable<'a>) : IAsyncObservable<'s> =
         Aggregation.scanAsync initial accumulator source
 
-    // Combine
+  // CombineRegion
 
     /// Merges the specified observable sequences into one observable
     /// sequence by combining elements of the sources into tuples.
@@ -93,7 +97,7 @@ module AsyncRx =
     let inline zipSeq (sequence: seq<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a*'b> =
         Combine.zipSeq sequence source
 
-    // Creation
+  // CreateRegion
 
     /// Creates an async observable (`AsyncObservable{'a}`) from the
     /// given subscribe function.
@@ -128,11 +132,12 @@ module AsyncRx =
     let inline ofAsync (workflow: Async<'a>)  : IAsyncObservable<'a> =
         Create.ofAsync workflow
 
-#if !FABLE_COMPILER
+    #if !FABLE_COMPILER
     /// Convert async sequence into an async observable.
     let inline ofAsyncSeq (xs: AsyncSeq<'a>) : IAsyncObservable<'a> =
         Create.ofAsyncSeq xs
-#endif
+    #endif
+
     /// Returns the async observable sequence whose elements are pulled
     /// from the given enumerable sequence.
     let inline ofSeq (xs: seq<'a>) : IAsyncObservable<'a> =
@@ -148,7 +153,7 @@ module AsyncRx =
     let inline timer (dueTime: int) : IAsyncObservable<int> =
         Create.timer dueTime
 
-    // Filter
+  // FilterRegion
 
     /// Applies the given function to each element of the stream and
     /// returns the stream comprised of the results for each element
@@ -184,16 +189,16 @@ module AsyncRx =
     let inline takeUntil (other: IAsyncObservable<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
         Filter.takeUntil other source
 
-    // Leave
-#if !FABLE_COMPILER
+  // LeaveRegion
+    #if !FABLE_COMPILER
     /// Convert async observable to async sequence, non-blocking.
     /// Producer will be awaited until item is consumed by the async
     /// enumerator.
     let inline toAsyncSeq (source: IAsyncObservable<'a>) : AsyncSeq<'a> =
         Leave.toAsyncSeq source
-#endif
+    #endif
 
-    // Timeshift
+  // TimeshiftRegion
 
     /// Ignores values from an observable sequence which are followed by
     /// another value before the given timeout.
@@ -209,7 +214,7 @@ module AsyncRx =
     let inline sample (msecs: int) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
         Timeshift.sample msecs source
 
-    // Transform
+   // TransformRegion
 
     /// Returns an observable sequence containing the first sequence's
     /// elements, followed by the elements of the handler sequence in
@@ -291,3 +296,20 @@ module AsyncRx =
     /// Observable.
     let inline share (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
         Transformation.share source
+
+  // StreamsRegion
+
+    /// A stream is both an observable sequence as well as an observer.
+    /// Each notification is broadcasted to all subscribed observers.
+    let inline stream<'a> () : IAsyncObserver<'a> * IAsyncObservable<'a> =
+        Streams.stream<'a> ()
+
+    /// A mailbox stream is a subscribable mailbox. Each message is
+    /// broadcasted to all subscribed observers.
+    let inline mbStream<'a> () : MailboxProcessor<Notification<'a>>*IAsyncObservable<'a> =
+        Streams.mbStream<'a> ()
+
+    /// A cold stream that only supports a single subscriber. Will await the
+    /// caller if no-one is subscribing.
+    let inline singleStream<'a> () : IAsyncObserver<'a> * IAsyncObservable<'a> =
+        Streams.singleStream<'a> ()

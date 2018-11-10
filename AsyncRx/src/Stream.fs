@@ -8,7 +8,7 @@ open Core
 
 module Streams =
     /// A cold stream that only supports a single subscriber
-    let singleStream () : IAsyncObserver<'a> * IAsyncObservable<'a> =
+    let singleStream<'a> () : IAsyncObserver<'a> * IAsyncObservable<'a> =
         let mutable oobv: IAsyncObserver<'a> option = None
         let cts = new CancellationTokenSource ()
 
