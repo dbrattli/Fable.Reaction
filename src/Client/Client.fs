@@ -7,8 +7,7 @@ open Fable.Helpers.React
 open Fable.Helpers.React.Props
 
 open Fulma
-open Reaction.AsyncRx
-open Elmish.Reaction
+open Reaction
 open Fable.PowerPack.Fetch
 
 open Thoth.Json
@@ -136,7 +135,7 @@ let toInfoMsgs msgs =
 
 
 let loadLetterString () =
-  ofPromise (fetchAs<string> "/api/init" Decode.string [])
+  AsyncRx.ofPromise (fetchAs<string> "/api/init" Decode.string [])
   |> AsyncRx.map (Ok >> InitialLetterStringLoaded)
   |> AsyncRx.catch (Result.Error >> InitialLetterStringLoaded >> AsyncRx.single)
 
