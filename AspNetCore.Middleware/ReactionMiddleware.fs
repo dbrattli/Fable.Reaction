@@ -10,8 +10,7 @@ open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Logging
 
-open Reaction.AsyncRx
-open Reaction.AsyncRx.Streams
+open Reaction
 
 module Middleware =
     type ConnectionId = string
@@ -36,8 +35,8 @@ module Middleware =
 
     type ReactionMiddleware<'msg> (next: RequestDelegate, getOptions: GetOptions<'msg>)  =
         let sockets = List<WebSocket> ()
-        let obvAll, streamAll = stream<'msg*ConnectionId> ()
-        let obv, stream = stream<'msg*ConnectionId> ()
+        let obvAll, streamAll = AsyncRx.stream<'msg*ConnectionId> ()
+        let obv, stream = AsyncRx.stream<'msg*ConnectionId> ()
         let mutable subscription : IAsyncDisposable option = None
 
         member this.Invoke (ctx: HttpContext) =
