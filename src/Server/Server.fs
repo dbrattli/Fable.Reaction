@@ -11,8 +11,8 @@ open Microsoft.Extensions.DependencyInjection
 
 open FSharp.Control.Tasks.V2
 open Giraffe
-open Reaction.AsyncRx
-open Reaction.AspNetCore.Middleware.Middleware
+open Reaction
+open Reaction.AspNetCore.Middleware
 open Shared
 
 open Giraffe.Serialization
@@ -22,7 +22,7 @@ let port = 8085us
 
 
 type LetterMsg =
-  | Set of string 
+  | Set of string
   | Get of AsyncReplyChannel<string>
 
 let mailbox =

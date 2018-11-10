@@ -8,3 +8,4 @@ group Server
     Thoth.Json.Net
     Reaction.Giraffe
     Reaction.AsyncRx
+    Reaction.AspNetCore.Middleware

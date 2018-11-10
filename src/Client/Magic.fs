@@ -14,7 +14,7 @@ open Shared
 open Fulma
 open Fulma.Extensions
 
-open Reaction.AsyncRx
+open Reaction
 open Elmish.Reaction
 open Utils
 
