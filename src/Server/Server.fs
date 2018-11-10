@@ -1,3 +1,5 @@
+module Server
+
 open System
 open System.IO
 open System.Threading.Tasks
@@ -20,7 +22,7 @@ let port = 8085us
 
 
 type LetterMsg =
-  | Set of string
+  | Set of string 
   | Get of AsyncReplyChannel<string>
 
 let mailbox =
@@ -55,28 +57,17 @@ let webApp =
         return! Successful.OK letterString next ctx
       }
 
-let letterObserver =
-  { new IAsyncObserver<string> with
-      member __.OnNextAsync letterString = async {
-        printfn "next letter string: %s" letterString
-        do mailbox.Post (Set letterString)
-      }
-      member __.OnErrorAsync err = async {
-        do printfn "Reaction error: %A" err
-      }
-      member __.OnCompletedAsync () = async {
-        do printfn "Reaction query completed"
-      }
-  }
 
 let query (connectionId: ConnectionId) (msgs: IAsyncObservable<Msg*ConnectionId>) : IAsyncObservable<Msg*ConnectionId> =
-  let letterStringChanged =
-    msgs
-    |> AsyncRx.choose (fun (msg, _) -> match msg with Msg.LetterString letterString -> Some letterString | _ -> None)
-
-  letterStringChanged.SubscribeAsync letterObserver |> ignore
-
   msgs
+  |> AsyncRx.flatMap(fun (msg,id) ->
+       match msg with
+       | Msg.LetterString letterString ->
+          mailbox.Post (Set letterString)
+          AsyncRx.single (msg,id)
+
+       | _ -> AsyncRx.empty())
+
 
 let configureApp (app : IApplicationBuilder) =
     app.UseWebSockets()
