@@ -64,9 +64,10 @@ let query (connectionId: ConnectionId) (msgs: IAsyncObservable<Msg*ConnectionId>
        match msg with
        | Msg.LetterString letterString ->
           mailbox.Post (Set letterString)
-          AsyncRx.single (msg,id)
 
-       | _ -> AsyncRx.empty())
+       | _ -> ()
+
+       AsyncRx.single (msg,id))
 
 
 let configureApp (app : IApplicationBuilder) =
