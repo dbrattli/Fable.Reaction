@@ -1,21 +1,15 @@
 module Magic
 
-open Elmish
-
 open Fable.Core.JsInterop
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
-open Fable.PowerPack.Fetch
-
-open Thoth.Json
 
 open Shared
 
 open Fulma
 open Fulma.Extensions
 
-open Reaction.AsyncRx
-open Elmish.Reaction
+open Reaction
 open Utils
 
 type LetterSource =
@@ -219,7 +213,7 @@ let letterStream letterString =
   |> Seq.mapi (fun i c -> i, c) // Create a tuple with the index
   |> AsyncRx.ofSeq // Make this an observable
   |> AsyncRx.flatMap (fun (i, letter) ->
-      ofMouseMove ()
+      AsyncRx.ofMouseMove ()
       |> AsyncRx.delay (100 * i)
       |> AsyncRx.map (fun ev -> (i, { Letter = string letter; X = ev.clientX; Y = ev.clientY }))
   )
@@ -238,8 +232,8 @@ let query (model : Model) msgs =
    | Remote _ ->
       let letterQuery =
         model.LetterString
-          |> letterStream
-          |> AsyncRx.map Shared.Msg.Letter
+        |> letterStream
+        |> AsyncRx.map Shared.Msg.Letter
 
       let letterStringQuery =
         msgs
@@ -255,4 +249,4 @@ let query (model : Model) msgs =
       Subscribe (xs, model.LetterString + "_remote")
 
   | _ ->
-        Dispose
+        Query.Dispose

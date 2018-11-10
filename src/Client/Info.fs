@@ -1,14 +1,12 @@
 module Info
 
-open Elmish
 open Fable.Helpers.React
 
 open Fulma
 open Fulma.Extensions
 
-open Reaction.AsyncRx
-open Elmish.Reaction
-open Elmish.Reaction.WebSocket
+open Reaction
+
 open Utils
 
 type Model =
@@ -109,4 +107,4 @@ let query (model : Model) (msgs : IAsyncObservable<Msg>) =
 
     Subscribe (xs, "remote")
   else
-    Dispose
+    Query.Dispose
