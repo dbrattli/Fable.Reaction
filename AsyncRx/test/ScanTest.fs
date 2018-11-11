@@ -20,7 +20,7 @@ let ``Test scanAsync``() = toTask <| async {
             return acc + x
         }
 
-    let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scanAsync 0 scanner
+    let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scanInitAsync 0 scanner
     let obv = TestObserver<int>()
 
     // Act
@@ -41,7 +41,7 @@ let ``Test scan``() = toTask <| async {
     let scanner acc x =
         acc + x
 
-    let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scan 0 scanner
+    let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scanInit 0 scanner
     let obv = TestObserver<int>()
 
     // Act
@@ -64,7 +64,7 @@ let ``Test scan accumulator fails``() = toTask <| async {
         raise error
         0
 
-    let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scan 0 scanner
+    let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scanInit 0 scanner
     let obv = TestObserver<int>()
 
     // Act

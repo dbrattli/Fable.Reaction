@@ -1,6 +1,6 @@
-# Reaction
+# Fable/Reaction
 
-Reaction is a collection of projects that combines the power of asynchronous reactive (AsyncRx) programming with F#, [Fable](http://fable.io/) and [Elmish](https://elmish.github.io/) applications.
+Fable/Reaction is a collection of projects that combines the power of asynchronous reactive (AsyncRx) programming with F#, [Fable](http://fable.io/) and [Elmish](https://elmish.github.io/) applications.
 
 - **Reaction.AsyncRx** - implementation of Async Observables in F#.
 - **Elmish.Reaction** - for the use of Reaction with Elmish (without Fable).

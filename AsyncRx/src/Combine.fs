@@ -6,7 +6,7 @@ open Reaction.Core
 module Combine =
     /// Returns an observable sequence that contains the elements of
     /// each given sequences, in sequential order.
-    let concat (sources: seq<IAsyncObservable<'a>>) : IAsyncObservable<'a> =
+    let concatSeq (sources: seq<IAsyncObservable<'a>>) : IAsyncObservable<'a> =
         let subscribeAsync (aobv: IAsyncObserver<'a>) =
             let safeObserver = safeObserver aobv
 

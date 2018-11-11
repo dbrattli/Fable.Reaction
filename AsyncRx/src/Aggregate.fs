@@ -9,7 +9,7 @@ module Aggregation =
     /// sequence and returns each intermediate result. The seed value is
     /// used as the initial accumulator value. Returns an observable
     /// sequence containing the accumulated values.
-    let scanAsync (initial: 's) (accumulator: 's -> 'a -> Async<'s>) (source: IAsyncObservable<'a>) : IAsyncObservable<'s> =
+    let scanInitAsync (initial: 's) (accumulator: 's -> 'a -> Async<'s>) (source: IAsyncObservable<'a>) : IAsyncObservable<'s> =
         let subscribeAsync (aobv : IAsyncObserver<'s>) =
             let safeObserver = safeObserver aobv
             let mutable state = initial
@@ -32,12 +32,37 @@ module Aggregation =
             }
         { new IAsyncObservable<'s> with member __.SubscribeAsync o = subscribeAsync o }
 
-    /// Applies an accumulator function over an observable sequence and
-    /// returns each intermediate result. The seed value is used as the
-    /// initial accumulator value. Returns an observable sequence
-    /// containing the accumulated values.
-    let scan (initial : 's) (scanner:'s -> 'a -> 's) (source: IAsyncObservable<'a>) : IAsyncObservable<'s> =
-        scanAsync initial (fun s x -> async { return scanner s x } ) source
+    /// Applies an async accumulator function over an observable
+    /// sequence and returns each intermediate result. The first value
+    /// is used as the initial accumulator value. Returns an observable
+    /// sequence containing the accumulated values.
+    let scanAsync (accumulator: 'a -> 'a -> Async<'a>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
+        let subscribeAsync (aobv : IAsyncObserver<'a>) =
+            let safeObserver = safeObserver aobv
+            let mutable states = None
+
+            async {
+                let obv n =
+                    async {
+                        match n with
+                        | OnNext x ->
+                            match states with
+                            | Some state ->
+                                try
+                                    let! state' = accumulator state x
+                                    states <- Some state'
+                                    do! safeObserver.OnNextAsync state
+                                with
+                                | err -> do! safeObserver.OnErrorAsync err
+                            | None ->
+                                states <- Some x
+                        | OnError e -> do! safeObserver.OnErrorAsync e
+                        | OnCompleted -> do! safeObserver.OnCompletedAsync ()
+                    }
+                return! AsyncObserver obv |> source.SubscribeAsync
+            }
+        { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
+
 
     /// Groups the elements of an observable sequence according to a
     /// specified key mapper function. Returns a sequence of observable

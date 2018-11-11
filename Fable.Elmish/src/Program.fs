@@ -11,6 +11,7 @@ type Query<'msg, 'name> =
     | Queries of Query<'msg,'name> list
     | Dispose
 
+// Separate type containing the functions to avoid the generics above
 type Query =
     /// Map a query from one message type to another.
     static member map mapper query  =

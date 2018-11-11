@@ -31,7 +31,7 @@ module AsyncObservable =
 
     /// Returns an observable sequence that contains the elements of
     /// the given sequences.
-    let inline (++) source other = Combine.concat [source; other]
+    let inline (++) source other = Combine.concatSeq [source; other]
 
 /// A single module that contains all the operators. Nicer and shorter way than writing
 /// AsyncObservable. We want to prefix our operators so we don't mix e.g. `map` with other modules.
@@ -49,15 +49,29 @@ module AsyncRx =
     /// returns each intermediate result. The seed value is used as the
     /// initial accumulator value. Returns an observable sequence
     /// containing the accumulated values.
-    let inline scan (initial: 's) (accumulator: 's -> 'a -> 's) (source: IAsyncObservable<'a>) : IAsyncObservable<'s> =
-        Aggregation.scan initial accumulator source
+    let inline scanInit (initial: 's) (accumulator: 's -> 'a -> 's) (source: IAsyncObservable<'a>) : IAsyncObservable<'s> =
+        Aggregation.scanInitAsync initial (fun s x -> async { return accumulator s x } ) source
 
     /// Applies an async accumulator function over an observable
     /// sequence and returns each intermediate result. The seed value is
     /// used as the initial accumulator value. Returns an observable
     /// sequence containing the accumulated values.
-    let inline scanAsync (initial: 's) (accumulator: 's -> 'a -> Async<'s>) (source: IAsyncObservable<'a>) : IAsyncObservable<'s> =
-        Aggregation.scanAsync initial accumulator source
+    let inline scanInitAsync (initial: 's) (accumulator: 's -> 'a -> Async<'s>) (source: IAsyncObservable<'a>) : IAsyncObservable<'s> =
+        Aggregation.scanInitAsync initial accumulator source
+
+    /// Applies an async accumulator function over an observable
+    /// sequence and returns each intermediate result. The first value
+    /// is used as the initial accumulator value. Returns an observable
+    /// sequence containing the accumulated values.
+    let inline scan (accumulator: 'a -> 'a -> 'a) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
+        Aggregation.scanAsync (fun s x -> async { return accumulator s x } ) source
+
+    /// Applies an async accumulator function over an observable
+    /// sequence and returns each intermediate result. The first value
+    /// is used as the initial accumulator value. Returns an observable
+    /// sequence containing the accumulated values.
+    let inline scanAsync (accumulator: 'a -> 'a -> Async<'a>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
+        Aggregation.scanAsync accumulator source
 
   // CombineRegion
 
@@ -67,24 +81,32 @@ module AsyncRx =
     let inline combineLatest (other: IAsyncObservable<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a*'b> =
         Combine.combineLatest other source
 
+    /// Concatenates an observable sequence with another observable sequence.
+    let inline concat (other : IAsyncObservable<'a>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
+        Combine.concatSeq [source; other]
+
     /// Returns an observable sequence that contains the elements of
     /// each given sequences, in sequential order.
-    let inline concat (sources: seq<IAsyncObservable<'a>>) : IAsyncObservable<'a> =
-        Combine.concat sources
+    let inline concatSeq (sources: seq<IAsyncObservable<'a>>) : IAsyncObservable<'a> =
+        Combine.concatSeq sources
 
     /// Merges an observable sequence of observable sequences into an
     /// observable sequence.
     let inline mergeInner (source: IAsyncObservable<IAsyncObservable<'a>>) : IAsyncObservable<'a> =
         Combine.mergeInner source
 
-    /// Merges an observable sequence with another observable sequences.
+    /// Merges an observable sequence with another observable sequence.
     let inline merge (other : IAsyncObservable<'a>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
         Create.ofSeq [source; other] |> mergeInner
+
+    /// Merges a sequence of observable sequences.
+    let inline mergeSeq (sources: seq<IAsyncObservable<'a>>) : IAsyncObservable<'a> =
+        Create.ofSeq sources |> mergeInner
 
     /// Prepends a sequence of values to an observable sequence.
     /// Returns the source sequence prepended with the specified values.
     let inline startWith (items : seq<'a>) (source: IAsyncObservable<'a>) =
-        concat [Create.ofSeq items; source]
+        concatSeq [Create.ofSeq items; source]
 
     /// Merges the specified observable sequences into one observable
     /// sequence by combining the values into tuples only when the first

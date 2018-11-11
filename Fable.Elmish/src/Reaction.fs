@@ -41,7 +41,6 @@ module AsyncRx =
     /// Websocket channel operator. Passes string items as ws messages to
     /// the server. Received ws messages will be forwarded down stream.
     /// JSON encode/decode of application messages is left to the client.
-
     let inline channel (uri: string) (source: IAsyncObservable<string>) : IAsyncObservable<string> =
         Reaction.WebSocket.channel uri source
 
