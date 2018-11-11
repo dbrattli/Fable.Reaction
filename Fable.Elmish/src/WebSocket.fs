@@ -10,51 +10,68 @@ module WebSocket =
     /// the server. Received ws messages will be forwarded down stream.
     /// JSON encode/decode of application messages is left to the client.
     let channel (uri: string) (source: IAsyncObservable<string>) : IAsyncObservable<string> =
-        let subscribe (obv: IAsyncObserver<string>) : Async<IAsyncDisposable> =
+        let subscribe (down: IAsyncObserver<string>) : Async<IAsyncDisposable> =
             async {
                 let websocket = WebSocket.Create uri
                 let mutable disposable = AsyncDisposable.Empty
+                let mutable disposed = false
 
-                let _obv n = async {
-                    match n with
-                    | OnNext msg ->
-                        websocket.send msg
-                    | OnError ex ->
-                        printfn "OnError: closing"
-                        websocket.close ()
-                    | OnCompleted ->
-                        printfn "OnCompleted: closing"
-                        websocket.close ()
+                let cancel () = async {
+                    disposed <- true
+                    do! disposable.DisposeAsync ()
+                    websocket.close ()
+                }
+
+                let serverObs n = async {
+                    if not disposed then
+                        match n with
+                        | OnNext msg ->
+                            try
+                                websocket.send msg
+                            with
+                            | ex ->
+                                printfn "OnNext failed, closing channel"
+                                Async.StartImmediate (cancel ())
+                        | OnError ex ->
+                            //printfn "OnError: closing"
+                            Async.StartImmediate (cancel ())
+                        | OnCompleted ->
+                            //printfn "OnCompleted: closing"
+                            Async.StartImmediate (cancel ())
                 }
 
                 let onMessage (ev : MessageEvent) =
                     let msg = (string ev.data)
-                    Async.StartImmediate (obv.OnNextAsync msg)
+                    Async.StartImmediate (down.OnNextAsync msg)
 
                 let onOpen _ =
+                    //printfn "onOpen"
                     let action = async {
-                        let! disposable' = source.SubscribeAsync _obv
+                        let! disposable' = source.SubscribeAsync serverObs
                         disposable <- disposable'
                     }
-
                     Async.StartImmediate action
 
                 let onError ev =
+                    //printfn "onError"
                     let ex = WSError (ev.ToString ())
-                    Async.StartImmediate (obv.OnErrorAsync ex)
+                    Async.StartImmediate (async {
+                        do! down.OnErrorAsync ex
+                        do! cancel ();
+                    })
 
                 let onClose ev =
-                    Async.StartImmediate (obv.OnCompletedAsync ())
+                    //printfn "onClose"
+                    Async.StartImmediate (async {
+                        do! down.OnCompletedAsync ()
+                        do! cancel ();
+                    })
 
                 websocket.onmessage <- onMessage
                 websocket.onclose <- onClose
                 websocket.onopen <- onOpen
                 websocket.onerror <- onError
 
-                let cancel () = async {
-                    do! disposable.DisposeAsync ()
-                    websocket.close ()
-                }
                 return AsyncDisposable.Create cancel
             }
 
