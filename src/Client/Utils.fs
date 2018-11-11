@@ -1,9 +1,11 @@
 module Utils
 
-open Reaction.WebSocket
+open Reaction
+
+open Fable.Import.Browser
 
 let server source =
-  msgChannel<Shared.Msg>
+  AsyncRx.msgChannel<Shared.Msg>
     "ws://localhost:8085/ws"
     Shared.Msg.Encode
     Shared.Msg.Decode

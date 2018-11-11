@@ -230,23 +230,25 @@ let query (model : Model) msgs =
       Subscribe (xs, model.LetterString + "_local")
 
    | Remote _ ->
-      let letterQuery =
-        model.LetterString
-        |> letterStream
-        |> AsyncRx.map Shared.Msg.Letter
-
-      let letterStringQuery =
+      let stringQuery =
         msgs
         |> AsyncRx.choose (function | LetterStringChanged str -> Some str | _ -> Option.None)
+
+      let letterStringQuery =
+        stringQuery
         |> AsyncRx.map Shared.Msg.LetterString
 
       let xs =
-        letterStringQuery
-        |> AsyncRx.merge letterQuery
+        stringQuery
+        |> AsyncRx.startWith [model.LetterString]
+        |> AsyncRx.flatMapLatest (fun letters ->
+            letterStream letters)
+        |> AsyncRx.map Shared.Msg.Letter
+        |> AsyncRx.merge letterStringQuery
         |> server
         |> AsyncRx.map RemoteMsg
 
-      Subscribe (xs, model.LetterString + "_remote")
+      Subscribe (xs, "_remote")
 
   | _ ->
         Query.Dispose
