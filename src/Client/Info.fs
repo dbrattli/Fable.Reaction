@@ -98,7 +98,7 @@ let query (model : Model) (msgs : IAsyncObservable<Msg>) =
 
     let letterStringQuery =
       websocket
-      |> AsyncRx.choose (function | Shared.Msg.LetterString str -> Some (LetterStringChanged str) | _ -> None)
+      |> AsyncRx.choose (function | Shared.Msg.LetterStringChanged str -> Some (LetterStringChanged str) | _ -> None)
 
     let xs =
       websocket

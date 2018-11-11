@@ -14,7 +14,7 @@ type LetterPos = {
 
 type Msg =
 | Letter of int * LetterPos
-| LetterString of string
+| LetterStringChanged of string
 
 type Msg with
     static member Encode (msg: Msg) : string =

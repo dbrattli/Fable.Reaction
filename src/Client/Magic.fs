@@ -60,16 +60,24 @@ let withToggledRemoterLetters model =
   | Local letters ->
       { model with Letters = Remote letters }
 
+let withLetterString letterString model =
+  { model with LetterString = letterString }
+
+
 let update (msg : Msg) (model : Model) : Model =
   match msg with
-  | LetterStringChanged str ->
-      { model with LetterString = str}
+  | LetterStringChanged letterString ->
+      model |> withLetterString letterString
 
   | ToggleLetters ->
       model |> withToggledLetters
 
   | ToggleRemoteLetters ->
       model |> withToggledRemoterLetters
+
+  | RemoteMsg (Shared.LetterStringChanged letterString) ->
+      printfn "HALLO %A" letterString
+      model |> withLetterString letterString
 
   | RemoteMsg (Shared.Letter (index, pos)) ->
       match model.Letters with
@@ -78,16 +86,12 @@ let update (msg : Msg) (model : Model) : Model =
 
       | _ -> model
 
-
   | Letter (index, pos) ->
       match model.Letters with
       | Local letters ->
           { model with Letters = Local <| letters.Add (index, pos) }
 
       | _ -> model
-
-
-  | _ -> model
 
 
 let offsetX x i =
@@ -236,7 +240,7 @@ let query (model : Model) msgs =
 
       let letterStringQuery =
         stringQuery
-        |> AsyncRx.map Shared.Msg.LetterString
+        |> AsyncRx.map Shared.Msg.LetterStringChanged
 
       let xs =
         stringQuery
