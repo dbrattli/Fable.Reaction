@@ -17,23 +17,29 @@ type LetterSource =
 | Local of Map<int,LetterPos>
 | Remote of Map<int,LetterPos>
 
+type LetterString =
+  | Show of string
+  | Edit of string
+
 type Model =
   {
     Letters : LetterSource
-    LetterString : string
+    LetterString : LetterString
   }
 
 type Msg =
   | ToggleLetters
   | ToggleRemoteLetters
-  | LetterStringChanged of string
+  | EditLetterStringRequested
+  | EditLetterStringDone of string
+  | LetterStringEdited of string
   | Letter of int * LetterPos
   | RemoteMsg of Shared.Msg
 
 let init letterString =
   {
     Letters = None
-    LetterString = letterString
+    LetterString = Show letterString
   }
 
 let withToggledLetters model =
@@ -59,12 +65,42 @@ let withToggledRemoterLetters model =
       { model with Letters = Remote letters }
 
 let withLetterString letterString model =
-  { model with LetterString = letterString }
+  match model.LetterString with
+  | Show _ ->
+      { model with LetterString = Show letterString }
+
+  | Edit _ ->
+      { model with LetterString = Edit letterString }
+
+let withEditLetterString model =
+  match model.LetterString with
+  | Show letterString ->
+      { model with LetterString = Edit letterString }
+
+  | Edit letterString ->
+      model
+
+let withEditedLetterString letterString model =
+  match model.LetterString with
+  | Show letterString ->
+      model
+
+  | Edit _ ->
+      { model with LetterString = Edit letterString }
+
+let withShowLetterString letterString model =
+  { model with LetterString = Show letterString }
 
 let update (msg : Msg) (model : Model) : Model =
   match msg with
-  | LetterStringChanged letterString ->
-      model |> withLetterString letterString
+  | EditLetterStringRequested ->
+      model |> withEditLetterString
+
+  | EditLetterStringDone letterString ->
+      model |> withShowLetterString letterString
+
+  | LetterStringEdited letterString ->
+      model |> withEditedLetterString letterString
 
   | ToggleLetters ->
       model |> withToggledLetters
@@ -174,31 +210,57 @@ let viewStatus dispatch model =
     ]
 
 
+let viewLetterString letterString dispatch =
+  match letterString with
+  | Show letterString ->
+      div []
+        [
+          str <| letterString
+          str " "
+
+          Button.button
+            [
+              Button.Color IsPrimary
+              Button.OnClick (fun _ -> dispatch EditLetterStringRequested)
+            ] [ str "Edit" ]
+        ]
+
+  | Edit letterString ->
+      div []
+        [
+          Field.div [ Field.IsGrouped]
+            [
+              Control.div []
+                [
+                  Input.text
+                    [
+                      Input.Placeholder "Magic String"
+                      Input.DefaultValue letterString
+                      Input.Props [ OnChange (fun event -> LetterStringEdited (!!event.target?value) |> dispatch) ]
+                    ]
+                ]
+
+              Control.div []
+                [
+                  Button.button
+                    [
+                      Button.Color IsPrimary
+                      Button.OnClick (fun _ -> dispatch <| EditLetterStringDone letterString)
+                    ] [ str "Submit" ]
+                ]
+            ]
+        ]
+
+
 let view model dispatch =
   div []
     [
       Heading.h3 [] [ str "Subcomponent 1" ]
+      Heading.h4 [ Heading.IsSubtitle ] [ str "Magic String" ]
       Columns.columns []
         [
           Column.column []
-            [
-              form []
-                [
-                  Field.div []
-                    [
-                      Label.label [] [ str "Magic String" ]
-                      Control.div []
-                        [
-                          Input.text
-                            [
-                              Input.Placeholder "Magic String"
-                              Input.DefaultValue model.LetterString
-                              Input.Props [ OnChange (fun event -> LetterStringChanged (!!event.target?value) |> dispatch) ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+            [ viewLetterString model.LetterString dispatch ]
 
           Column.column [] []
         ]
@@ -222,29 +284,37 @@ let letterStream letterString =
   )
 
 
+let extractedLetterString letterString =
+  match letterString with
+  | Show letterString | Edit letterString ->
+      letterString
+
+
 let query (model : Model) msgs =
   match model.Letters with
   | Local _ ->
+      let letterString =
+        model.LetterString |> extractedLetterString
+
       let xs =
-        model.LetterString
+        letterString
         |> letterStream
         |> AsyncRx.map Letter
 
-      Subscribe (xs, model.LetterString + "_local")
+      Subscribe (xs, letterString + "_local")
 
    | Remote _ ->
       let stringQuery =
         msgs
-        |> AsyncRx.choose (function | LetterStringChanged str -> Some str | _ -> Option.None)
+        |> AsyncRx.choose (function | EditLetterStringDone letterString -> Some letterString | _ -> Option.None)
 
       let letterStringQuery =
         stringQuery
         |> AsyncRx.map Shared.Msg.LetterStringChanged
-        |> AsyncRx.map (fun x -> printfn "stringQuery %A" x ; x)
 
       let xs =
         stringQuery
-        |> AsyncRx.startWith [model.LetterString]
+        |> AsyncRx.startWith [model.LetterString |> extractedLetterString]
         |> AsyncRx.flatMapLatest (fun letters ->
             letterStream letters)
         |> AsyncRx.map Shared.Msg.Letter
