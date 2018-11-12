@@ -45,10 +45,13 @@ module Combine =
                 )
 
             async {
-                for source in sources do
-                    do! innerAgent.PostAndAsyncReply(fun replyChannel -> InnerObservable source, replyChannel) |> Async.Ignore
+                let worker () = async {
+                    for source in sources do
+                        do! innerAgent.PostAndAsyncReply(fun replyChannel -> InnerObservable source, replyChannel) |> Async.Ignore
 
-                do! safeObserver.OnCompletedAsync ()
+                    do! safeObserver.OnCompletedAsync ()
+                }
+                Async.Start (worker ())
 
                 let cancel () =
                     async {
