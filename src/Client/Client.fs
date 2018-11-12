@@ -100,7 +100,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
           Navbar.Item.div []
             [
               Heading.h2 []
-                [ str "SAFE Template with Fable.Reaction" ]
+                [ str "Fable.Reaction Playground" ]
             ]
         ]
 

@@ -39,14 +39,12 @@ let init letterString =
 let withToggledLetters model =
   match model.Letters with
   | None ->
-      printfn "None"
       { model with Letters = Local Map.empty }
 
   | Remote letters ->
       { model with Letters = Local letters }
 
   | Local _ ->
-      printfn "Letters=None"
       { model with Letters = None }
 
 let withToggledRemoterLetters model =
@@ -63,7 +61,6 @@ let withToggledRemoterLetters model =
 let withLetterString letterString model =
   { model with LetterString = letterString }
 
-
 let update (msg : Msg) (model : Model) : Model =
   match msg with
   | LetterStringChanged letterString ->
@@ -76,7 +73,6 @@ let update (msg : Msg) (model : Model) : Model =
       model |> withToggledRemoterLetters
 
   | RemoteMsg (Shared.LetterStringChanged letterString) ->
-      printfn "HALLO %A" letterString
       model |> withLetterString letterString
 
   | RemoteMsg (Shared.Letter (index, pos)) ->
@@ -181,6 +177,7 @@ let viewStatus dispatch model =
 let view model dispatch =
   div []
     [
+      Heading.h3 [] [ str "Subcomponent 1" ]
       Columns.columns []
         [
           Column.column []
@@ -202,13 +199,15 @@ let view model dispatch =
                     ]
                 ]
             ]
+
+          Column.column [] []
         ]
 
       Columns.columns []
-          [ Column.column [] [ viewStatus dispatch model ] ]
+        [ Column.column [] [ viewStatus dispatch model ] ]
 
       Columns.columns []
-          [ Column.column [] [ viewLetters model ] ]
+        [ Column.column [] [ viewLetters model ] ]
     ]
 
 let letterStream letterString =
@@ -241,6 +240,7 @@ let query (model : Model) msgs =
       let letterStringQuery =
         stringQuery
         |> AsyncRx.map Shared.Msg.LetterStringChanged
+        |> AsyncRx.map (fun x -> printfn "stringQuery %A" x ; x)
 
       let xs =
         stringQuery

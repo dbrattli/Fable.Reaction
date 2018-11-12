@@ -85,6 +85,7 @@ let viewStatus dispatch model =
 let view model dispatch =
   Container.container []
     [
+      Heading.h3 [] [ str "Subcomponent 2" ]
       Columns.columns []
         [ Column.column [] [ viewStatus dispatch model ] ]
     ]
