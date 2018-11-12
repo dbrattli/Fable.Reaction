@@ -62,7 +62,7 @@ let query (connectionId: ConnectionId) (msgs: IAsyncObservable<Msg*ConnectionId>
   msgs
   |> AsyncRx.flatMap(fun (msg,id) ->
        match msg with
-       | Msg.LetterString letterString ->
+       | Msg.LetterStringChanged letterString ->
           mailbox.Post (Set letterString)
 
        | _ -> ()
