@@ -24,7 +24,7 @@ module Create =
             let obv = safeObserver aobv
 
             async {
-                Async.StartImmediate (worker obv token)
+                Async.Start (worker obv token)
                 return disposable
             }
         { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
@@ -61,7 +61,7 @@ module Create =
         ofAsyncWorker (fun obv token -> async {
             for x in xs do
                 if token.IsCancellationRequested then
-                    raise <| OperationCanceledException("Operation cancelled")
+                    raise <| OperationCanceledException ("Operation cancelled")
 
                 try
                     do! obv.OnNextAsync x
@@ -86,7 +86,7 @@ module Create =
                         let! result =
                             async {
                                 try
-                                    let! value = ie.MoveNext()
+                                    let! value = ie.MoveNext ()
                                     return Ok value
                                 with
                                 | ex -> return Error ex
@@ -146,7 +146,7 @@ module Create =
                         do! aobv.OnCompletedAsync ()
                 }
 
-                Async.StartImmediate ((handler msecs 0), token)
+                Async.Start ((handler msecs 0), token)
                 return cancel
             }
 
