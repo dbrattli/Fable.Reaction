@@ -196,7 +196,7 @@ let viewStatus dispatch model =
 
           tr []
            [
-             td [] [ str "Letters over Websockets" ]
+             td [] [ str "Letters (string and position) over Websockets" ]
              td []
               [
                 Switch.switch
@@ -256,7 +256,7 @@ let view model dispatch =
   div []
     [
       Heading.h3 [] [ str "Subcomponent 1" ]
-      Heading.h4 [ Heading.IsSubtitle ] [ str "Magic String" ]
+      Heading.h4 [ Heading.IsSubtitle ] [ str "Magic String over websockets (when activated)" ]
       Columns.columns []
         [
           Column.column []

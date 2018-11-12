@@ -47,7 +47,7 @@ let viewStatus dispatch model =
         [
           tr []
             [
-              th [] [ str "Remote" ]
+              th [] [ str "Remote (string and number of messages over websockets)" ]
               th []
                 [
                   Switch.switch
@@ -72,7 +72,7 @@ let viewStatus dispatch model =
 
           tr []
              [
-               td [] [ str "Letter string" ]
+               td [] [ str "Current string (updated when websocket is active)" ]
                td []
                 [
                   str model.LetterString
@@ -86,6 +86,7 @@ let view model dispatch =
   Container.container []
     [
       Heading.h3 [] [ str "Subcomponent 2" ]
+      Heading.h4 [ Heading.IsSubtitle ] [ str "Different Websocket subscription" ]
       Columns.columns []
         [ Column.column [] [ viewStatus dispatch model ] ]
     ]
