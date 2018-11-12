@@ -81,17 +81,17 @@ module Streams =
         , cts.Token)
 
         let subscribeAsync (aobv: IAsyncObserver<'a>) : Async<IAsyncDisposable> =
-            let sobv = safeObserver aobv
-            obvs.Add sobv
-
             async {
+                let sobv = safeObserver aobv
+                obvs.Add sobv
+
                 let cancel () = async {
                     obvs.Remove sobv |> ignore
                 }
                 return AsyncDisposable.Create cancel
             }
-        let obs = { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
-        mb, obs
+
+        mb, { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
 
     /// A stream is both an observable sequence as well as an observer.
     /// Each notification is broadcasted to all subscribed observers.
