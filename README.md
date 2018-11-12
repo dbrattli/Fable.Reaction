@@ -1,7 +1,6 @@
-<img src="/AsyncRx/logo/logo.png" width="100" style="float:right">
-
-
 # Fable/Reaction
+
+<img src="/AsyncRx/logo/logo.png" width="100">
 
 Fable/Reaction is a collection of projects that combines the power of asynchronous reactive (AsyncRx) programming with F#, [Fable](http://fable.io/) and [Elmish](https://elmish.github.io/) applications.
 
