@@ -106,7 +106,7 @@ module AsyncRx =
     /// Prepends a sequence of values to an observable sequence.
     /// Returns the source sequence prepended with the specified values.
     let inline startWith (items : seq<'a>) (source: IAsyncObservable<'a>) =
-        concatSeq [Create.ofSeq items; source]
+        Combine.concatSeq [Create.ofSeq items; source]
 
     /// Merges the specified observable sequences into one observable
     /// sequence by combining the values into tuples only when the first
