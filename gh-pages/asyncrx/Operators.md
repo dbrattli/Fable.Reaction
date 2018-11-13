@@ -6,7 +6,7 @@ currently supported. Other operators may be implemented on-demand, but the goal 
 To use the operators open either the `Reaction` namespace.
 
 ```fs
-open Reaction.AsyncRx
+open Reaction
 
 xs = AsyncRx.single 42
 ```
@@ -14,7 +14,7 @@ xs = AsyncRx.single 42
 You can also open the `Reaction.AsyncObserable` module if you don't want to prepend every operator with `AsyncObservable`. Be aware of possible namespace conflicts with operators such as `map`.
 
 ```fs
-open Reaction.AsyncRx
+open Reaction
 
 xs = AsyncRx.single 42
 ```

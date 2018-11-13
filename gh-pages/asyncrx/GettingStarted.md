@@ -3,7 +3,7 @@
 Below is the simple "Hello, world!" example of a single value stream being subscribed using an observer function.
 
 ```fs
-open Reaction.AsyncRx
+open Reaction
 
 let main = async {
     let xs = AsyncRx.single "Hello, world!"

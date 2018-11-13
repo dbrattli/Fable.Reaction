@@ -3,7 +3,7 @@
 Queries may be written by composing functions or using query expressions.
 
 ```fs
-let xs = reaction {
+let xs = asyncRx {
     yield 42
 }
 ```
@@ -11,13 +11,13 @@ let xs = reaction {
 This expression is equivalent to:
 
 ```fs
-let xs = AsyncObservable.single 42
+let xs = AsyncRx.single 42
 ```
 
 You can also yield multiple values:
 
 ```fs
-let xs = reaction {
+let xs = asyncRx {
     yield 42
     yield 43
 }
@@ -26,18 +26,18 @@ let xs = reaction {
 This is equivalent to:
 
 ```fs
-let xs = AsyncObservable.ofSeq [42; 43]
+let xs = AsyncRx.ofSeq [42; 43]
 
 // or
 
-let xs = AsyncObservable.concat [AsyncObservable.single 42; AsyncObservable.single 43]
+let xs = AsyncRx.concat [AsyncRx.single 42; AsyncRx.single 43]
 ```
 
 ## Flat mapping
 
 ```fs
-let xs = reaction {
-    let! i = single 42
+let xs = asyncRx {
+    let! i = AsyncRx.single 42
     yield i*10
 }
 ```
@@ -46,9 +46,9 @@ This is equivalent to:
 
 ```fs
 let xs =
-    AsyncObservable.single 42
-    |> flatMap (fun i ->
-        AsynbObservable.single (i * 10))
+    AsyncRx.single 42
+    |> AsyncRx.flatMap (fun i ->
+        AsyncRx.single (i * 10))
 }
 ```
 
@@ -59,21 +59,21 @@ These two examples below are equivalent:
 ```fs
 Seq.toList "TIME FLIES LIKE AN ARROW"
 |> Seq.mapi (fun i c -> i, c)
-|> ofSeq
-|> flatMap (fun (i, c) ->
-    fromMouseMoves ()
-    |> delay (100 * i)
-    |> map (fun m -> Letter (i, string c, int m.clientX, int m.clientY)))
+|> AsyncRx.ofSeq
+|> AsyncRx.flatMap (fun (i, c) ->
+    AsyncRx.fromMouseMoves ()
+    |> AsyncRx.delay (100 * i)
+    |> AsyncRx.map (fun m -> Letter (i, string c, int m.clientX, int m.clientY)))
 ```
 
 The above query may be written in query expression style:
 
 ```fs
-reaction {
+asyncRx {
     let! i, c = Seq.toList "TIME FLIES LIKE AN ARROW"
                 |> Seq.mapi (fun i c -> i, c)
-                |> ofSeq
-    let ms = fromMouseMoves () |> delay (100 * i)
+                |> AsyncRx.ofSeq
+    let ms = AsyncRx.fromMouseMoves () |> delay (100 * i)
     for m in ms do
         yield Letter (i, string c, int m.clientX, int m.clientY)
 }

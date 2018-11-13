@@ -1,4 +1,4 @@
-# Fable/Reaction
+# Elmish |> AsyncRx
 
 <img src="/AsyncRx/logo/logo.png" width="100">
 

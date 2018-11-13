@@ -394,55 +394,55 @@
                                 
                                 <h1 id="query-builder">Query Builder</h1>
 <p>Queries may be written by composing functions or using query expressions.</p>
-<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = reaction {
+<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = asyncRx {
     <span class="hljs-keyword">yield</span> <span class="hljs-number">42</span>
 }
 </code></pre>
 <p>This expression is equivalent to:</p>
-<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = AsyncObservable.single <span class="hljs-number">42</span>
+<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = AsyncRx.single <span class="hljs-number">42</span>
 </code></pre>
 <p>You can also yield multiple values:</p>
-<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = reaction {
+<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = asyncRx {
     <span class="hljs-keyword">yield</span> <span class="hljs-number">42</span>
     <span class="hljs-keyword">yield</span> <span class="hljs-number">43</span>
 }
 </code></pre>
 <p>This is equivalent to:</p>
-<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = AsyncObservable.ofSeq [<span class="hljs-number">42</span>; <span class="hljs-number">43</span>]
+<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = AsyncRx.ofSeq [<span class="hljs-number">42</span>; <span class="hljs-number">43</span>]
 
 <span class="hljs-comment">// or</span>
 
-<span class="hljs-keyword">let</span> xs = AsyncObservable.concat [AsyncObservable.single <span class="hljs-number">42</span>; AsyncObservable.single <span class="hljs-number">43</span>]
+<span class="hljs-keyword">let</span> xs = AsyncRx.concat [AsyncRx.single <span class="hljs-number">42</span>; AsyncRx.single <span class="hljs-number">43</span>]
 </code></pre>
 <h2 id="flat-mapping">Flat mapping</h2>
-<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = reaction {
-    <span class="hljs-keyword">let!</span> i = single <span class="hljs-number">42</span>
+<pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs = asyncRx {
+    <span class="hljs-keyword">let!</span> i = AsyncRx.single <span class="hljs-number">42</span>
     <span class="hljs-keyword">yield</span> i*<span class="hljs-number">10</span>
 }
 </code></pre>
 <p>This is equivalent to:</p>
 <pre><code class="lang-fs"><span class="hljs-keyword">let</span> xs =
-    AsyncObservable.single <span class="hljs-number">42</span>
-    |&gt; flatMap (<span class="hljs-keyword">fun</span> i -&gt;
-        AsynbObservable.single (i * <span class="hljs-number">10</span>))
+    AsyncRx.single <span class="hljs-number">42</span>
+    |&gt; AsyncRx.flatMap (<span class="hljs-keyword">fun</span> i -&gt;
+        AsyncRx.single (i * <span class="hljs-number">10</span>))
 }
 </code></pre>
 <h2 id="more-advanced-example">More advanced example</h2>
 <p>These two examples below are equivalent:</p>
 <pre><code class="lang-fs">Seq.toList <span class="hljs-string">&quot;TIME FLIES LIKE AN ARROW&quot;</span>
 |&gt; Seq.mapi (<span class="hljs-keyword">fun</span> i c -&gt; i, c)
-|&gt; ofSeq
-|&gt; flatMap (<span class="hljs-keyword">fun</span> (i, c) -&gt;
-    fromMouseMoves ()
-    |&gt; delay (<span class="hljs-number">100</span> * i)
-    |&gt; map (<span class="hljs-keyword">fun</span> m -&gt; Letter (i, string c, int m.clientX, int m.clientY)))
+|&gt; AsyncRx.ofSeq
+|&gt; AsyncRx.flatMap (<span class="hljs-keyword">fun</span> (i, c) -&gt;
+    AsyncRx.fromMouseMoves ()
+    |&gt; AsyncRx.delay (<span class="hljs-number">100</span> * i)
+    |&gt; AsyncRx.map (<span class="hljs-keyword">fun</span> m -&gt; Letter (i, string c, int m.clientX, int m.clientY)))
 </code></pre>
 <p>The above query may be written in query expression style:</p>
-<pre><code class="lang-fs">reaction {
+<pre><code class="lang-fs">asyncRx {
     <span class="hljs-keyword">let!</span> i, c = Seq.toList <span class="hljs-string">&quot;TIME FLIES LIKE AN ARROW&quot;</span>
                 |&gt; Seq.mapi (<span class="hljs-keyword">fun</span> i c -&gt; i, c)
-                |&gt; ofSeq
-    <span class="hljs-keyword">let</span> ms = fromMouseMoves () |&gt; delay (<span class="hljs-number">100</span> * i)
+                |&gt; AsyncRx.ofSeq
+    <span class="hljs-keyword">let</span> ms = AsyncRx.fromMouseMoves () |&gt; delay (<span class="hljs-number">100</span> * i)
     <span class="hljs-keyword">for</span> m <span class="hljs-keyword">in</span> ms <span class="hljs-keyword">do</span>
         <span class="hljs-keyword">yield</span> Letter (i, string c, int m.clientX, int m.clientY)
 }
@@ -490,7 +490,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Query Builder","level":"2.9","depth":1,"next":{"title":"Error Handling","level":"2.10","depth":1,"path":"asyncrx/Errors.md","ref":"asyncrx/Errors.md","articles":[]},"previous":{"title":"Operators","level":"2.8","depth":1,"path":"asyncrx/Operators.md","ref":"asyncrx/Operators.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["insert-logo","highlight-code"],"pluginsConfig":{"insert-logo":{"style":"background: none; width: 150px","url":"/Reaction/logo.png"},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"highlight-code":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"asyncrx/Query.md","mtime":"2018-11-07T20:53:04.012Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-11-07T21:26:18.700Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Query Builder","level":"2.9","depth":1,"next":{"title":"Error Handling","level":"2.10","depth":1,"path":"asyncrx/Errors.md","ref":"asyncrx/Errors.md","articles":[]},"previous":{"title":"Operators","level":"2.8","depth":1,"path":"asyncrx/Operators.md","ref":"asyncrx/Operators.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["insert-logo","highlight-code"],"pluginsConfig":{"insert-logo":{"style":"background: none; width: 150px","url":"/Reaction/logo.png"},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"highlight-code":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"asyncrx/Query.md","mtime":"2018-11-13T06:39:30.110Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-11-13T06:40:11.613Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

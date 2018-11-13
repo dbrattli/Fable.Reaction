@@ -10,10 +10,10 @@ A Stream in Reaction return both an observer (`IAsyncObserver`) and an observabl
 we need to use `Async.Start` to start the worker function so it runs concurrently.
 
 ```fs
-open Reaction.AsyncRx.Streams
+open Reaction
 
 let myStream () =
-    let dispatch, obs = stream<Msg> ()
+    let dispatch, obs = AsyncRx.stream<Msg> ()
 
     let worker () = async {
         while true do
@@ -27,11 +27,11 @@ let myStream () =
 
 ## 2. Use Create
 
-The `AsyncObservable.Create` function takes an `Async` subscribe function and returns an `IAsyncObservable`. Note that
+The `AsyncRx.Create` function takes an `Async` subscribe function and returns an `IAsyncObservable`. Note that
 we need to use `Async.Start` to start the worker function so it runs concurrently.
 
 ```fs
-open Reation.AsyncObservable
+open Reation
 
 let myStream () =
     let subscribeAsync (obs: IAsyncObserver<Msg>) : Async<IAsyncDisposable> =
@@ -53,7 +53,7 @@ let myStream () =
             return AsyncDisposable.Create(cancel)
         }
 
-    AsyncObservable.create(subscribeAsync)
+    AsyncRx.create(subscribeAsync)
 ```
 
 ## 3. Use ofAsyncWorker

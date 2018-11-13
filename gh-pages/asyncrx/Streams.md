@@ -17,7 +17,7 @@ The stream will forward any notification pushed to the `IAsyncObserver<'a>` side
 - **stream** : `unit -> IAsyncObserver<'a> * IAsyncObservable<'a>`
 
 ```fs
-let dispatch, obs = stream ()
+let dispatch, obs = AsyncRx.stream ()
 
 let main = async {
     let! sub = obs.SubscribeAsync obv
@@ -35,7 +35,7 @@ Same as a `stream` except that the observer is exposed as a `MailboxProcessor<No
 - **mbStream** : `unit -> MailboxProcessor<Notification<'a>> * IAsyncObservable<'a>`
 
 ```fs
-let dispatch, obs = mbStream ()
+let dispatch, obs = AsyncRx.mbStream ()
 
 let main = async {
     let! sub = obs.SubscribeAsync obv
@@ -53,7 +53,7 @@ The stream will forward any notification pushed to the `IAsyncObserver<'a>` side
 - **singleStream** : `unit -> IAsyncObserver<'a> * IAsyncObservable<'a>`
 
 ```fs
-let dispatch, obs = singleStream ()
+let dispatch, obs = AsyncRx.singleStream ()
 
 let main = async {
     let! sub = obs.SubscribeAsync obv
