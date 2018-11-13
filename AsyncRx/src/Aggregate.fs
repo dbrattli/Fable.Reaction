@@ -85,11 +85,9 @@ module Aggregation =
                                 let! newGroups = async {
                                     match groups.TryFind groupKey with
                                     | Some group ->
-                                        //printfn "Found group: %A" groupKey
                                         do! group.OnNextAsync x
                                         return groups, false
                                     | None ->
-                                        //printfn "New group: %A" groupKey
                                         let obv, obs = Streams.singleStream ()
                                         do! aobv.OnNextAsync obs
                                         do! obv.OnNextAsync x
@@ -97,15 +95,11 @@ module Aggregation =
                                 }
                                 return newGroups
                             | OnError ex ->
-                                //printfn "%A" n
-
                                 for entry in groups do
                                     do! entry.Value.OnErrorAsync ex
                                 do! aobv.OnErrorAsync ex
                                 return Map.empty, true
                             | OnCompleted ->
-                                //printfn "%A" n
-
                                 for entry in groups do
                                     do! entry.Value.OnCompletedAsync ()
                                 do! aobv.OnCompletedAsync ()
