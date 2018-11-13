@@ -18,7 +18,7 @@ let ``Test filter async``() = toTask <| async {
             return x < 3
         }
 
-    let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.filterAsync predicate
+    let xs = seq { 1..5 } |> AsyncRx.ofSeq |> AsyncRx.filterAsync predicate
     let obv = TestObserver<int>()
 
     // Act
@@ -39,7 +39,7 @@ let ``Test filter``() = toTask <| async {
     // Arrange
     let predicate x = x < 3
 
-    let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.filter predicate
+    let xs = seq { 1..5 } |> AsyncRx.ofSeq |> AsyncRx.filter predicate
     let obv = TestObserver<int>()
 
     // Act
@@ -66,7 +66,7 @@ let ``Test filter predicate throws exception``() = toTask <| async {
             return true
         }
 
-    let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.filterAsync predicate
+    let xs = seq { 1..5 } |> AsyncRx.ofSeq |> AsyncRx.filterAsync predicate
     let obv = TestObserver<int>()
 
     // Act

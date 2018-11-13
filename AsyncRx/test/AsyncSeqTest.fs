@@ -13,7 +13,7 @@ let toTask computation : Task = Async.StartAsTask computation :> _
 
 [<Test>]
 let ``Test to async seq``() = toTask <| async {
-    let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.toAsyncSeq
+    let xs = seq { 1..5 } |> AsyncRx.ofSeq  |> AsyncRx.toAsyncSeq
     let result = List<int> ()
 
     let each x = async {

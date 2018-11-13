@@ -15,9 +15,9 @@ let toTask computation : Task = Async.StartAsTask computation :> _
 [<Test>]
 let ``Test merge non empty emtpy``() = toTask <| async {
     // Arrange
-    let xs = AsyncRx.ofSeq <| seq { 1..5 }
+    let xs = seq { 1..5 } |> AsyncRx.ofSeq
     let ys = AsyncRx.empty<int> ()
-    let zs = AsyncRx.ofSeq <| [ xs; ys ] |> AsyncRx.mergeInner
+    let zs = AsyncRx.ofSeq [ xs; ys ] |> AsyncRx.mergeInner
     let obv = TestObserver<int>()
 
     // Act
@@ -36,8 +36,8 @@ let ``Test merge non empty emtpy``() = toTask <| async {
 let ``Test merge empty non emtpy``() = toTask <| async {
     // Arrange
     let xs = AsyncRx.empty<int> ()
-    let ys = AsyncRx.ofSeq <| seq { 1..5 }
-    let zs = AsyncRx.ofSeq <| [ xs; ys ] |> AsyncRx.mergeInner
+    let ys = seq { 1..5 } |> AsyncRx.ofSeq
+    let zs = AsyncRx.ofSeq [ xs; ys ] |> AsyncRx.mergeInner
     let obv = TestObserver<int>()
 
     // Act
@@ -58,8 +58,8 @@ let ``Test merge error error``() = toTask <| async {
     let error = MyError "error"
     let xs = AsyncRx.fail error
     let ys = AsyncRx.fail error
-    let zs = AsyncRx.ofSeq <| [ xs; ys ] |> AsyncRx.mergeInner
-    let obv = TestObserver<int>()
+    let zs = AsyncRx.ofSeq [ xs; ys ] |> AsyncRx.mergeInner
+    let obv = TestObserver<int> ()
 
     // Act
     let! sub = zs.SubscribeAsync obv
@@ -73,16 +73,16 @@ let ``Test merge error error``() = toTask <| async {
     obv.Notifications |> should haveCount 1
     let actual = obv.Notifications |> Seq.toList
     let expected : Notification<int> list = [ OnError error ]
-    Assert.That(actual, Is.EquivalentTo(expected))
+    Assert.That(actual, Is.EquivalentTo (expected))
 }
 
 [<Test>]
 let ``Test merge two``() = toTask <| async {
     // Arrange
-    let xs  = AsyncRx.ofSeq <| seq { 1..3 }
-    let ys = AsyncRx.ofSeq <| seq { 4..5 }
-    let zs = AsyncRx.ofSeq <| [ xs; ys ] |> AsyncRx.mergeInner
-    let obv = TestObserver<int>()
+    let xs  = seq { 1..3 } |> AsyncRx.ofSeq
+    let ys = seq { 4..5 } |> AsyncRx.ofSeq
+    let zs = AsyncRx.ofSeq [ xs; ys ] |> AsyncRx.mergeInner
+    let obv = TestObserver<int> ()
 
     // Act
     let! sub = zs.SubscribeAsync obv

@@ -64,7 +64,7 @@ let ``Test groupby 2 groups``() = toTask <| async {
     let xs = AsyncRx.ofSeq [1; 2; 3; 4; 5; 6]
             |> AsyncRx.groupBy (fun x -> x % 2)
             |> AsyncRx.flatMap (fun x -> x)
-    let obv = TestObserver<int>()
+    let obv = TestObserver<int> ()
 
     // Act
     let! sub = xs.SubscribeAsync obv
@@ -87,7 +87,7 @@ let ``Test groupby cancel``() = toTask <| async {
     let xs = AsyncRx.ofSeq [1; 2; 3; 4; 5; 6]
             |> AsyncRx.groupBy (fun x -> x % 2)
             |> AsyncRx.flatMap (fun x -> x)
-    let obv = TestObserver<int>()
+    let obv = TestObserver<int> ()
 
     // Act
     let! sub = xs.SubscribeAsync obv

@@ -14,7 +14,7 @@ let toTask computation : Task = Async.StartAsTask computation :> _
 let ``Test single happy``() = toTask <| async {
     // Arrange
     let xs = AsyncRx.single 42
-    let obv = TestObserver<int>()
+    let obv = TestObserver<int> ()
 
     // Act
     let! dispose = xs.SubscribeAsync obv
@@ -32,7 +32,7 @@ let ``Test single happy``() = toTask <| async {
 let ``Test just dispose after subscribe``() = toTask <| async {
     // Arrange
     let xs = AsyncRx.single 42
-    let obv = TestObserver<int>()
+    let obv = TestObserver<int> ()
 
     // Act
     let! subscription = xs.SubscribeAsync obv
@@ -48,7 +48,7 @@ let ``Test just dispose after subscribe``() = toTask <| async {
 let ``Test ofSeq empty``() = toTask <| async {
     // Arrange
     let xs = AsyncRx.ofSeq Seq.empty
-    let obv = TestObserver<int>()
+    let obv = TestObserver<int> ()
 
     // Act
     let! dispose = xs.SubscribeAsync obv
@@ -65,8 +65,8 @@ let ``Test ofSeq empty``() = toTask <| async {
 [<Test>]
 let ``Test ofSeq non empty``() = toTask <| async {
     // Arrange
-    let xs = AsyncRx.ofSeq <| seq { 1 .. 5 }
-    let obv = TestObserver<int>()
+    let xs = seq { 1 .. 5 } |> AsyncRx.ofSeq
+    let obv = TestObserver<int> ()
 
     // Act
     let! dispose = xs.SubscribeAsync obv
@@ -83,7 +83,7 @@ let ``Test ofSeq non empty``() = toTask <| async {
 let ``Test ofSeq dispose after subscribe``() = toTask <| async {
     // Arrange
     let xs = AsyncRx.ofSeq <| seq { 1 .. 5 }
-    let obv = TestObserver<int>()
+    let obv = TestObserver<int> ()
 
     // Act
     let! subscription = xs.SubscribeAsync obv

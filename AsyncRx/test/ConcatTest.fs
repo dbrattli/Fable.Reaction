@@ -35,7 +35,7 @@ let ``Test concat emtpy empty``() = toTask <| async {
 [<Test>]
 let ``Test concat non emtpy empty``() = toTask <| async {
     // Arrange
-    let xs = AsyncRx.ofSeq <| seq { 1..3 }
+    let xs = seq { 1..3 } |> AsyncRx.ofSeq
     let ys = AsyncRx.empty ()
     let zs = AsyncRx.concatSeq [ xs; ys ]
     let obv = TestObserver<int>()
@@ -56,7 +56,7 @@ let ``Test concat non emtpy empty``() = toTask <| async {
 let ``Test concat empty non empty``() = toTask <| async {
     // Arrange
     let xs = AsyncRx.empty ()
-    let ys = AsyncRx.ofSeq <| seq { 1..3 }
+    let ys = seq { 1..3 } |> AsyncRx.ofSeq
     let zs = AsyncRx.concatSeq [ xs; ys ]
     let obv = TestObserver<int>()
 
@@ -75,10 +75,10 @@ let ``Test concat empty non empty``() = toTask <| async {
 [<Test>]
 let ``Test concat two``() = toTask <| async {
     // Arrange
-    let xs = AsyncRx.ofSeq <| seq { 1..3 }
-    let ys = AsyncRx.ofSeq <| seq { 4..6 }
+    let xs = seq { 1..3 } |> AsyncRx.ofSeq
+    let ys = seq { 4..6 } |> AsyncRx.ofSeq
     let zs = AsyncRx.concatSeq [ xs; ys ]
-    let obv = TestObserver<int>()
+    let obv = TestObserver<int> ()
 
     // Act
     let! sub = zs.SubscribeAsync obv
@@ -95,8 +95,8 @@ let ``Test concat two``() = toTask <| async {
 [<Test>]
 let ``Test concat ++``() = toTask <| async {
     // Arrange
-    let xs = AsyncRx.ofSeq <| seq { 1..3 }
-    let ys = AsyncRx.ofSeq <| seq { 4..6 }
+    let xs = seq { 1..3 } |> AsyncRx.ofSeq
+    let ys = seq { 4..6 } |> AsyncRx.ofSeq
     let zs = xs ++ ys
     let obv = TestObserver<int>()
 
@@ -115,9 +115,9 @@ let ``Test concat ++``() = toTask <| async {
 [<Test>]
 let ``Test concat three``() = toTask <| async {
     // Arrange
-    let a = AsyncRx.ofSeq <| seq { 1..2 }
-    let b = AsyncRx.ofSeq <| seq { 3..4 }
-    let c = AsyncRx.ofSeq <| seq { 5..6 }
+    let a = seq { 1..2 } |> AsyncRx.ofSeq
+    let b = seq { 3..4 } |> AsyncRx.ofSeq
+    let c = seq { 5..6 } |> AsyncRx.ofSeq
     let xs = AsyncRx.concatSeq [ a; b; c ]
     let obv = TestObserver<int>()
 
@@ -140,7 +140,7 @@ let ``Test concat fail with non emtpy ``() = toTask <| async {
     // Arrange
     let error = MyError "error"
     let xs = AsyncRx.fail error
-    let ys = AsyncRx.ofSeq <| seq { 1..3 }
+    let ys = seq { 1..3 } |> AsyncRx.ofSeq
     let zs = AsyncRx.concatSeq [ xs; ys ]
     let obv = TestObserver<int>()
 
