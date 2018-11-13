@@ -30,14 +30,14 @@ module AsyncObservable =
         }
 
     /// Returns an observable sequence that contains the elements of
-    /// the given sequences.
+    /// the given sequences concatenated together.
     let inline (++) source other = Combine.concatSeq [source; other]
 
 /// A single module that contains all the operators. Nicer and shorter way than writing
 /// AsyncObservable. We want to prefix our operators so we don't mix e.g. `map` with other modules.
 module AsyncRx =
 
-  // AggregateRegion
+  // Aggregate Region
 
     /// Groups the elements of an observable sequence according to a
     /// specified key mapper function. Returns a sequence of observable
@@ -73,7 +73,7 @@ module AsyncRx =
     let inline scanAsync (accumulator: 'a -> 'a -> Async<'a>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
         Aggregation.scanAsync accumulator source
 
-  // CombineRegion
+  // Combine Region
 
     /// Merges the specified observable sequences into one observable
     /// sequence by combining elements of the sources into tuples.
@@ -119,7 +119,7 @@ module AsyncRx =
     let inline zipSeq (sequence: seq<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a*'b> =
         Combine.zipSeq sequence source
 
-  // CreateRegion
+  // Create Region
 
     /// Creates an async observable (`AsyncObservable{'a}`) from the
     /// given subscribe function.
@@ -175,7 +175,7 @@ module AsyncRx =
     let inline timer (dueTime: int) : IAsyncObservable<int> =
         Create.timer dueTime
 
-  // FilterRegion
+  // Filter Region
 
     /// Applies the given function to each element of the stream and
     /// returns the stream comprised of the results for each element
@@ -211,7 +211,7 @@ module AsyncRx =
     let inline takeUntil (other: IAsyncObservable<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
         Filter.takeUntil other source
 
-  // LeaveRegion
+  // Leave Region
     #if !FABLE_COMPILER
     /// Convert async observable to async sequence, non-blocking.
     /// Producer will be awaited until item is consumed by the async
@@ -220,7 +220,7 @@ module AsyncRx =
         Leave.toAsyncSeq source
     #endif
 
-  // TimeshiftRegion
+  // Timeshift Region
 
     /// Ignores values from an observable sequence which are followed by
     /// another value before the given timeout.
@@ -236,7 +236,7 @@ module AsyncRx =
     let inline sample (msecs: int) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
         Timeshift.sample msecs source
 
-   // TransformRegion
+  // Transform Region
 
     /// Returns an observable sequence containing the first sequence's
     /// elements, followed by the elements of the handler sequence in
@@ -319,7 +319,7 @@ module AsyncRx =
     let inline share (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
         Transformation.share source
 
-  // StreamsRegion
+  // Streams Region
 
     /// A stream is both an observable sequence as well as an observer.
     /// Each notification is broadcasted to all subscribed observers.
