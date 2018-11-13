@@ -28,7 +28,7 @@ module Combine =
                         let getInnerSubscription = async {
                             match cmd with
                             | InnerObservable xs ->
-                                return! AsyncObserver (obv <| replyChannel) |> xs.SubscribeAsync
+                                return! AsyncObserver (obv replyChannel) |> xs.SubscribeAsync
                             | Dispose ->
                                 do! innerSubscription.DisposeAsync ()
                                 replyChannel.Reply true
