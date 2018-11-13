@@ -1,7 +1,7 @@
 # Scaling Fable.Reaction Applications
 
 
-From `Fable.Reaction` ~> 3 `withQuery` now takes a query that takes the current Model (`'model`) as the first argument like this:
+From `Fable.Elmish.Reaction` ~> 2 `withQuery` now takes a query that takes the current Model (`'model`) as the first argument like this:
 
 ```fs
 let withQuery (query: 'model -> IAsyncObservable<'msg> -> IAsyncObservable<'msg>*'key) (program: Elmish.Program<_,_,_,_>) =

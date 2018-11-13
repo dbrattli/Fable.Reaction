@@ -3,16 +3,15 @@
 To use Fable Reaction with Elmish you need to call the `Program.withQuery` with your reactive query. The query function takes an `IAsyncObservable<'msg>` and returns a possibibly transformed `IAsyncObservable<'msg>`.
 
 ```fs
-open Reaction.AsyncObservable // 1. Open AsyncObserable for operators such as delay.
-open Fable.Reaction  // 2. Open Fable.Reaction
+open Reaction // 1. Open Reaction
 
 // (your Elmish program here)
 
 let query msgs = // 3. Add reactive query
-    msgs |> delay 1000
+    msgs |> AsyncRx.delay 1000
 
 Program.mkSimple init update view
-|> Program.withQuery query       // 4. Enable the query in Elmish
+|> Program.withSimpleQuery query       // 4. Enable the query in Elmish
 |> Program.withReact "elmish-app"
 |> Program.run
 ```
@@ -23,16 +22,15 @@ To load initial state from the server without using commands (`Cmd`) you create 
 
 ```fs
 // Add open statements to top of file
-open Reaction.AsyncObservable
-open Fable.Reaction
+open Reaction
 
 let loadCount =
     ofPromise (fetchAs<int> "/api/init" [])
-        |> map (Ok >> InitialCountLoaded)
-        |> catch (Error >> InitialCountLoaded >> single)
+        |> AsyncRx.map (Ok >> InitialCountLoaded)
+        |> AsyncRx.catch (Error >> InitialCountLoaded >> single)
 
 let query msgs =
-    concat [loadCount; msgs]
+    loadCount ++ msgs
 ```
 
 ## Doing side effects per message
@@ -43,16 +41,15 @@ The `flatMapLatest` operator is a combination of the `map` and `switchLatest` op
 
 ```fs
 // Add open statements to top of file
-open Reaction.AsyncObservable
-open Fable.Reaction
+open Reaction
 
 let query msgs =
     msgs
-    |> choose Msg.asKeyboardEvent
-    |> map targetValue
-    |> filter (fun term -> term.Length > 2 || term.Length = 0)
-    |> debounce 750          // Pause for 750ms
-    |> distinctUntilChanged  // Only if the value has changed
-    |> flatMapLatest searchWikipedia
+    |> AsyncRx.choose Msg.asKeyboardEvent
+    |> AsyncRx.map targetValue
+    |> AsyncRx.filter (fun term -> term.Length > 2 || term.Length = 0)
+    |> AsyncRx.debounce 750          // Pause for 750ms
+    |> AsyncRx.distinctUntilChanged  // Only if the value has changed
+    |> AsyncRx.flatMapLatest searchWikipedia
 
 ```

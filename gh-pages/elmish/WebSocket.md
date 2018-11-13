@@ -23,7 +23,7 @@ This enables us to compose the message channel into the qury without resorting t
 ```fs
 let query (msgs: IAsyncObservable<Msg>) =
     msgs
-    |> msgChannel "ws://localhost:8085/ws" Msg.Encode Msg.Decode
+    |> AsyncRx.msgChannel "ws://localhost:8085/ws" Msg.Encode Msg.Decode
 
 Program.mkProgram init update view
 |> Program.withQuery query

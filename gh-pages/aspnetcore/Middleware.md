@@ -57,7 +57,7 @@ Thus this query will only send messages back to the same client that sent them. 
 ```fs
 let query (connectionId: ConnectionId) (msgs: IAsyncObservable<Msg*ConnectionId>) : IAsyncObservable<Msg*ConnectionId> =
     msgs
-    |> filter (fun (msg, cId) -> cId = connectionId)
+    |> AsyncRx.filter (fun (msg, cId) -> cId = connectionId)
 ```
 
 This query will only send back messages from other clients. Messages that the client sent itself will be filtered.
@@ -65,7 +65,7 @@ This query will only send back messages from other clients. Messages that the cl
 ```fs
 let query (connectionId: ConnectionId) (msgs: IAsyncObservable<Msg*ConnectionId>) : IAsyncObservable<Msg*ConnectionId> =
     msgs
-    |> filter (fun (msg, cId) -> cId <> connectionId)
+    |> AsyncRx.filter (fun (msg, cId) -> cId <> connectionId)
 ```
 
 ### QueryAll
