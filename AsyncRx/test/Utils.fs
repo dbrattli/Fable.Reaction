@@ -10,7 +10,6 @@ type TestObserver<'a>() =
     let notifications = new List<Notification<'a>>()
     let completed = TaskCompletionSource<'a>()
     let monitor = new Object ()
-
     let mutable latest : 'a option = None
 
     member this.Notifications = notifications

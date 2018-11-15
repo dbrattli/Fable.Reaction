@@ -13,7 +13,7 @@ module Combine =
             let innerAgent =
                 MailboxProcessor.Start(fun inbox ->
                     let rec messageLoop (innerSubscription : IAsyncDisposable) = async {
-                        let! cmd, replyChannel = inbox.Receive()
+                        let! cmd, replyChannel = inbox.Receive ()
 
                         let obv (replyChannel : AsyncReplyChannel<bool>) n =
                             async {

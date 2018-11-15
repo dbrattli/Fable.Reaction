@@ -15,8 +15,9 @@ module Core =
         let disposable = { new IAsyncDisposable with member __.DisposeAsync () = cancel () }
         disposable, cts.Token
 
-    /// Safe observer that wraps the given observer and makes sure that
-    /// the Rx grammar (onNext* (onError|onCompleted)?) is not violated.
+    /// Safe observer that wraps the given observer. Makes sure that
+    /// invocations are serialized and that the Rx grammar (OnNext*
+    /// (OnError|OnCompleted)?) is not violated.
     let safeObserver (obv: IAsyncObserver<'a>) : IAsyncObserver<'a> =
         let agent = MailboxProcessor.Start (fun inbox ->
             let rec messageLoop stopped = async {
@@ -45,9 +46,7 @@ module Core =
 
                 return! messageLoop stop
             }
-
-            messageLoop false
-        )
+            messageLoop false)
         { new IAsyncObserver<'a> with
             member this.OnNextAsync x = async {
                 OnNext x |> agent.Post
@@ -79,27 +78,3 @@ module Core =
             messageLoop initial
         )
 
-
-[<AutoOpen>]
-module Context =
-    type IReactionTime =
-       abstract member SleepAsync : int -> Async<unit>
-
-       abstract member Now : DateTime
-
-    type ReactionContext () =
-        static let instance : IReactionTime = ReactionContext () :> IReactionTime
-        static member val Current = instance with get, set
-
-        interface IReactionTime with
-            member this.SleepAsync msecs =
-                Async.Sleep msecs
-
-            member this.Now =
-                DateTime.Now
-
-        static member SleepAsync = ReactionContext.Current.SleepAsync
-
-        static member Now = ReactionContext.Current.Now
-
-        static member Reset () = ReactionContext.Current <- instance

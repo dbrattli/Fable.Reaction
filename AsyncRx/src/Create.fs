@@ -10,15 +10,17 @@ open FSharp.Control
 open Core
 open Types
 
+
 [<RequireQualifiedAccess>]
 module Create =
+
     /// Creates an async observable (`AsyncObservable{'a}`) from the
     /// given subscribe function.
     let create (subscribe : IAsyncObserver<'a> -> Async<IAsyncDisposable>) : IAsyncObservable<'a> =
         { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribe o }
 
     // Create async observable from async worker function
-    let ofAsyncWorker (worker: IAsyncObserver<'a> -> CancellationToken -> Async<unit>) : IAsyncObservable<_> =
+    let ofAsyncWorker (worker: IAsyncObserver<'a> -> CancellationToken -> Async<unit>) : IAsyncObservable<'a> =
         let subscribeAsync (aobv : IAsyncObserver<_>) : Async<IAsyncDisposable> =
             let disposable, token = canceller ()
             let obv = safeObserver aobv
@@ -35,6 +37,14 @@ module Create =
         ofAsyncWorker (fun obv _ -> async {
             let! result = workflow
             do! obv.OnNextAsync result
+            do! obv.OnCompletedAsync ()
+        })
+
+    /// Returns an observable sequence containing the single specified
+    /// element.
+    let single (value: 'a) =
+        ofAsyncWorker (fun obv _ -> async {
+            do! obv.OnNextAsync value
             do! obv.OnCompletedAsync ()
         })
 
@@ -76,7 +86,6 @@ module Create =
     let ofAsyncSeq (xs: AsyncSeq<'a>) : IAsyncObservable<'a> =
         let subscribeAsync  (aobv : IAsyncObserver<'a>) : Async<IAsyncDisposable> =
             let cancel, token = canceller ()
-            let mutable running = true
 
             async {
                 let ie = xs.GetEnumerator ()
@@ -109,10 +118,6 @@ module Create =
             }
         { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
 #endif
-    /// Returns an observable sequence containing the single specified
-    /// element.
-    let inline single (x : 'a) : IAsyncObservable<'a> =
-        ofSeq [ x ]
 
     // Returns an observable sequence that invokes the specified factory
     // function whenever a new observer subscribes.
@@ -146,7 +151,7 @@ module Create =
                         do! aobv.OnCompletedAsync ()
                 }
 
-                Async.Start ((handler msecs 0), token)
+                Async.Start((handler msecs 0),token)
                 return cancel
             }
 
@@ -156,15 +161,3 @@ module Create =
     /// after the given duetime in milliseconds.
     let timer (dueTime: int) : IAsyncObservable<int> =
         interval dueTime 0
-
-/// A ValueObservable is both a value and an async observable. The basic idea is that this is the
-/// AsyncObservable version of the ValueTask, and makes it possible for us to shortcut and bypass
-/// the `mergeInner` opeation in a `flatMap` for synchronous values (where we already have the
-/// value).
-type ValueObservable<'a>(value) =
-    interface IAsyncObservable<'a> with
-        member this.SubscribeAsync (obv: IAsyncObserver<'a>) =
-            let obs = Create.single value
-            obs.SubscribeAsync obv
-    member this.Value = value
-

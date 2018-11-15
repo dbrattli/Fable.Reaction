@@ -1,5 +1,8 @@
 namespace Reaction
 
+open System
+open System.Threading
+
 type Notification<'a> =
     | OnNext of 'a
     | OnError of exn

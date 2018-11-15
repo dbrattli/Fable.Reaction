@@ -2,6 +2,7 @@ namespace Reaction
 
 #if !FABLE_COMPILER
 open FSharp.Control
+open System.Threading
 #endif
 
 /// Overloads and extensions for AsyncObservable
@@ -154,6 +155,9 @@ module AsyncRx =
     let inline ofAsync (workflow: Async<'a>)  : IAsyncObservable<'a> =
         Create.ofAsync workflow
 
+    let inline ofAsyncWorker (worker: IAsyncObserver<'a> -> CancellationToken -> Async<unit>) : IAsyncObservable<'a> =
+        Create.ofAsyncWorker worker
+
     #if !FABLE_COMPILER
     /// Convert async sequence into an async observable.
     let inline ofAsyncSeq (xs: AsyncSeq<'a>) : IAsyncObservable<'a> =
@@ -168,7 +172,7 @@ module AsyncRx =
     /// Returns an observable sequence containing the single specified
     /// element.
     let inline single (x : 'a) : IAsyncObservable<'a> =
-        upcast ValueObservable x
+        Create.single x
 
     /// Returns an observable sequence that triggers the value 0
     /// after the given duetime.

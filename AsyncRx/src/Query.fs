@@ -2,12 +2,15 @@ namespace Reaction
 
 type QueryBuilder() =
     member this.Zero () : IAsyncObservable<_> = Create.empty ()
-    member this.Yield (x: 'a) : IAsyncObservable<'a> = upcast ValueObservable x
+    member this.Yield (x: 'a) : IAsyncObservable<'a> = Create.single x
     member this.YieldFrom (xs: IAsyncObservable<'a>) : IAsyncObservable<'a> = xs
-    member this.Combine (xs: IAsyncObservable<'a>, ys: IAsyncObservable<'a>) = Combine.concatSeq [xs; ys]
+    member this.Combine (xs: IAsyncObservable<'a>, ys: IAsyncObservable<'a>) =
+        Combine.concatSeq [xs; ys]
     member this.Delay (fn) = fn ()
-    member this.Bind(source: IAsyncObservable<'a>, fn: 'a -> IAsyncObservable<'b>) : IAsyncObservable<'b> = Transformation.flatMap fn source
-    member x.For(source: IAsyncObservable<_>, func) : IAsyncObservable<'b> = Transformation.flatMap func source
+    member this.Bind(source: IAsyncObservable<'a>, fn: 'a -> IAsyncObservable<'b>) : IAsyncObservable<'b> =
+        Transformation.flatMap fn source
+    member x.For(source: IAsyncObservable<_>, func) : IAsyncObservable<'b> =
+        Transformation.flatMap func source
 
     // Async to AsyncObservable conversion
     member this.Bind (source: Async<'a>, fn: 'a -> IAsyncObservable<'b>) =

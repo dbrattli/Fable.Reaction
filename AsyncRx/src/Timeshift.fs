@@ -1,6 +1,7 @@
 namespace Reaction
 
 open System
+open System.Threading;
 
 open Reaction.Core
 
@@ -16,10 +17,10 @@ module Timeshift =
                 let rec messageLoop state = async {
                     let! n, dueTime = inbox.Receive()
 
-                    let diff : TimeSpan = dueTime - ReactionContext.Now
+                    let diff : TimeSpan = dueTime - DateTime.UtcNow
                     let msecs = Convert.ToInt32 diff.TotalMilliseconds
                     if msecs > 0 then
-                        do! ReactionContext.SleepAsync msecs
+                        do! Async.Sleep msecs
                     match n with
                     | OnNext x -> do! aobv.OnNextAsync x
                     | OnError ex -> do! aobv.OnErrorAsync ex
@@ -33,7 +34,7 @@ module Timeshift =
             async {
                 let obv n =
                     async {
-                        let dueTime = ReactionContext.Now + TimeSpan.FromMilliseconds(float msecs)
+                        let dueTime = DateTime.UtcNow + TimeSpan.FromMilliseconds(float msecs)
                         agent.Post (n, dueTime)
                     }
                 return! AsyncObserver obv |> source.SubscribeAsync
@@ -50,6 +51,7 @@ module Timeshift =
             let agent = MailboxProcessor.Start(fun inbox ->
                 let rec messageLoop currentIndex = async {
                     let! n, index = inbox.Receive ()
+                    printfn "Agent %A" (n, index)
 
                     let! newIndex = async {
                         match n, index with
@@ -82,14 +84,18 @@ module Timeshift =
                     async {
                         indexer.MoveNext () |> ignore
                         let index = indexer.Current
+                        printfn "1. Posting: %A" (n, index)
                         agent.Post (n, index)
 
                         let worker = async {
-                            do! ReactionContext.SleepAsync msecs
+                            printfn "Current thread (ProcessDelayed): %A" Thread.CurrentThread.ManagedThreadId
+                            printfn "*** sleeping"
+                            do! Async.Sleep msecs
+                            printfn "2. Posting: %A" (n, index)
                             agent.Post (n, index)
                         }
 
-                        Async.Start worker
+                        Async.Start(worker)
                     }
                 let! dispose = AsyncObserver obv |> source.SubscribeAsync
 

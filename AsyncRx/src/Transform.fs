@@ -50,10 +50,9 @@ module Transformation =
     /// observable sequence and merges the resulting observable
     /// sequences back into one observable sequence.
     let flatMap (mapper:'a -> IAsyncObservable<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
-        let mapped = source |> map mapper
-        match mapped with
-        | :? ValueObservable<'b> as obs -> upcast obs
-        | _ -> Combine.mergeInner mapped
+        source
+        |> map mapper
+        |> Combine.mergeInner
 
     /// Projects each element of an observable sequence into an
     /// observable sequence by incorporating the element's
@@ -68,10 +67,9 @@ module Transformation =
     /// into an observable sequence and merges the resulting observable
     /// sequences back into one observable sequence.
     let flatMapAsync (mapper:'a -> Async<IAsyncObservable<'b>>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
-        let mapped = source |> mapAsync mapper
-        match mapped with
-        | :? ValueObservable<'b> as obs -> upcast obs
-        | _ -> Combine.mergeInner mapped
+        source
+        |> mapAsync mapper
+        |> Combine.mergeInner
 
     /// Asynchronously projects each element of an observable sequence
     /// into an observable sequence by incorporating the element's
