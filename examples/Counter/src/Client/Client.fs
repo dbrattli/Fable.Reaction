@@ -1,16 +1,16 @@
 module Client
 
+open Fable.Core
 open Fable.PowerPack.Fetch
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
-open Fable.Reaction
-open Reaction
-open Reaction.AsyncObservable
 
+open Thoth.Json
 open Shared
 open Fulma
 open Elmish
 open Elmish.React
+open Reaction
 
 
 // The model holds data that you want to keep track of while the application is running
@@ -95,13 +95,19 @@ let view (model : Model) (dispatch : Msg -> unit) =
                     [ safeComponents ] ] ]
 
 let loadCountCmd =
-    let decoder = Thoth.Json.Decode.int
-    ofPromise (fetchAs<int> "/api/init" decoder [])
-        |> map (Ok >> InitialCountLoaded)
-        |> catch (Error >> InitialCountLoaded >> single)
+    let decoder = Decode.int
+    AsyncRx.ofPromise (fetchAs<int> "/api/init" decoder [])
+        |> AsyncRx.map (Ok >> InitialCountLoaded)
+        |> AsyncRx.catch (Error >> InitialCountLoaded >> AsyncRx.single)
 
-let query msgs =
-    concat [loadCountCmd; msgs]
+
+let query model msgs =
+    match model.Counter with
+    | Some x ->
+        Subscribe (msgs, "msgs")
+    | _ ->
+        Subscribe (loadCountCmd, "initial")
+
 
 Program.mkSimple init update view
 |> Program.withQuery query
