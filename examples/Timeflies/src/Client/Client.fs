@@ -50,23 +50,23 @@ let getOffset (element: Browser.Element) =
 
     int (scrollTop - clientTop), int (scrollLeft - clientLeft)
 
-let container = Browser.document.querySelector("#elmish-app")
+let container = Browser.document.querySelector "#elmish-app"
 let top, left = getOffset container
 
 // Query for message stream transformation (expression style)
-let query model msgs =
-    Subscribe (asyncRx {
+let query msgs =
+    asyncRx {
         let chars =
             Seq.toList "TIME FLIES LIKE AN ARROW"
             |> Seq.mapi (fun i c -> i, c)
 
-        for i, c in chars do
-            yield! AsyncRx.ofMouseMove ()
-                |> AsyncRx.delay (100 * i)
-                |> AsyncRx.map (fun m -> Letter (i, string c, int m.clientX + i * 10 + 15 - left, int m.clientY - top))
-    }, "msgs")
+        let! i, c = AsyncRx.ofSeq chars
+        yield! AsyncRx.ofMouseMove ()
+            |> AsyncRx.delay (100 * i)
+            |> AsyncRx.map (fun m -> Letter (i, string c, int m.clientX + i * 10 + 15 - left, int m.clientY - top))
+    }
 
 Program.mkSimple init update view
-|> Program.withQuery query
+|> Program.withSimpleQuery query
 |> Program.withReact "elmish-app"
 |> Program.run
