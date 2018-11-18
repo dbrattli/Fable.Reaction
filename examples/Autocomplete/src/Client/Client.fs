@@ -140,31 +140,31 @@ let searchWikipedia (term: string) =
         |> AsyncRx.catch (sprintf "%A" >> Error >> QueryResult >> AsyncRx.single)
 
 let query model msgs =
+    let targetValue (ev: Fable.Import.React.KeyboardEvent) : string =
+        try
+            let target = !!ev.target?value : string
+            target.Trim ()
+        with _ -> ""
+
+    let terms =
+        msgs
+        |> AsyncRx.choose Msg.asKeyboardEvent
+        |> AsyncRx.map targetValue       // Map keyboard event to input value
+        |> AsyncRx.filter (fun term -> term.Length > 2 || term.Length = 0)
+        |> AsyncRx.debounce 750          // Pause for 750ms
+        |> AsyncRx.distinctUntilChanged  // Only if the value has changed
+
     Queries [
-        let targetValue (ev: Fable.Import.React.KeyboardEvent) : string =
-            try
-                let target = !!ev.target?value : string
-                target.Trim ()
-            with _ -> ""
-
-        let terms =
-            msgs
-            |> AsyncRx.choose Msg.asKeyboardEvent
-            |> AsyncRx.map targetValue       // Map keyboard event to input value
-            |> AsyncRx.filter (fun term -> term.Length > 2 || term.Length = 0)
-            |> AsyncRx.debounce 750          // Pause for 750ms
-            |> AsyncRx.distinctUntilChanged  // Only if the value has changed
-
         let loading =
             terms
             |> AsyncRx.filter (fun x -> x.Length > 0)
             |> AsyncRx.map (fun _ -> Loading)
-        yield Subscribe (loading, "loading")
+        yield Query (loading, "loading")
 
         let results =
             terms
             |> AsyncRx.flatMapLatest searchWikipedia
-        yield Subscribe (results, "search")
+        yield Query (results, "search")
     ]
 
 Program.mkSimple init update view
