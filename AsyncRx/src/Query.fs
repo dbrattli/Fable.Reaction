@@ -10,7 +10,7 @@ type QueryBuilder() =
     member this.Bind(source: IAsyncObservable<'a>, fn: 'a -> IAsyncObservable<'b>) : IAsyncObservable<'b> =
         Transformation.flatMap fn source
     member x.For(source: IAsyncObservable<_>, func) : IAsyncObservable<'b> =
-        Transformation.flatMap func source
+        Transformation.concatMap func source
 
     // Async to AsyncObservable conversion
     member this.Bind (source: Async<'a>, fn: 'a -> IAsyncObservable<'b>) =
@@ -21,7 +21,7 @@ type QueryBuilder() =
     // Sequence to AsyncObservable conversion
     member x.For(source: seq<_>, func) : IAsyncObservable<'b> =
         Create.ofSeq source
-        |> Transformation.flatMap func
+        |> Transformation.concatMap func
 
 [<AutoOpen>]
 module QueryBuilder =
