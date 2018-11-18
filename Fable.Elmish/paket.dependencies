@@ -4,4 +4,4 @@ storage: none
 nuget Fable.Core ~> 2
 nuget Fable.React ~> 2
 nuget Fable.Elmish ~> 2
-nuget Reaction.AsyncRx prerelease
+nuget Reaction.AsyncRx ~> 2
