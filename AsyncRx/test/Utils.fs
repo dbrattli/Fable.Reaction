@@ -27,7 +27,7 @@ type TestObserver<'a>() =
 
     member this.PostAsync (n : Notification<'a>) =
         async {
-            printfn "TestObserver %A" n
+            //printfn "TestObserver %A" n
 
             lock monitor (fun () ->
                 this.Notifications.Add(n)

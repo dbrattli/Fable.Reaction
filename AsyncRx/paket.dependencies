@@ -3,6 +3,4 @@ source https://www.nuget.org/api/v2
 nuget coverlet.msbuild
 nuget FSharp.Control.AsyncSeq
 nuget Microsoft.NET.Test.Sdk
-nuget NUnit
-nuget NUnit3TestAdapter
-nuget FsUnit
+nuget Expecto

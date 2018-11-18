@@ -3,94 +3,90 @@ module Tests.Create
 open System.Threading.Tasks
 
 open Reaction
+open Expecto
 
-open NUnit.Framework
-open FsUnit
 open Tests.Utils
 
-let toTask computation : Task = Async.StartAsTask computation :> _
+[<Tests>]
+let tests = testList "Create Tests" [
 
-[<Test>]
-let ``Test single happy``() = toTask <| async {
-    // Arrange
-    let xs = AsyncRx.single 42
-    let obv = TestObserver<int> ()
+    testAsync "Test single happy" {
+        // Arrange
+        let xs = AsyncRx.single 42
+        let obv = TestObserver<int> ()
 
-    // Act
-    let! dispose = xs.SubscribeAsync obv
+        // Act
+        let! dispose = xs.SubscribeAsync obv
 
-    // Assert
-    let! latest = obv.Await ()
-    latest |> should equal 42
+        // Assert
+        let! latest = obv.Await ()
+        Expect.equal latest 42 "Should be equal"
 
-    let actual = obv.Notifications |> Seq.toList
-    let expected = [ OnNext 42; OnCompleted ]
-    Assert.That(actual, Is.EquivalentTo(expected))
-}
+        let actual = obv.Notifications |> Seq.toList
+        let expected = [ OnNext 42; OnCompleted ]
 
-[<Test>]
-let ``Test just dispose after subscribe``() = toTask <| async {
-    // Arrange
-    let xs = AsyncRx.single 42
-    let obv = TestObserver<int> ()
+        Expect.equal actual expected "Should be equal"
+    }
 
-    // Act
-    let! subscription = xs.SubscribeAsync obv
-    Async.StartImmediate (subscription.DisposeAsync ())
+    testAsync "Test just dispose after subscribe" {
+        // Arrange
+        let xs = AsyncRx.single 42
+        let obv = TestObserver<int> ()
 
-    // Assert
-    //let actual = obv.Notifications |> Seq.toList
-    //Assert.That(actual, Is.EquivalentTo([]))
-    ()
-}
+        // Act
+        let! subscription = xs.SubscribeAsync obv
+        Async.StartImmediate (subscription.DisposeAsync ())
 
-[<Test>]
-let ``Test ofSeq empty``() = toTask <| async {
-    // Arrange
-    let xs = AsyncRx.ofSeq Seq.empty
-    let obv = TestObserver<int> ()
+        // Assert
+        //let actual = obv.Notifications |> Seq.toList
+        //Assert.That(actual, Is.EquivalentTo([]))
+        ()
+    }
 
-    // Act
-    let! dispose = xs.SubscribeAsync obv
+    testAsync "Test ofSeq empty"  {
+        // Arrange
+        let xs = AsyncRx.ofSeq Seq.empty
+        let obv = TestObserver<int> ()
 
-    do! obv.AwaitIgnore ()
+        // Act
+        let! dispose = xs.SubscribeAsync obv
 
-    // Assert
-    let actual = obv.Notifications |> Seq.toList
-    let expected : Notification<int> list = [ OnCompleted ]
+        do! obv.AwaitIgnore ()
 
-    Assert.That(actual, Is.EquivalentTo(expected))
-}
+        // Assert
+        let actual = obv.Notifications |> Seq.toList
+        let expected : Notification<int> list = [ OnCompleted ]
 
-[<Test>]
-let ``Test ofSeq non empty``() = toTask <| async {
-    // Arrange
-    let xs = seq { 1 .. 5 } |> AsyncRx.ofSeq
-    let obv = TestObserver<int> ()
+        Expect.equal actual expected "Should be equal"
+    }
 
-    // Act
-    let! dispose = xs.SubscribeAsync obv
-    do! obv.AwaitIgnore ()
+    testAsync "Test ofSeq non empty" {
+        // Arrange
+        let xs = seq { 1 .. 5 } |> AsyncRx.ofSeq
+        let obv = TestObserver<int> ()
 
-    // Assert
-    let actual = obv.Notifications |> Seq.toList
-    let expected = [ OnNext 1; OnNext 2; OnNext 3; OnNext 4; OnNext 5; OnCompleted ]
+        // Act
+        let! dispose = xs.SubscribeAsync obv
+        do! obv.AwaitIgnore ()
 
-    Assert.That(actual, Is.EquivalentTo(expected))
-}
+        // Assert
+        let actual = obv.Notifications |> Seq.toList
+        let expected = [ OnNext 1; OnNext 2; OnNext 3; OnNext 4; OnNext 5; OnCompleted ]
 
-[<Test>]
-let ``Test ofSeq dispose after subscribe``() = toTask <| async {
-    // Arrange
-    let xs = AsyncRx.ofSeq <| seq { 1 .. 5 }
-    let obv = TestObserver<int> ()
+        Expect.equal actual expected "Should be equal"
+    }
 
-    // Act
-    let! subscription = xs.SubscribeAsync obv
-    do! subscription.DisposeAsync ()
+    testAsync "Test ofSeq dispose after subscribe" {
+        // Arrange
+        let xs = AsyncRx.ofSeq <| seq { 1 .. 5 }
+        let obv = TestObserver<int> ()
 
-    // Assert
-    //let actual = obv.Notifications |> Seq.toList
-    //Assert.That(actual, Is.EquivalentTo([]))
-}
+        // Act
+        let! subscription = xs.SubscribeAsync obv
+        do! subscription.DisposeAsync ()
 
+        // Assert
+        //let actual = obv.Notifications |> Seq.toList
+        //Assert.That(actual, Is.EquivalentTo([]))
+    }
+]

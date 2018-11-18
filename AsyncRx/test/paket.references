@@ -1,6 +1,4 @@
-coverlet.msbuild
 FSharp.Core
+coverlet.msbuild
 Microsoft.NET.Test.Sdk
-NUnit
-NUnit3TestAdapter
-FsUnit
+Expecto

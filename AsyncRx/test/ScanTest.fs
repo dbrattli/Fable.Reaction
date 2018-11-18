@@ -1,80 +1,74 @@
 module Tests.Scan
 
-open System.Threading.Tasks
-
 open Reaction
 
-open NUnit.Framework
-open FsUnit
+open Expecto
 open Tests.Utils
 
 exception MyError of string
 
-let toTask computation : Task = Async.StartAsTask computation :> _
+[<Tests>]
+let tests = testList "Query Tests" [
 
-[<Test>]
-let ``Test scanAsync``() = toTask <| async {
-    // Arrange
-    let scanner acc x =
-        async {
-            return acc + x
-        }
+    testAsync "Test scanAsync" {
+        // Arrange
+        let scanner acc x =
+            async {
+                return acc + x
+            }
 
-    let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scanInitAsync 0 scanner
-    let obv = TestObserver<int>()
+        let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scanInitAsync 0 scanner
+        let obv = TestObserver<int>()
 
-    // Act
-    let! sub = xs.SubscribeAsync obv
-    let! result = obv.Await ()
+        // Act
+        let! sub = xs.SubscribeAsync obv
+        let! result = obv.Await ()
 
-    // Assert
-    result |> should equal 15
-    obv.Notifications |> should haveCount 6
-    let actual = obv.Notifications |> Seq.toList
-    let expected = [ OnNext 1; OnNext 3; OnNext 6; OnNext 10; OnNext 15; OnCompleted ]
-    Assert.That(actual, Is.EquivalentTo(expected))
-}
+        // Assert
+        Expect.equal result 15 "Should be equal"
+        let actual = obv.Notifications |> Seq.toList
+        let expected = [ OnNext 1; OnNext 3; OnNext 6; OnNext 10; OnNext 15; OnCompleted ]
+        Expect.equal actual expected "Should be equal"
+    }
 
-[<Test>]
-let ``Test scan``() = toTask <| async {
-    // Arrange
-    let scanner acc x =
-        acc + x
+    testAsync "Test scan" {
+        // Arrange
+        let scanner acc x =
+            acc + x
 
-    let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scanInit 0 scanner
-    let obv = TestObserver<int>()
+        let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scanInit 0 scanner
+        let obv = TestObserver<int>()
 
-    // Act
-    let! sub = xs.SubscribeAsync obv
-    let! result = obv.Await ()
+        // Act
+        let! sub = xs.SubscribeAsync obv
+        let! result = obv.Await ()
 
-    // Assert
-    result |> should equal 15
-    obv.Notifications |> should haveCount 6
-    let actual = obv.Notifications |> Seq.toList
-    let expected = [ OnNext 1; OnNext 3; OnNext 6; OnNext 10; OnNext 15; OnCompleted ]
-    Assert.That(actual, Is.EquivalentTo(expected))
-}
+        // Assert
+        Expect.equal result 15 "Should be equal"
+        let actual = obv.Notifications |> Seq.toList
+        let expected = [ OnNext 1; OnNext 3; OnNext 6; OnNext 10; OnNext 15; OnCompleted ]
+        Expect.equal actual expected "Should be equal"
+    }
 
-[<Test>]
-let ``Test scan accumulator fails``() = toTask <| async {
-    // Arrange
-    let error = MyError "error"
-    let scanner acc x =
-        raise error
-        0
+    testAsync "Test scan accumulator fails" {
+        // Arrange
+        let error = MyError "error"
+        let scanner acc x =
+            raise error
+            0
 
-    let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scanInit 0 scanner
-    let obv = TestObserver<int>()
+        let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scanInit 0 scanner
+        let obv = TestObserver<int>()
 
-    // Act
-    let! sub = xs.SubscribeAsync obv
+        // Act
+        let! sub = xs.SubscribeAsync obv
 
-    try
-        do! obv.AwaitIgnore ()
-    with
-    | ex -> ()
+        try
+            do! obv.AwaitIgnore ()
+        with
+        | ex -> ()
 
-    // Assert
-    obv.Notifications |> should haveCount 1
-}
+        // Assert
+        Expect.equal obv.Notifications.Count 1 "Should be equal"
+    }
+]

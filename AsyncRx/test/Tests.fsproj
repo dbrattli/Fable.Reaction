@@ -1,28 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="Utils.fs" />
     <Compile Include="ObserverTest.fs" />
     <Compile Include="CreateTest.fs" />
-    <Compile Include="MapTest.fs" />
     <Compile Include="FilterTest.fs" />
+    <Compile Include="MapTest.fs" />
     <Compile Include="MergeTest.fs" />
     <Compile Include="ConcatTest.fs" />
-    <Compile Include="CatchTest.fs" />
-    <Compile Include="GroupByTest.fs" />
-    <Compile Include="BindTest.fs" />
-    <Compile Include="TakeUntilTest.fs" />
-    <Compile Include="AsyncSeqTest.fs" />
-    <Compile Include="SwitchTest.fs" />
-    <Compile Include="ScanTest.fs" />
+    <Compile Include="FlatMapTest.fs" />
     <Compile Include="QueryTest.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="CatchTest.fs" />
+    <Compile Include="ScanTest.fs" />
+    <Compile Include="Main.fs" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="../src/Reaction.AsyncRx.fsproj" />
-   </ItemGroup>
+  </ItemGroup>
+
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
