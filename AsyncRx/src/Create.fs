@@ -23,10 +23,10 @@ module Create =
     let ofAsyncWorker (worker: IAsyncObserver<'a> -> CancellationToken -> Async<unit>) : IAsyncObservable<'a> =
         let subscribeAsync (aobv : IAsyncObserver<_>) : Async<IAsyncDisposable> =
             let disposable, token = canceller ()
-            let obv = safeObserver aobv
+            let safeObv = safeObserver aobv
 
             async {
-                Async.Start ((worker obv token), token)
+                Async.Start ((worker safeObv token), token)
                 return disposable
             }
         { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
@@ -34,29 +34,45 @@ module Create =
     /// Returns the async observable sequence whose single element is
     /// the result of the given async workflow.
     let ofAsync (workflow : Async<'a>)  : IAsyncObservable<'a> =
-        ofAsyncWorker (fun obv _ -> async {
-            let! result = workflow
-            do! obv.OnNextAsync result
-            do! obv.OnCompletedAsync ()
-        })
+        let subscribeAsync (aobv : IAsyncObserver<_>) : Async<IAsyncDisposable> =
+            let safeObv = safeObserver aobv
 
-    /// Returns an observable sequence containing the single specified
-    /// element.
+            async {
+                let! result = workflow
+                do! safeObv.OnNextAsync result
+                do! safeObv.OnCompletedAsync ()
+                return AsyncDisposable.Empty
+            }
+        { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
+
+    /// Returns an observable sequence containing the single specified element.
     let single (value: 'a) =
-        ofAsyncWorker (fun obv _ -> async {
-            do! obv.OnNextAsync value
-            do! obv.OnCompletedAsync ()
-        })
+        let subscribeAsync (aobv : IAsyncObserver<_>) : Async<IAsyncDisposable> =
+            let safeObv = safeObserver aobv
+
+            async {
+                do! safeObv.OnNextAsync value
+                do! safeObv.OnCompletedAsync ()
+                return AsyncDisposable.Empty
+            }
+        { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
 
     /// Returns an observable sequence with no elements.
     let inline empty<'a> () : IAsyncObservable<'a> =
-        ofAsyncWorker (fun obv _ -> async {
-            do! obv.OnCompletedAsync ()
-        })
+        let subscribeAsync (aobv : IAsyncObserver<_>) : Async<IAsyncDisposable> =
+            async {
+                do! aobv.OnCompletedAsync ()
+                return AsyncDisposable.Empty
+            }
+        { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
 
     /// Returns an empty observable sequence that never completes.
     let inline never<'a> () : IAsyncObservable<'a> =
-        ofAsyncWorker (fun _ _ ->  async { () })
+        let subscribeAsync (_ : IAsyncObserver<_>) : Async<IAsyncDisposable> =
+            async {
+                return AsyncDisposable.Empty
+            }
+        { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
 
     /// Returns the observable sequence that terminates exceptionally
     /// with the specified exception.
