@@ -84,18 +84,14 @@ module Timeshift =
                     async {
                         indexer.MoveNext () |> ignore
                         let index = indexer.Current
-                        printfn "1. Posting: %A" (n, index)
                         agent.Post (n, index)
 
                         let worker = async {
-                            printfn "Current thread (ProcessDelayed): %A" Thread.CurrentThread.ManagedThreadId
-                            printfn "*** sleeping"
                             do! Async.Sleep msecs
-                            printfn "2. Posting: %A" (n, index)
                             agent.Post (n, index)
                         }
 
-                        Async.Start(worker)
+                        Async.Start worker
                     }
                 let! dispose = AsyncObserver obv |> source.SubscribeAsync
 
