@@ -51,7 +51,6 @@ module Timeshift =
             let agent = MailboxProcessor.Start(fun inbox ->
                 let rec messageLoop currentIndex = async {
                     let! n, index = inbox.Receive ()
-                    printfn "Agent %A" (n, index)
 
                     let! newIndex = async {
                         match n, index with
