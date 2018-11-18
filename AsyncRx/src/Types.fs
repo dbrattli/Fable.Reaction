@@ -1,8 +1,5 @@
 namespace Reaction
 
-open System
-open System.Threading
-
 type Notification<'a> =
     | OnNext of 'a
     | OnError of exn
@@ -22,16 +19,3 @@ module Types =
 
     type IAsyncObservable<'a> =
         abstract member SubscribeAsync: IAsyncObserver<'a> -> Async<IAsyncDisposable>
-
-[<AutoOpen>]
-module Commands =
-    type RefCountCmd =
-        | Increase
-        | Decrease
-
-    type InnerSubscriptionCmd<'a> =
-        | InnerObservable of IAsyncObservable<'a>
-        | InnerCompleted of int
-        | Completed
-        | Dispose
-

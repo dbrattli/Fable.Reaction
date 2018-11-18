@@ -1,6 +1,5 @@
 namespace Reaction
 
-open System
 open System.Threading
 open Types
 
@@ -58,23 +57,3 @@ module Core =
                 OnCompleted  |> agent.Post
             }
         }
-
-    let refCountAgent initial action =
-        MailboxProcessor.Start(fun inbox ->
-            let rec messageLoop count = async {
-                let! cmd = inbox.Receive ()
-                let newCount =
-                    match cmd with
-                    | Increase -> count + 1
-                    | Decrease -> count - 1
-
-                if newCount = 0 then
-                    do! action
-                    return ()
-
-                return! messageLoop newCount
-            }
-
-            messageLoop initial
-        )
-
