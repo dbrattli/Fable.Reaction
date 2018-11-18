@@ -31,7 +31,7 @@ module Program =
                     program.onError ("[Reaction] Query error", err)
                 }
                 member __.OnCompletedAsync () = async {
-                    debug ("[Reaction] Query completed: ", name)
+                    debug ("[Reaction] Query completed:", name)
                     subscriptions.Remove name |> ignore
                 }
             }
@@ -39,7 +39,7 @@ module Program =
         let subscribe (dispatch: Dispatch<'msg>) (addMap: Map<'name, IAsyncObservable<'msg>>) =
             async {
                 for KeyValue(name, msgs) in addMap do
-                    debug ("[Reaction] Subscribing: ", name)
+                    debug ("[Reaction] Subscribing:", name)
                     let! disposable = msgs.SubscribeAsync (msgObserver name dispatch)
                     subscriptions.Add (name, disposable)
             }
@@ -49,7 +49,7 @@ module Program =
                 for name in removeSet do
                     let disposable = subscriptions.[name]
                     do! disposable.DisposeAsync ()
-                    debug ("[Reaction] Disposing: ", name)
+                    debug ("[Reaction] Disposing:", name)
                     subscriptions.Remove name |> ignore
             }
 
