@@ -3,6 +3,29 @@ namespace Reaction
 open Fable.Core
 open Fable.Import.Browser
 
+
+[<RequireQualifiedAccess>]
+type Query =
+    /// Map query from one message type to another.
+    static member map mapper query  =
+        match query with
+        | Query (msgs', name) ->
+            Query.Query (msgs' |> AsyncRx.map mapper, name)
+        | Queries q ->
+            Queries [
+                for query in q do
+                    yield Query.map mapper query
+            ]
+        | Dispose -> Dispose
+
+and Query<'msg, 'name> =
+    /// Named Elmish query
+    | Query of IAsyncObservable<'msg>*'name
+    /// Collection of named Elmish queries
+    | Queries of Query<'msg,'name> list
+    /// Dispose Elmish query
+    | Dispose
+
 /// Extra Reaction operators that may be used from Fable
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module AsyncRx =
@@ -57,3 +80,7 @@ module AsyncRx =
     /// decoded using `decode` and forwarded down stream as messages {Result<'msg, exn>}.
     let msgResultChannel<'msg> (uri: string) (encode: 'msg -> string) (decode: string -> Result<'msg, exn>) (source: IAsyncObservable<'msg>) : IAsyncObservable<Result<'msg, exn>> =
         Reaction.WebSocket.msgResultChannel uri encode decode source
+
+    /// Wrap observable as a named query
+    let inline asQuery (name: 'name) (source: IAsyncObservable<'a>) : Query<'a, 'name> =
+        Query (source, name)

@@ -6,27 +6,14 @@ open System.Collections.Generic
 open Elmish
 open Reaction
 
-type Query<'msg, 'name> =
-    | Subscribe of IAsyncObservable<'msg>*'name
-    | Queries of Query<'msg,'name> list
-    | Dispose
-
-// Separate type containing the functions to avoid the generics above
-type Query =
-    /// Map a query from one message type to another.
-    static member map mapper query  =
-        match query with
-        | Subscribe (msgs', name) ->
-            Subscribe (msgs' |> AsyncRx.map mapper, name)
-        | Queries q ->
-            Queries [
-                for query in q do
-                    yield Query.map mapper query
-            ]
-        | Dispose -> Dispose
-
 [<RequireQualifiedAccess>]
 module Program =
+    #if DEBUG
+    let debug (text: string, o: #obj) = printfn "%s %A" text o
+    #else
+    let debug (text: string, o: #obj) = ()
+    #endif
+
     /// Attach a Reaction query to the message (Msg) stream of an Elmish program. The supplied query
     /// function will be called every time the model is updated.This makes it possible to dynamically
     /// change the query at runtime based on the current state (Model).
@@ -41,10 +28,10 @@ module Program =
                     dispatch x
                 }
                 member __.OnErrorAsync err = async {
-                    program.onError ("Reaction query error", err)
+                    program.onError ("[Reaction] Query error", err)
                 }
                 member __.OnCompletedAsync () = async {
-                    //printfn "Reaction query completed: %A" name
+                    debug ("[Reaction] Query completed: ", name)
                     subscriptions.Remove name |> ignore
                 }
             }
@@ -52,7 +39,7 @@ module Program =
         let subscribe (dispatch: Dispatch<'msg>) (addMap: Map<'name, IAsyncObservable<'msg>>) =
             async {
                 for KeyValue(name, msgs) in addMap do
-                    //printfn "Subscribing: %A" name
+                    debug ("[Reaction] Subscribing: ", name)
                     let! disposable = msgs.SubscribeAsync (msgObserver name dispatch)
                     subscriptions.Add (name, disposable)
             }
@@ -62,7 +49,7 @@ module Program =
                 for name in removeSet do
                     let disposable = subscriptions.[name]
                     do! disposable.DisposeAsync ()
-                    //printfn "Disposing: %A" name
+                    debug ("[Reaction] Disposing: ", name)
                     subscriptions.Remove name |> ignore
             }
 
@@ -79,8 +66,7 @@ module Program =
                     match query with
                     | Queries queries' ->
                         loop (List.append tail queries') keys
-                    | Subscribe (obs, name) ->
-                        //printfn "Add: %A" name
+                    | Query (obs, name) ->
                         let addMap, removeSet = loop tail (keys.Remove name)
                         if keys.Contains name then
                             addMap, removeSet.Remove name
@@ -92,9 +78,6 @@ module Program =
 
             let addMap, removeSet = loop [query'] currentKeys
 
-            //printfn "CurrentKeys: %A" currentKeys
-            //printfn "AddMap: %A" addMap
-            //printfn "RemoveSet: %A" removeSet
             if addMap.Count > 0 then
                 Async.StartImmediate (subscribe dispatch addMap)
             if removeSet.Count > 0 then
@@ -118,10 +101,10 @@ module Program =
                                 dispatch x
                             }
                             member __.OnErrorAsync err = async {
-                                program.onError ("Reaction query error", err)
+                                program.onError ("[Reaction] Query error", err)
                             }
                             member __.OnCompletedAsync () = async {
-                                program.onError ("Reaction query completed", Exception ())
+                                program.onError ("[Reaction] Query completed", Exception ())
                             }
                         }
 
