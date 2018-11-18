@@ -52,7 +52,7 @@ module Transformation =
     let flatMap (mapper:'a -> IAsyncObservable<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
         source
         |> map mapper
-        |> Combine.mergeInner
+        |> Combine.mergeInner 0
 
     /// Projects each element of an observable sequence into an
     /// observable sequence by incorporating the element's
@@ -61,7 +61,7 @@ module Transformation =
     let flatMapi (mapper:'a*int -> IAsyncObservable<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
         source
         |> mapi mapper
-        |> Combine.mergeInner
+        |> Combine.mergeInner 0
 
     /// Asynchronously projects each element of an observable sequence
     /// into an observable sequence and merges the resulting observable
@@ -69,7 +69,7 @@ module Transformation =
     let flatMapAsync (mapper:'a -> Async<IAsyncObservable<'b>>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
         source
         |> mapAsync mapper
-        |> Combine.mergeInner
+        |> Combine.mergeInner 0
 
     /// Asynchronously projects each element of an observable sequence
     /// into an observable sequence by incorporating the element's
@@ -78,7 +78,12 @@ module Transformation =
     let flatMapiAsync (mapperAsync:'a*int -> Async<IAsyncObservable<'b>>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
         source
         |> mapiAsync mapperAsync
-        |> Combine.mergeInner
+        |> Combine.mergeInner 0
+
+    let concatMap (mapper:'a -> IAsyncObservable<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
+        source
+        |> map mapper
+        |> Combine.mergeInner 1
 
     /// Transforms an observable sequence of observable sequences into
     /// an observable sequence producing values only from the most
