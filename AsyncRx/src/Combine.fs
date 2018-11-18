@@ -1,132 +1,131 @@
 namespace Reaction
 
+open System.Collections.Generic
 open Reaction.Core
 
 [<RequireQualifiedAccess>]
 module Combine =
-    /// Returns an observable sequence that contains the elements of
-    /// each given sequences, in sequential order.
-    let concatSeq (sources: seq<IAsyncObservable<'a>>) : IAsyncObservable<'a> =
+    type Key = int
+    type Model<'a> = {
+        Subscriptions: Map<Key, IAsyncDisposable>
+        Queue: List<IAsyncObservable<'a>>
+        IsStopped: bool
+        Key: Key
+    }
+
+    [<RequireQualifiedAccess>]
+    type Msg<'a> =
+        | InnerObservable of IAsyncObservable<'a>
+        | InnerCompleted of Key
+        | OuterCompleted
+        | Dispose
+
+    let mergeInner (maxConcurrent: int) (source: IAsyncObservable<IAsyncObservable<'a>>) : IAsyncObservable<'a> =
         let subscribeAsync (aobv: IAsyncObserver<'a>) =
-            let safeObserver = safeObserver aobv
+            let safeObv = safeObserver aobv
 
-            let innerAgent =
-                MailboxProcessor.Start(fun inbox ->
-                    let rec messageLoop (innerSubscription : IAsyncDisposable) = async {
-                        let! cmd, replyChannel = inbox.Receive ()
-
-                        let obv (replyChannel : AsyncReplyChannel<bool>) n =
-                            async {
-                                match n with
-                                | OnNext x -> do! safeObserver.OnNextAsync x
-                                | OnError err ->
-                                    do! safeObserver.OnErrorAsync err
-                                    replyChannel.Reply false
-                                | OnCompleted -> replyChannel.Reply true
-                            }
-
-                        let getInnerSubscription = async {
-                            match cmd with
-                            | InnerObservable xs ->
-                                return! AsyncObserver (obv replyChannel) |> xs.SubscribeAsync
-                            | Dispose ->
-                                do! innerSubscription.DisposeAsync ()
-                                replyChannel.Reply true
-                                return AsyncDisposable.Empty
-                            | _ -> return AsyncDisposable.Empty
-                        }
-
-                        do! innerSubscription.DisposeAsync ()
-                        let! newInnerSubscription = getInnerSubscription
-                        return! messageLoop newInnerSubscription
-                    }
-
-                    messageLoop AsyncDisposable.Empty
-                )
-
-            async {
-                let worker () = async {
-                    for source in sources do
-                        do! innerAgent.PostAndAsyncReply(fun replyChannel -> InnerObservable source, replyChannel) |> Async.Ignore
-
-                    do! safeObserver.OnCompletedAsync ()
-                }
-                Async.Start (worker ())
-
-                let cancel () =
-                    async {
-                        do! innerAgent.PostAndAsyncReply(fun replyChannel -> Dispose, replyChannel) |> Async.Ignore
-                    }
-                return AsyncDisposable.Create cancel
+            let initialModel = {
+                Subscriptions = Map.empty
+                Queue = new List<IAsyncObservable<'a>> ()
+                IsStopped = false
+                Key = 0
             }
-        { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
 
-    /// Merges an observable sequence of observable sequences into an
-    /// observable sequence.
-    let mergeInner (source: IAsyncObservable<IAsyncObservable<'a>>) : IAsyncObservable<'a> =
-        let subscribeAsync (aobv: IAsyncObserver<'a>) =
-            let safeObserver = safeObserver aobv
-            let refCount = refCountAgent 1 (async {
-                do! safeObserver.OnCompletedAsync ()
-            })
-
-            let innerAgent =
-                let obv = {
-                    new IAsyncObserver<'a> with
-                        member this.OnNextAsync x = async {
-                            do! safeObserver.OnNextAsync x
-                        }
-                        member this.OnErrorAsync err = async {
-                            do! safeObserver.OnErrorAsync err
-                        }
-                        member this.OnCompletedAsync () = async {
-                            refCount.Post Decrease
-                        }
-                    }
-
+            let agent =
                 MailboxProcessor.Start(fun inbox ->
-                    let rec messageLoop (innerSubscriptions : IAsyncDisposable list) = async {
-                        let! cmd = inbox.Receive()
-                        let getInnerSubscriptions = async {
-                            match cmd with
-                            | InnerObservable xs ->
-                                let! inner = xs.SubscribeAsync obv
-                                return inner :: innerSubscriptions
-                            | Dispose ->
-                                for dispose in innerSubscriptions do
-                                    do! dispose.DisposeAsync ()
-                                return []
-                            | _ -> return innerSubscriptions
+                    let obv key = {
+                        new IAsyncObserver<'a> with
+                            member this.OnNextAsync x = async {
+                                do! safeObv.OnNextAsync x
+                            }
+                            member this.OnErrorAsync err = async {
+                                do! safeObv.OnErrorAsync err
+                            }
+                            member this.OnCompletedAsync () = async {
+                                Msg.InnerCompleted key |> inbox.Post
+                            }
                         }
-                        let! newInnerSubscriptions = getInnerSubscriptions
-                        return! messageLoop newInnerSubscriptions
+
+                    let update msg model =
+                        async {
+                            match msg with
+                            | Msg.InnerObservable xs ->
+                                //printfn "InnerObservable: maxConcurrent=%A" maxConcurrent
+                                if maxConcurrent = 0 || model.Subscriptions.Count < maxConcurrent then
+                                    //printfn "InnerObservable: Subscribe: %A" model.Key
+                                    let! inner = xs.SubscribeAsync (obv model.Key)
+                                    return { model with Subscriptions = model.Subscriptions.Add (model.Key, inner); Key = model.Key + 1 }
+                                else
+                                    //printfn "InnerObservable: Queue"
+                                    model.Queue.Add xs
+                                    return model
+                            | Msg.InnerCompleted key ->
+                                //printfn "InnerComplete: %A" key
+                                let subscriptions = model.Subscriptions.Remove key
+
+                                if model.Queue.Count > 0 then
+                                    let xs = model.Queue.[0]
+                                    model.Queue.RemoveAt 0
+                                    //printfn "InnerComplete: Subscribing: %A" model.Key
+                                    let! inner = xs.SubscribeAsync (obv model.Key)
+
+                                    return { model with Subscriptions = subscriptions.Add (model.Key, inner); Key = model.Key + 1 }
+                                else if subscriptions.Count > 0 then
+                                    return { model with Subscriptions = subscriptions }
+                                else
+                                    if model.IsStopped then
+                                        //printfn "InnerComplete: completing"
+                                        do! safeObv.OnCompletedAsync ()
+                                    return { model with Subscriptions = Map.empty }
+                            | Msg.OuterCompleted ->
+                                //printfn "OuterComplete"
+                                if model.Subscriptions.Count = 0 then
+                                    //printfn "OuterComplete: completing"
+                                    do! safeObv.OnCompletedAsync ()
+                                return { model with IsStopped = true }
+                            | Msg.Dispose ->
+                                for KeyValue(key, dispose) in model.Subscriptions do
+                                    do! dispose.DisposeAsync ()
+                                return initialModel
+                        }
+
+                    let rec messageLoop (model : Model<'a>) = async {
+                        let! msg = inbox.Receive ()
+                        let! newModel = update msg model
+                        return! messageLoop newModel
                     }
 
-                    messageLoop []
+                    messageLoop initialModel
                 )
             async {
                 let obv = {
                     new IAsyncObserver<IAsyncObservable<'a>> with
                         member this.OnNextAsync xs = async {
-                            refCount.Post Increase
-                            InnerObservable xs |> innerAgent.Post
+                            Msg.InnerObservable xs |> agent.Post
                         }
                         member this.OnErrorAsync err = async {
-                            do! safeObserver.OnErrorAsync err
+                            do! safeObv.OnErrorAsync err
+                            agent.Post Msg.Dispose
                         }
                         member this.OnCompletedAsync () = async {
-                            refCount.Post Decrease
+                            Msg.OuterCompleted |> agent.Post
                         }
                     }
                 let! dispose = source.SubscribeAsync obv
                 let cancel () =
                     async {
                         do! dispose.DisposeAsync ()
-                        innerAgent.Post Dispose
+                        agent.Post Msg.Dispose
                     }
                 return AsyncDisposable.Create cancel
             }
         { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
+
+    /// Returns an observable sequence that contains the elements of
+    /// each given sequences, in sequential order.
+    let concatSeq (sources: seq<IAsyncObservable<'a>>) : IAsyncObservable<'a> =
+        Create.ofSeq(sources)
+        |> mergeInner 1
 
     type Notifications<'a, 'b> =
     | Source of Notification<'a>

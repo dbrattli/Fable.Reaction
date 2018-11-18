@@ -1,8 +1,9 @@
 namespace Reaction
 
+open System.Threading
+
 #if !FABLE_COMPILER
 open FSharp.Control
-open System.Threading
 #endif
 
 /// Overloads and extensions for AsyncObservable
@@ -94,7 +95,7 @@ module AsyncRx =
     /// Merges an observable sequence of observable sequences into an
     /// observable sequence.
     let inline mergeInner (source: IAsyncObservable<IAsyncObservable<'a>>) : IAsyncObservable<'a> =
-        Combine.mergeInner source
+        Combine.mergeInner 0 source
 
     /// Merges an observable sequence with another observable sequence.
     let inline merge (other : IAsyncObservable<'a>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
@@ -146,7 +147,8 @@ module AsyncRx =
         Create.fail<'a> error
 
     /// Returns an observable sequence that triggers the increasing
-    /// sequence starting with 0 after the given period.
+    /// sequence starting with 0 after msecs and then repeats with the
+    /// given period.
     let inline interval (msecs: int) (period: int) : IAsyncObservable<int> =
         Create.interval msecs period
 
