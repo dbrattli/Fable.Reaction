@@ -85,6 +85,13 @@ module Transformation =
         |> map mapper
         |> Combine.mergeInner 1
 
+
+    type InnerSubscriptionCmd<'a> =
+        | InnerObservable of IAsyncObservable<'a>
+        | InnerCompleted of int
+        | Completed
+        | Dispose
+
     /// Transforms an observable sequence of observable sequences into
     /// an observable sequence producing values only from the most
     /// recent observable sequence.
