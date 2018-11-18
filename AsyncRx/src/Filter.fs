@@ -1,6 +1,7 @@
 namespace Reaction
 
 open Reaction.Core
+open System.Collections.Generic
 
 [<RequireQualifiedAccess>]
 module Filter =
@@ -92,6 +93,86 @@ module Filter =
                         agent.Post n
                     }
                 return! AsyncObserver obv |> source.SubscribeAsync
+            }
+        { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
+
+    /// Bypasses a specified number of elements in an observable sequence
+    /// and then returns the remaining elements.
+    let skip (count: int) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
+        let subscribeAsync (obvAsync : IAsyncObserver<'a>) =
+            let safeObv = safeObserver obvAsync
+
+            async {
+                let mutable remaining = count
+
+                let _obv (n : Notification<'a>) =
+                    async {
+                        match n with
+                        | OnNext x ->
+                            if remaining <= 0 then
+                                do! safeObv.OnNextAsync x
+                            else
+                                remaining <- remaining - 1
+
+                        | OnError ex -> do! safeObv.OnErrorAsync ex
+                        | OnCompleted -> do! safeObv.OnCompletedAsync ()
+                    }
+
+                return! source.SubscribeAsync (AsyncObserver.Create _obv)
+            }
+        { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
+
+    /// Returns a specified number of contiguous elements from the start of
+    /// an observable sequence.
+    let take (count: int) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
+        let subscribeAsync (obvAsync : IAsyncObserver<'a>) =
+            let safeObv = safeObserver obvAsync
+
+            async {
+                let mutable remaining = count
+
+                let _obv (n : Notification<'a>) =
+                    async {
+                        match n with
+                        | OnNext x ->
+                            if remaining > 0 then
+                                do! safeObv.OnNextAsync x
+                                remaining <- remaining - 1
+                            if remaining = 0 then
+                                do! safeObv.OnCompletedAsync ()
+                                remaining <- remaining - 1
+
+                        | OnError ex -> do! safeObv.OnErrorAsync ex
+                        | OnCompleted -> do! safeObv.OnCompletedAsync ()
+                    }
+
+                return! source.SubscribeAsync (AsyncObserver.Create _obv)
+            }
+        { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
+
+    /// Returns a specified number of contiguous elements from the end of an
+    /// observable sequence.
+    let takeLast (count: int) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
+        let subscribeAsync (obvAsync : IAsyncObserver<'a>) =
+            let safeObv = safeObserver obvAsync
+            let mutable queue = List<'a> ()
+
+            async {
+                let _obv (n : Notification<'a>) =
+                    async {
+                        match n with
+                        | OnNext x ->
+                            queue.Add x
+                            if queue.Count > count then
+                                queue.RemoveAt 0
+                        | OnError ex -> do! safeObv.OnErrorAsync ex
+                        | OnCompleted ->
+                            for item in queue do
+                                do! safeObv.OnNextAsync item
+                            do! safeObv.OnCompletedAsync ()
+                    }
+
+                return! source.SubscribeAsync (AsyncObserver.Create _obv)
             }
         { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
 
