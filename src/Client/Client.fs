@@ -145,17 +145,17 @@ let query (model: Model) (msgs: IAsyncObservable<Msg>) =
   | Loading ->
       Queries
         [
-          Subscribe (msgs, "msgs")
-          Subscribe (loadLetterString (), "loading")
+          Query (msgs, "msgs")
+          Query (loadLetterString (), "loading")
         ]
 
   | Error exn ->
-      Subscribe (msgs, "msgs")
+      Query (msgs, "msgs")
 
   | App model ->
       Queries
         [
-          Subscribe (msgs, "msgs")
+          Query (msgs, "msgs")
           Magic.query model.Magic (toMagicMsgs msgs) |> Query.map MagicMsg
           Info.query model.Info (toInfoMsgs msgs) |> Query.map InfoMsg
         ]

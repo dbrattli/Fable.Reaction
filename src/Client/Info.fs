@@ -107,6 +107,6 @@ let query (model : Model) (msgs : IAsyncObservable<Msg>) =
       |> AsyncRx.map (fun _ -> MsgAdded)
       |> AsyncRx.merge letterStringQuery
 
-    Subscribe (xs, "remote")
+    Query (xs, "remote")
   else
     Query.Dispose

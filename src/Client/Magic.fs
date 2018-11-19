@@ -301,7 +301,7 @@ let query (model : Model) msgs =
         |> letterStream
         |> AsyncRx.map Letter
 
-      Subscribe (xs, letterString + "_local")
+      Query (xs, letterString + "_local")
 
    | Remote _ ->
       let stringQuery =
@@ -312,17 +312,15 @@ let query (model : Model) msgs =
         stringQuery
         |> AsyncRx.map Shared.Msg.LetterStringChanged
 
-      let xs =
-        stringQuery
-        |> AsyncRx.startWith [model.LetterString |> extractedLetterString]
-        |> AsyncRx.flatMapLatest (fun letters ->
-            letterStream letters)
-        |> AsyncRx.map Shared.Msg.Letter
-        |> AsyncRx.merge letterStringQuery
-        |> server
-        |> AsyncRx.map RemoteMsg
-
-      Subscribe (xs, "_remote")
+      stringQuery
+      |> AsyncRx.startWith [model.LetterString |> extractedLetterString]
+      |> AsyncRx.flatMapLatest (fun letters ->
+          letterStream letters)
+      |> AsyncRx.map Shared.Msg.Letter
+      |> AsyncRx.merge letterStringQuery
+      |> server
+      |> AsyncRx.map RemoteMsg
+      |> AsyncRx.asQuery "_remote"
 
   | _ ->
         Query.Dispose
