@@ -67,7 +67,13 @@ module.exports = {
                 }
             }
         },
-        minimizer: isProduction ? [new MinifyPlugin()] : []
+        minimizer: isProduction ? [new MinifyPlugin({
+            terserOptions: {
+              compress: {
+                  inline: false
+              }
+            }
+          })] : []
     },
     // DEVELOPMENT
     //      - HotModuleReplacementPlugin: Enables hot reloading when code changes without refreshing
