@@ -140,24 +140,24 @@ let loadLetterString () =
   |> AsyncRx.catch (Result.Error >> InitialLetterStringLoaded >> AsyncRx.single)
 
 
-let query (model: Model) (msgs: IAsyncObservable<Msg>) =
+let stream (model: Model) (msgs: IAsyncObservable<Msg>) =
   match model with
   | Loading ->
-      Queries
+      Streams
         [
-          Query (msgs, "msgs")
-          Query (loadLetterString (), "loading")
+          msgs |> AsyncRx.asStream "msgs"
+          loadLetterString () |> AsyncRx.asStream "loading"
         ]
 
   | Error exn ->
-      Query (msgs, "msgs")
+      msgs |> AsyncRx.asStream "msgs"
 
   | App model ->
-      Queries
+      Streams
         [
-          Query (msgs, "msgs")
-          Magic.query model.Magic (toMagicMsgs msgs) |> Query.map MagicMsg
-          Info.query model.Info (toInfoMsgs msgs) |> Query.map InfoMsg
+          msgs |> AsyncRx.asStream "msgs"
+          Magic.query model.Magic (toMagicMsgs msgs) |> Stream.map MagicMsg
+          Info.query model.Info (toInfoMsgs msgs) |> Stream.map InfoMsg
         ]
 
 #if DEBUG
@@ -166,7 +166,7 @@ open Elmish.HMR
 #endif
 
 Program.mkSimple init update view
-|> Program.withQuery query
+|> Program.withMsgStream stream
 #if DEBUG
 //|> Program.withConsoleTrace
 |> Program.withHMR

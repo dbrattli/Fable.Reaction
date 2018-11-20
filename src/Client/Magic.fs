@@ -296,12 +296,10 @@ let query (model : Model) msgs =
       let letterString =
         model.LetterString |> extractedLetterString
 
-      let xs =
-        letterString
-        |> letterStream
-        |> AsyncRx.map Letter
-
-      Query (xs, letterString + "_local")
+      letterString
+      |> letterStream
+      |> AsyncRx.map Letter
+      |> AsyncRx.asStream (letterString + "_local")
 
    | Remote _ ->
       let stringQuery =
@@ -320,7 +318,7 @@ let query (model : Model) msgs =
       |> AsyncRx.merge letterStringQuery
       |> server
       |> AsyncRx.map RemoteMsg
-      |> AsyncRx.asQuery "_remote"
+      |> AsyncRx.asStream "_remote"
 
   | _ ->
-        Query.Dispose
+        Stream.Dispose
