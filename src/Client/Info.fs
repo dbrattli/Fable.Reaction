@@ -91,7 +91,7 @@ let view model dispatch =
         [ Column.column [] [ viewStatus dispatch model ] ]
     ]
 
-let query (model : Model) (msgs : IAsyncObservable<Msg>) =
+let stream (model : Model) (msgs : IAsyncObservable<Msg>) =
   if model.Remote then
     let websocket =
       AsyncRx.never()

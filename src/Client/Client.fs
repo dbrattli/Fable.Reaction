@@ -156,8 +156,8 @@ let stream (model: Model) (msgs: IAsyncObservable<Msg>) =
       Streams
         [
           msgs |> AsyncRx.asStream "msgs"
-          Magic.query model.Magic (toMagicMsgs msgs) |> Stream.map MagicMsg
-          Info.query model.Info (toInfoMsgs msgs) |> Stream.map InfoMsg
+          Magic.stream model.Magic (toMagicMsgs msgs) |> Stream.map MagicMsg
+          Info.stream model.Info (toInfoMsgs msgs) |> Stream.map InfoMsg
         ]
 
 #if DEBUG
