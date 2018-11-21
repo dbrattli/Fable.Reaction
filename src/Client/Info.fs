@@ -91,7 +91,7 @@ let view model dispatch =
         [ Column.column [] [ viewStatus dispatch model ] ]
     ]
 
-let query (model : Model) (msgs : IAsyncObservable<Msg>) =
+let stream (model : Model) (msgs : IAsyncObservable<Msg>) =
   if model.Remote then
     let websocket =
       AsyncRx.never()
@@ -102,11 +102,9 @@ let query (model : Model) (msgs : IAsyncObservable<Msg>) =
       websocket
       |> AsyncRx.choose (function | Shared.Msg.LetterStringChanged str -> Some (LetterStringChanged str) | _ -> None)
 
-    let xs =
-      websocket
-      |> AsyncRx.map (fun _ -> MsgAdded)
-      |> AsyncRx.merge letterStringQuery
-
-    Query (xs, "remote")
+    websocket
+    |> AsyncRx.map (fun _ -> MsgAdded)
+    |> AsyncRx.merge letterStringQuery
+    |> AsyncRx.asStream "remote"
   else
-    Query.Dispose
+    Stream.Dispose
