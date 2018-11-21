@@ -120,9 +120,6 @@ let asMagicMsg msg =
   | _ ->
       None
 
-let toMagicMsgs msgs =
-    msgs |> AsyncRx.choose asMagicMsg
-
 let asInfoMsg msg =
   match msg with
   | InfoMsg msg ->
@@ -130,34 +127,38 @@ let asInfoMsg msg =
   | _ ->
       None
 
-let toInfoMsgs msgs =
-  msgs |> AsyncRx.choose asInfoMsg
-
-
 let loadLetterString () =
   AsyncRx.ofPromise (fetchAs<string> "/api/init" Decode.string [])
   |> AsyncRx.map (Ok >> InitialLetterStringLoaded)
   |> AsyncRx.catch (Result.Error >> InitialLetterStringLoaded >> AsyncRx.single)
+  |> AsyncRx.asStream "loading"
 
 
-let stream (model: Model) (msgs: IAsyncObservable<Msg>) =
+let stream model msgs =
   match model with
   | Loading ->
-      Streams
-        [
-          msgs |> AsyncRx.asStream "msgs"
-          loadLetterString () |> AsyncRx.asStream "loading"
-        ]
+      loadLetterString ()
 
   | Error exn ->
-      msgs |> AsyncRx.asStream "msgs"
+      msgs
 
   | App model ->
+      let magicMsgs =
+        msgs
+        |> Stream.choose asMagicMsg
+        |> Magic.stream model.Magic
+        |> Stream.map MagicMsg
+      let infoMsgs =
+        msgs
+        |> Stream.choose asInfoMsg
+        |> Info.stream model.Info
+        |> Stream.map InfoMsg
+
       Streams
         [
-          msgs |> AsyncRx.asStream "msgs"
-          Magic.stream model.Magic (toMagicMsgs msgs) |> Stream.map MagicMsg
-          Info.stream model.Info (toInfoMsgs msgs) |> Stream.map InfoMsg
+          msgs
+          magicMsgs
+          infoMsgs
         ]
 
 #if DEBUG
@@ -166,7 +167,7 @@ open Elmish.HMR
 #endif
 
 Program.mkSimple init update view
-|> Program.withMsgStream stream
+|> Program.withMsgStream stream "msgs"
 #if DEBUG
 //|> Program.withConsoleTrace
 |> Program.withHMR

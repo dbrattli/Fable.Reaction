@@ -290,7 +290,7 @@ let extractedLetterString letterString =
       letterString
 
 
-let stream (model : Model) msgs =
+let stream model msgs =
   match model.Letters with
   | Local _ ->
       let letterString =
