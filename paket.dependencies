@@ -17,7 +17,6 @@ group Server
 group Client
     storage: none
     source https://api.nuget.org/v3/index.json
-    source /Users/dbrattli/Developer/packages
 
     nuget Fable.Core ~> 2
     nuget Fable.Elmish ~> 2
