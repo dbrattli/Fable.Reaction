@@ -26,7 +26,7 @@ group Client
     nuget Fable.React ~> 4
     nuget Fulma ~> 1
     nuget Fulma.Extensions
-    nuget Fable.Elmish.Reaction ~> 2.1
+    nuget Fable.Elmish.Reaction ~> 2.2
 
     clitool dotnet-fable ~> 2
 
