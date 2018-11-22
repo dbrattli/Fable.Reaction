@@ -14,12 +14,12 @@ module Program =
     let debug (text: string, o: #obj) = ()
     #endif
 
-    /// Attach a Reaction query to the message (Msg) stream of an Elmish program. The supplied query
-    /// function will be called every time the model is updated.This makes it possible to dynamically
-    /// change the query at runtime based on the current state (Model).
-    let withQuery (query: 'model -> IAsyncObservable<'msg> -> Query<'msg, 'name>) (program: Elmish.Program<_,_,_,_>) =
+    /// Attach a Reaction query to the Elmish message (Msg) stream. The supplied stream function
+    /// will be called every time the model is updated. This makes it possible to dynamically
+    /// change the stream handling at runtime based on the current state (Model).
+    let withMsgStream (stream: 'model -> Stream<'msg, 'name> -> Stream<'msg, 'name>) (name: 'name) (program: Elmish.Program<_,_,_,_>) =
         let subscriptions = new Dictionary<'name, IAsyncDisposable> ()
-        let mb, stream = AsyncRx.mbStream<'msg> ()
+        let mb, obs = AsyncRx.mbStream<'msg> ()
         let dispatch' = OnNext >> mb.Post
 
         let msgObserver name dispatch =
@@ -28,10 +28,10 @@ module Program =
                     dispatch x
                 }
                 member __.OnErrorAsync err = async {
-                    program.onError ("[Reaction] Query error", err)
+                    program.onError ("[Reaction] Stream error", err)
                 }
                 member __.OnCompletedAsync () = async {
-                    debug ("[Reaction] Query completed:", name)
+                    debug ("[Reaction] Stream completed:", name)
                     subscriptions.Remove name |> ignore
                 }
             }
@@ -39,7 +39,7 @@ module Program =
         let subscribe (dispatch: Dispatch<'msg>) (addMap: Map<'name, IAsyncObservable<'msg>>) =
             async {
                 for KeyValue(name, msgs) in addMap do
-                    debug ("[Reaction] Subscribing:", name)
+                    debug ("[Reaction] Subscribing stream:", name)
                     let! disposable = msgs.SubscribeAsync (msgObserver name dispatch)
                     subscriptions.Add (name, disposable)
             }
@@ -49,7 +49,7 @@ module Program =
                 for name in removeSet do
                     let disposable = subscriptions.[name]
                     do! disposable.DisposeAsync ()
-                    debug ("[Reaction] Disposing:", name)
+                    debug ("[Reaction] Disposing stream:", name)
                     subscriptions.Remove name |> ignore
             }
 
@@ -59,14 +59,14 @@ module Program =
         let view model dispatch =
             let currentKeys = Set.ofSeq subscriptions.Keys
 
-            let query' = query model stream
-            let rec loop (queries: Query<'msg, 'name> list) (keys: Set<'name>) : Map<'name, IAsyncObservable<'msg>>*Set<'name> =
-                match queries with
+            let stream' = stream model (Stream (obs, name))
+            let rec loop (streams: Stream<'msg, 'name> list) (keys: Set<'name>) : Map<'name, IAsyncObservable<'msg>>*Set<'name> =
+                match streams with
                 | query :: tail ->
                     match query with
-                    | Queries queries' ->
-                        loop (List.append tail queries') keys
-                    | Query (obs, name) ->
+                    | Streams streams' ->
+                        loop (List.append tail streams') keys
+                    | Stream (obs, name) ->
                         let addMap, removeSet = loop tail (keys.Remove name)
                         if keys.Contains name then
                             addMap, removeSet.Remove name
@@ -76,7 +76,7 @@ module Program =
                         loop tail keys
                 | [] -> Map.empty, keys
 
-            let addMap, removeSet = loop [query'] currentKeys
+            let addMap, removeSet = loop [stream'] currentKeys
 
             if addMap.Count > 0 then
                 Async.StartImmediate (subscribe dispatch addMap)
@@ -89,7 +89,7 @@ module Program =
 
     /// Attach a simple Reaction query to the message (Msg) stream of an Elmish program. The
     /// supplied query function is called once by the Elmish runtime.
-    let withSimpleQuery (query: IAsyncObservable<'msg> -> IAsyncObservable<'msg>) (program: Elmish.Program<_,_,_,_>) =
+    let withQuery (query: IAsyncObservable<'msg> -> IAsyncObservable<'msg>) (program: Elmish.Program<_,_,_,_>) =
         let mb, stream = AsyncRx.mbStream<'msg> ()
 
         let subscribe _ : Cmd<'msg> =
