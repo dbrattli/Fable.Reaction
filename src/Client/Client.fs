@@ -127,17 +127,13 @@ let asInfoMsg msg =
   | _ ->
       None
 
-let loadLetterString () =
-  AsyncRx.ofPromise (fetchAs<string> "/api/init" Decode.string [])
-  |> AsyncRx.map (Ok >> InitialLetterStringLoaded)
-  |> AsyncRx.catch (Result.Error >> InitialLetterStringLoaded >> AsyncRx.single)
-  |> AsyncRx.asStream "loading"
-
-
 let stream model msgs =
   match model with
   | Loading ->
-      loadLetterString ()
+    AsyncRx.ofPromise (fetchAs<string> "/api/init" Decode.string [])
+    |> AsyncRx.map (Ok >> InitialLetterStringLoaded)
+    |> AsyncRx.catch (Result.Error >> InitialLetterStringLoaded >> AsyncRx.single)
+    |> AsyncRx.asStream "loading"
 
   | Error exn ->
       msgs
