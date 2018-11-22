@@ -4,7 +4,7 @@ GROUP Build
 STORAGE: NONE
 NUGET
   remote: https://api.nuget.org/v3/index.json
-    BlackFox.VsWhere (0.3.2) - restriction: || (>= net462) (>= netstandard2.0)
+    BlackFox.VsWhere (1.0) - restriction: || (>= net462) (>= netstandard2.0)
       FSharp.Core (>= 4.0.0.1) - restriction: >= net45
       FSharp.Core (>= 4.2.3) - restriction: && (< net45) (>= netstandard2.0)
     Fake.Core.CommandLineParsing (5.10.1) - restriction: || (>= net46) (>= netstandard2.0)
@@ -97,8 +97,8 @@ NUGET
       System.Threading.Thread (>= 4.0) - restriction: && (< net45) (>= netstandard1.6) (< netstandard2.0)
       System.Threading.ThreadPool (>= 4.0.10) - restriction: && (< net45) (>= netstandard1.6) (< netstandard2.0)
       System.Threading.Timer (>= 4.0.1) - restriction: && (< net45) (>= netstandard1.6) (< netstandard2.0)
-    Microsoft.Build (15.8.166) - restriction: || (>= net462) (>= netstandard2.0)
-      Microsoft.Build.Framework (>= 15.8.166) - restriction: || (>= net46) (>= netstandard2.0)
+    Microsoft.Build (15.9.20) - restriction: || (>= net462) (>= netstandard2.0)
+      Microsoft.Build.Framework (>= 15.9.20) - restriction: || (>= net46) (>= netstandard2.0)
       Microsoft.VisualStudio.Setup.Configuration.Interop (>= 1.16.30) - restriction: >= net46
       Microsoft.Win32.Registry (>= 4.3) - restriction: || (&& (< net46) (>= netstandard2.0)) (>= netcoreapp2.1)
       System.Collections.Immutable (>= 1.5) - restriction: || (>= net46) (>= netstandard2.0)
@@ -112,12 +112,12 @@ NUGET
       System.Text.Encoding.CodePages (>= 4.0.1) - restriction: || (&& (< net46) (>= netstandard2.0)) (>= netcoreapp2.1)
       System.Threading.Tasks.Dataflow (>= 4.5.24) - restriction: >= net46
       System.Threading.Tasks.Dataflow (>= 4.6) - restriction: || (&& (< net46) (>= netstandard2.0)) (>= netcoreapp2.1)
-    Microsoft.Build.Framework (15.8.166) - restriction: || (>= net462) (>= netstandard2.0)
+    Microsoft.Build.Framework (15.9.20) - restriction: || (>= net462) (>= netstandard2.0)
       System.Runtime.Serialization.Primitives (>= 4.1.1) - restriction: && (< net46) (>= netstandard2.0)
       System.Threading.Thread (>= 4.0) - restriction: && (< net46) (>= netstandard2.0)
-    Microsoft.Build.Tasks.Core (15.8.166) - restriction: || (>= net462) (>= netstandard2.0)
-      Microsoft.Build.Framework (>= 15.8.166) - restriction: || (>= net46) (>= netstandard2.0)
-      Microsoft.Build.Utilities.Core (>= 15.8.166) - restriction: || (>= net46) (>= netstandard2.0)
+    Microsoft.Build.Tasks.Core (15.9.20) - restriction: || (>= net462) (>= netstandard2.0)
+      Microsoft.Build.Framework (>= 15.9.20) - restriction: || (>= net46) (>= netstandard2.0)
+      Microsoft.Build.Utilities.Core (>= 15.9.20) - restriction: || (>= net46) (>= netstandard2.0)
       Microsoft.VisualStudio.Setup.Configuration.Interop (>= 1.16.30) - restriction: >= net46
       Microsoft.Win32.Registry (>= 4.3) - restriction: && (< net46) (>= netstandard2.0)
       System.CodeDom (>= 4.4) - restriction: && (< net46) (>= netstandard2.0)
@@ -129,8 +129,8 @@ NUGET
       System.Resources.Writer (>= 4.0) - restriction: && (< net46) (>= netstandard2.0)
       System.Threading.Tasks.Dataflow (>= 4.5.24) - restriction: >= net46
       System.Threading.Tasks.Dataflow (>= 4.6) - restriction: && (< net46) (>= netstandard2.0)
-    Microsoft.Build.Utilities.Core (15.8.166) - restriction: || (>= net462) (>= netstandard2.0)
-      Microsoft.Build.Framework (>= 15.8.166) - restriction: || (>= net46) (>= netstandard2.0)
+    Microsoft.Build.Utilities.Core (15.9.20) - restriction: || (>= net462) (>= netstandard2.0)
+      Microsoft.Build.Framework (>= 15.9.20) - restriction: || (>= net46) (>= netstandard2.0)
       Microsoft.VisualStudio.Setup.Configuration.Interop (>= 1.16.30) - restriction: >= net46
       Microsoft.Win32.Registry (>= 4.3) - restriction: && (< net46) (>= netstandard2.0)
       System.Collections.Immutable (>= 1.5) - restriction: || (>= net46) (>= netstandard2.0)
@@ -865,7 +865,7 @@ NUGET
       Newtonsoft.Json (>= 11.0.2) - restriction: >= netcoreapp2.0
     Dotnet.ProjInfo (0.20) - restriction: >= netcoreapp2.0
       FSharp.Core (>= 4.1.18) - restriction: && (< net45) (>= netstandard2.0)
-    Fable.Core (2.0.1)
+    Fable.Core (2.0.2)
       FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
     Fable.Elmish (2.0.3)
       Fable.Core (>= 2.0) - restriction: >= netstandard2.0
@@ -877,7 +877,7 @@ NUGET
       Fable.PowerPack (>= 2.0.1) - restriction: >= netstandard2.0
       Fable.React (>= 4.0.1) - restriction: >= netstandard2.0
       FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
-    Fable.Elmish.Reaction (2.0.1)
+    Fable.Elmish.Reaction (2.2.1)
       Fable.Core (>= 2.0.1) - restriction: >= netstandard2.0
       Fable.Elmish (>= 2.0.3) - restriction: >= netstandard2.0
       Fable.React (>= 2.1) - restriction: >= netstandard2.0

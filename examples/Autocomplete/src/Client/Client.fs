@@ -139,7 +139,7 @@ let searchWikipedia (term: string) =
         |> AsyncRx.map QueryResult
         |> AsyncRx.catch (sprintf "%A" >> Error >> QueryResult >> AsyncRx.single)
 
-let query model msgs =
+let stream model msgs =
     let targetValue (ev: Fable.Import.React.KeyboardEvent) : string =
         try
             let target = !!ev.target?value : string
@@ -154,20 +154,18 @@ let query model msgs =
         |> AsyncRx.debounce 750          // Pause for 750ms
         |> AsyncRx.distinctUntilChanged  // Only if the value has changed
 
-    Queries [
-        let loading =
-            terms
-            |> AsyncRx.filter (fun x -> x.Length > 0)
-            |> AsyncRx.map (fun _ -> Loading)
-        yield Query (loading, "loading")
+    Streams [
+        terms
+        |> AsyncRx.filter (fun x -> x.Length > 0)
+        |> AsyncRx.map (fun _ -> Loading)
+        |> AsyncRx.asStream "loading"
 
-        let results =
-            terms
-            |> AsyncRx.flatMapLatest searchWikipedia
-        yield Query (results, "search")
+        terms
+        |> AsyncRx.flatMapLatest searchWikipedia
+        |> AsyncRx.asStream "search"
     ]
 
 Program.mkSimple init update view
-|> Program.withQuery query
+|> Program.withMsgStream stream "msgs"
 |> Program.withReact "elmish-app"
 |> Program.run
