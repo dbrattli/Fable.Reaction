@@ -14,10 +14,22 @@ module Program =
     let debug (text: string, o: #obj) = ()
     #endif
 
-    /// Attach a Reaction query to the Elmish message (Msg) stream. The supplied stream function
-    /// will be called every time the model is updated. This makes it possible to dynamically
-    /// change the stream handling at runtime based on the current state (Model).
-    let withMsgStream (stream: 'model -> Stream<'msg, 'name> -> Stream<'msg, 'name>) (name: 'name) (program: Elmish.Program<_,_,_,_>) =
+    /// **Description**
+    /// Transforms the Elmish message stream. The supplied `stream` function takes the model and a
+    /// named message stream, and returns a (possibly) transformed named message stream. The
+    /// `stream`functio will be called each time the model is updated. This makes it possible to
+    /// dynamically change the stream handling at runtime based on the current model. If the name
+    /// of a stream changes, the old stream will be disposed and the new stream will be subscribed
+    /// and active.
+    ///
+    /// **Parameters**
+    ///   * `stream` - A stream modifying function of type `'model -> Stream<'msg,'name> -> Stream<'msg,'name>`.
+    ///   * `initialName` - Initial name of stream e.g "msgs". Type of `'name` must support comparison.
+    ///   * `program` - Elmish program of type `Program<'a,'model,'msg,'b>`
+    ///
+    /// **Output Type**
+    ///   * `Program<'a,'model,'msg,'b>`
+    let withMsgStream (stream: 'model -> Stream<'msg, 'name> -> Stream<'msg, 'name>) (initialName: 'name) (program: Elmish.Program<_,_,_,_>) =
         let subscriptions = new Dictionary<'name, IAsyncDisposable> ()
         let mb, obs = AsyncRx.mbStream<'msg> ()
         let dispatch' = OnNext >> mb.Post
@@ -59,7 +71,7 @@ module Program =
         let view model dispatch =
             let currentKeys = Set.ofSeq subscriptions.Keys
 
-            let stream' = stream model (Stream (obs, name))
+            let stream' = stream model (Stream (obs, initialName))
             let rec loop (streams: Stream<'msg, 'name> list) (keys: Set<'name>) : Map<'name, IAsyncObservable<'msg>>*Set<'name> =
                 match streams with
                 | query :: tail ->
