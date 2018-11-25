@@ -158,11 +158,11 @@ let stream model msgs =
         terms
         |> AsyncRx.filter (fun x -> x.Length > 0)
         |> AsyncRx.map (fun _ -> Loading)
-        |> AsyncRx.asStream "loading"
+        |> AsyncRx.toStream "loading"
 
         terms
         |> AsyncRx.flatMapLatest searchWikipedia
-        |> AsyncRx.asStream "search"
+        |> AsyncRx.toStream "search"
     ]
 
 Program.mkSimple init update view

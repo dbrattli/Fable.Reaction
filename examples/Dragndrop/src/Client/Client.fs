@@ -105,7 +105,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
 
 open Fable.Import.Browser
 
-let query (msgs : IAsyncObservable<Msg>) : IAsyncObservable<Msg> =
+let stream model msgs =
     let mouseMove = AsyncRx.ofMouseMove ()
     let mouseUp =
         msgs
@@ -135,7 +135,7 @@ let query (msgs : IAsyncObservable<Msg>) : IAsyncObservable<Msg> =
             |> AsyncRx.map (fun ev ->
                 MouseDragEvent (ev.clientX - startX, ev.clientY - startY, project))
             |> AsyncRx.takeUntil mouseUp
-    }
+    } |> AsyncRx.toStream "dnd"
 
 #if DEBUG
 open Elmish.Debug
@@ -143,7 +143,7 @@ open Elmish.HMR
 #endif
 
 Program.mkSimple init update view
-|> Program.withSimpleQuery query
+|> Program.withMsgStream stream "msgs"
 #if DEBUG
 |> Program.withConsoleTrace
 |> Program.withHMR
