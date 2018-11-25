@@ -2,6 +2,7 @@ namespace Reaction
 
 open Fable.Core
 open Fable.Import.Browser
+open System
 
 /// AsyncRx Extensions
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
@@ -58,8 +59,12 @@ module AsyncRx =
     let msgResultChannel<'msg> (uri: string) (encode: 'msg -> string) (decode: string -> Result<'msg, exn>) (source: IAsyncObservable<'msg>) : IAsyncObservable<Result<'msg, exn>> =
         Reaction.WebSocket.msgResultChannel uri encode decode source
 
-    /// Wrap observable as a named stream
+    /// Turn the observable into a named stream
     let inline toStream (name: 'name) (source: IAsyncObservable<'a>) : Stream<'a, 'name> =
+        Stream (source, name)
+
+    [<Obsolete("Do not use. Use `toStream` instead.")>]
+    let inline asStream (name: 'name) (source: IAsyncObservable<'a>) : Stream<'a, 'name> =
         Stream (source, name)
 
     /// Convert stream back to async observable by merging all the streams.
