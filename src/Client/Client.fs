@@ -133,7 +133,7 @@ let stream model msgs =
     AsyncRx.ofPromise (fetchAs<string> "/api/init" Decode.string [])
     |> AsyncRx.map (Ok >> InitialLetterStringLoaded)
     |> AsyncRx.catch (Result.Error >> InitialLetterStringLoaded >> AsyncRx.single)
-    |> AsyncRx.asStream "loading"
+    |> AsyncRx.toStream "loading"
 
   | Error exn ->
       msgs
@@ -150,7 +150,7 @@ let stream model msgs =
         |> Info.stream model.Info
         |> Stream.map InfoMsg
 
-      Streams
+      Stream.batch
         [
           msgs
           magicMsgs
