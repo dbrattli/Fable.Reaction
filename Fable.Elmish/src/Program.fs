@@ -48,19 +48,18 @@ module Program =
                 }
             }
 
-        let subscribe (dispatch: Dispatch<'msg>) (addMap: Map<'name, IAsyncObservable<'msg>>) =
+        let subscribe (dispatch: Dispatch<'msg>) (adds: Subscription<'msg, 'name> list) =
             async {
-                for KeyValue(name, msgs) in addMap do
+                for msgs, name in adds do
                     debug ("[Reaction] Subscribing stream:", name)
                     let! disposable = msgs.SubscribeAsync (msgObserver name dispatch)
                     subscriptions.Add (name, disposable)
             }
 
-        let dispose (dispatch: Dispatch<'msg>) (removeSet: Set<'name>) =
+        let dispose (dispatch: Dispatch<'msg>) (removes: Set<'name>) =
             async {
-                for name in removeSet do
-                    let disposable = subscriptions.[name]
-                    do! disposable.DisposeAsync ()
+                for name in removes do
+                    do! subscriptions.[name].DisposeAsync ()
                     debug ("[Reaction] Disposing stream:", name)
                     subscriptions.Remove name |> ignore
             }
@@ -71,29 +70,15 @@ module Program =
         let view model dispatch =
             let currentKeys = Set.ofSeq subscriptions.Keys
 
-            let stream' = stream model (Stream (obs, initialName))
-            let rec loop (streams: Stream<'msg, 'name> list) (keys: Set<'name>) : Map<'name, IAsyncObservable<'msg>>*Set<'name> =
-                match streams with
-                | query :: tail ->
-                    match query with
-                    | Streams streams' ->
-                        loop (List.append tail streams') keys
-                    | Stream (obs, name) ->
-                        let addMap, removeSet = loop tail (keys.Remove name)
-                        if keys.Contains name then
-                            addMap, removeSet.Remove name
-                        else
-                            addMap.Add (name, obs), removeSet
-                    | Dispose ->
-                        loop tail keys
-                | [] -> Map.empty, keys
+            let (Stream streams) = Stream [obs, initialName] |> stream model
 
-            let addMap, removeSet = loop [stream'] currentKeys
+            let removes = Set.difference currentKeys (streams |> List.map (fun (xs, name) -> name) |> Set.ofList)
+            let adds = streams |> List.filter (fun (xs, name) -> not (currentKeys.Contains name))
 
-            if addMap.Count > 0 then
-                Async.StartImmediate (subscribe dispatch addMap)
-            if removeSet.Count > 0 then
-                Async.StartImmediate (dispose dispatch removeSet)
+            if adds.Length > 0 then
+                Async.StartImmediate (subscribe dispatch adds)
+            if removes.Count > 0 then
+                Async.StartImmediate (dispose dispatch removes)
 
             program.view model dispatch'
 

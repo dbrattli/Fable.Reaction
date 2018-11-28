@@ -2,7 +2,6 @@ namespace Reaction
 
 open Fable.Core
 open Fable.Import.Browser
-open System
 
 /// AsyncRx Extensions
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
@@ -61,34 +60,4 @@ module AsyncRx =
 
     /// Turn the observable into a named stream
     let inline toStream (name: 'name) (source: IAsyncObservable<'a>) : Stream<'a, 'name> =
-        Stream (source, name)
-
-    [<Obsolete("Do not use. Use `toStream` instead.")>]
-    let inline asStream (name: 'name) (source: IAsyncObservable<'a>) : Stream<'a, 'name> =
-        Stream (source, name)
-
-    /// Convert stream back to async observable by merging all the streams.
-    let inline ofStream (name: 'name) (source: Stream<'a, 'name>) : IAsyncObservable<'a> =
-        { new IAsyncObservable<'a> with
-            member this.SubscribeAsync obv =
-                let rec flatten streams =
-                    [
-                        for stream in streams do
-                            match stream with
-                            | Stream (xs, _) ->
-                                yield xs
-                            | Streams xss ->
-                                yield! flatten xss
-                            | _ -> ()
-                    ]
-                async {
-                    match source with
-                    | Stream (xs, _) ->
-                        return! xs.SubscribeAsync obv
-                    | Streams xss ->
-                        let xs = flatten xss |> AsyncRx.mergeSeq
-                        return! xs.SubscribeAsync obv
-                    | _ ->
-                        return AsyncDisposable.Empty
-                }
-        }
+        Stream [source, name]
