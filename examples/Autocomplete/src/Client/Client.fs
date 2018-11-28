@@ -154,7 +154,7 @@ let stream model msgs =
         |> AsyncRx.debounce 750          // Pause for 750ms
         |> AsyncRx.distinctUntilChanged  // Only if the value has changed
 
-    Streams [
+    Stream.batch [
         terms
         |> AsyncRx.filter (fun x -> x.Length > 0)
         |> AsyncRx.map (fun _ -> Loading)
