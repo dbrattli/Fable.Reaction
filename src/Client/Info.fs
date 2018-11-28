@@ -94,7 +94,7 @@ let view model dispatch =
 let stream model msgs =
   if model.Remote then
     let websocket =
-      AsyncRx.never()
+      AsyncRx.never ()
       |> server
       |> AsyncRx.share
 
@@ -105,6 +105,6 @@ let stream model msgs =
     websocket
     |> AsyncRx.map (fun _ -> MsgAdded)
     |> AsyncRx.merge letterStringQuery
-    |> AsyncRx.asStream "remote"
+    |> AsyncRx.toStream "remote"
   else
-    Stream.Dispose
+    Stream.none

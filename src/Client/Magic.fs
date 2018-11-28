@@ -299,7 +299,7 @@ let stream model msgs =
       letterString
       |> letterStream
       |> AsyncRx.map Letter
-      |> AsyncRx.asStream (letterString + "_local")
+      |> AsyncRx.toStream (letterString + "_local")
 
    | Remote _ ->
       let stringQuery =
@@ -318,7 +318,7 @@ let stream model msgs =
       |> AsyncRx.merge letterStringQuery
       |> server
       |> AsyncRx.map RemoteMsg
-      |> AsyncRx.asStream "_remote"
+      |> AsyncRx.toStream "_remote"
 
   | _ ->
-        Stream.Dispose
+        Stream.none
