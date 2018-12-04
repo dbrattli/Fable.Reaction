@@ -8,7 +8,6 @@ open FSharp.Control
 #endif
 
 open Core
-open Types
 
 
 [<RequireQualifiedAccess>]

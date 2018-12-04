@@ -1,6 +1,5 @@
 namespace Reaction
 
-open Types
 open Core
 
 [<RequireQualifiedAccess>]

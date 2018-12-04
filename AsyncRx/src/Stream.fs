@@ -3,7 +3,6 @@ namespace Reaction
 open System.Collections.Generic
 open System.Threading
 
-open Types
 open Core
 
 module Streams =

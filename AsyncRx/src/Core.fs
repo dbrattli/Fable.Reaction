@@ -1,7 +1,6 @@
 namespace Reaction
 
 open System.Threading
-open Types
 
 module Core =
     let infinite = Seq.initInfinite (fun index -> index)
@@ -20,7 +19,7 @@ module Core =
     let safeObserver (obv: IAsyncObserver<'a>) : IAsyncObserver<'a> =
         let agent = MailboxProcessor.Start (fun inbox ->
             let rec messageLoop stopped = async {
-                let! n = inbox.Receive()
+                let! n = inbox.Receive ()
 
                 if stopped then
                     return! messageLoop stopped
