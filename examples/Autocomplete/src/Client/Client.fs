@@ -124,7 +124,7 @@ let searchWikipedia (term: string) =
         let decoders = Decode.oneOf [ Decode.list Decode.string; (Decode.succeed []) ]
         Decode.fromString (Decode.list decoders) txt
 
-    let url = sprintf "http://en.wikipedia.org/w/api.php?action=opensearch&origin=*&format=json&search=%s" term
+    let url = sprintf "https://en.wikipedia.org/w/api.php?action=opensearch&origin=*&format=json&search=%s" term
     let props = [
         RequestProperties.Mode RequestMode.Cors
         requestHeaders [ ContentType "application/json" ]
