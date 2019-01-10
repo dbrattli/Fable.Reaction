@@ -37,6 +37,14 @@ module Stream =
             |> List.map (fun (xs, name) -> (xs |> AsyncRx.map f, name))
             |> Stream
 
+    /// Filter stream based on given predicate.
+    let filter (predicate: 'msg -> bool) : Stream<'msg, 'name> -> Stream<'msg, 'name> =
+        function
+        | Stream xss ->
+            xss
+            |> List.map (fun (xs, name) -> (xs |> AsyncRx.filter predicate, name))
+            |> Stream
+
     /// Aggregate multiple streams
     let batch (streams: #seq<Stream<'msg, 'name>>) : Stream<'msg, 'name> =
         Stream [
