@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Reaction.AsyncRx</PackageId>
-    <Version>2.0.0</Version>
+    <Version>2.1.0</Version>
     <PackageVersion>2.0.0</PackageVersion>
     <Authors>Dag Brattli</Authors>
     <Company>Brattli Labs</Company>
@@ -23,6 +23,7 @@
     <Compile Include="Combine.fs" />
     <Compile Include="Transform.fs" />
     <Compile Include="Timeshift.fs" />
+    <Compile Include="Tap.fs" />
     <Compile Include="AsyncObservable.fs" />
     <Compile Include="Query.fs" />
   </ItemGroup>
