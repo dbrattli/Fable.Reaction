@@ -25,7 +25,7 @@ type Stream<'msg, 'name> = Stream of Subscription<'msg, 'name> list with
 /// Stream extension methods
 [<RequireQualifiedAccess>]
 module Stream =
-    /// None - no stream. Use to dispose a previously subscribed stream`
+    /// None - no stream. Use to dispose a previously subscribed stream.
     let none : Stream<'msg, 'name> =
         Stream []
 
@@ -34,7 +34,7 @@ module Stream =
         function
         | Stream xss ->
             xss
-            |> List.map (fun (xs, name) -> (xs |> AsyncRx.map f, name))
+            |> List.map (fun (xs, name) -> xs |> AsyncRx.map f, name)
             |> Stream
 
     /// Filter stream based on given predicate.
@@ -42,7 +42,7 @@ module Stream =
         function
         | Stream xss ->
             xss
-            |> List.map (fun (xs, name) -> (xs |> AsyncRx.filter predicate, name))
+            |> List.map (fun (xs, name) -> xs |> AsyncRx.filter predicate, name)
             |> Stream
 
     /// Aggregate multiple streams
@@ -54,7 +54,7 @@ module Stream =
 
     /// Applies the given chooser function to each element of the stream and
     /// returns the stream comprised of the results for each element where the
-    /// function returns Some with some value.
+    /// function returns with Some value.
     let choose (chooser: 'a -> 'msg option) : Stream<'a, 'name> -> Stream<'msg, 'name> =
         function
         | Stream xss ->
@@ -62,10 +62,10 @@ module Stream =
             |> List.map (fun (xs, name) -> xs |> AsyncRx.choose chooser, name)
             |> Stream
 
-    /// Selects the stream wit the given name and applies the given chooser
+    /// Selects the stream with the given name and applies the given chooser
     /// function to each element of the stream and returns the stream comprised
-    /// of the results for each element where the function returns Some with
-    /// some value.
+    /// of the results for each element where the function returns with
+    /// Some value.
     let chooseNamed (name: 'name) (chooser: 'a -> 'msg option) : Stream<'a, 'name> -> Stream<'msg, 'name> =
         function
         | Stream xss ->
@@ -73,5 +73,3 @@ module Stream =
             |> List.filter (fun (xs, name') -> name = name')
             |> List.map (fun (xs, name') -> xs |> AsyncRx.choose chooser, name')
             |> Stream
-
-
