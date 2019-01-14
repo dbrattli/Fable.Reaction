@@ -113,7 +113,7 @@ module Transformation =
 
                 MailboxProcessor.Start(fun inbox ->
                     let rec messageLoop (current: IAsyncDisposable option, isStopped, currentId) = async {
-                        let! cmd = inbox.Receive()
+                        let! cmd = inbox.Receive ()
 
                         let! (current', isStopped', currentId') = async {
                             match cmd with
