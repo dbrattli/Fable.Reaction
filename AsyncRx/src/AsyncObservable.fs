@@ -341,3 +341,17 @@ module AsyncRx =
     /// caller if no-one is subscribing.
     let inline singleStream<'a> () : IAsyncObserver<'a> * IAsyncObservable<'a> =
         Streams.singleStream<'a> ()
+
+  // Tap Region
+
+    /// Tap asynchronously into the stream performing side effects by the given async actions.
+    let inline tapAsync (onNextAsync: 'a -> Async<unit>) (onErrorAsync: exn -> Async<unit>) (onCompletedAsync: unit -> Async<unit>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
+        Tap.tapAsync onNextAsync onErrorAsync onCompletedAsync source
+
+    /// Tap asynchronously into the stream performing side effects by the given `onNextAsync` action.
+    let inline tapOnNextAsync (onNextAsync: 'a -> Async<unit>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
+        Tap.tapOnNextAsync onNextAsync source
+
+    /// Tap synchronously into the stream performing side effects by the given `onNext` action.
+    let inline tapOnNext (onNext: 'a -> unit) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
+        Tap.tapOnNext onNext source

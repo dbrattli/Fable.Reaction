@@ -5,6 +5,8 @@ open System.Threading
 module Core =
     let infinite = Seq.initInfinite (fun index -> index)
 
+    let noopAsync = fun _ -> async { () }
+
     let canceller () =
         let cts = new CancellationTokenSource()
         let cancel () = async {
