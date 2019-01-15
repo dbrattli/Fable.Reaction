@@ -38,8 +38,7 @@ module Stream =
             |> Stream
 
     /// Filter stream based on given predicate.
-    let filter (predicate: 'msg -> bool) : Stream<'msg, 'name> -> Stream<'msg, 'name> =
-        function
+    let filter (predicate: 'msg -> bool) : Stream<'msg, 'name> -> Stream<'msg, 'name> = function
         | Stream xss ->
             xss
             |> List.map (fun (xs, name) -> xs |> AsyncRx.filter predicate, name)
@@ -51,6 +50,15 @@ module Stream =
             for (Stream xss) in streams do
                 yield! xss
         ]
+
+    /// Tap into stream and print messages to console. The tag is a
+    /// string used to give yourself a hint of where the tap is
+    /// inserted. Returns the stream unmodified.
+    let tap tag : Stream<'msg, 'name> -> Stream<'msg, 'name> = function
+        | Stream xss ->
+            xss
+            |> List.map (fun (xs, name) -> xs |> AsyncRx.tapOnNext (printfn "[Reaction] \"%s\" (%A) - %A" tag   name), name)
+            |> Stream
 
     /// Applies the given chooser function to each element of the stream and
     /// returns the stream comprised of the results for each element where the
