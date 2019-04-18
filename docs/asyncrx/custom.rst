@@ -1,12 +1,14 @@
-Creating Custom Observables
-===========================
+==================
+Custom Observables
+==================
 
-There are many ways to create custom observble streams. Note that the goal
-is to have some kind of create function that returns an ``IAsyncObservable<'a>``.
-We will go through a few options for creating such a custom stream.
+There are many ways to create custom observble streams. Note that the
+goal is to have some kind of create function that returns an
+``IAsyncObservable<'a>``. We will go through a few options for creating
+such a custom stream.
 
 1. Use a Stream
----------------
+===============
 
 A Stream in Reaction return both an observer (``IAsyncObserver``) and an
 observable (``IAsyncObservable``). Note that we need to use
@@ -29,7 +31,7 @@ observable (``IAsyncObservable``). Note that we need to use
         obs
 
 2. Use Create
--------------
+=============
 
 The ``AsyncRx.Create`` function takes an ``Async`` subscribe function and
 returns an ``IAsyncObservable``. Note that we need to use `Async.Start` to start
@@ -62,7 +64,7 @@ the worker function so it runs concurrently.
         AsyncRx.create(subscribeAsync)
 
 3. Use ofAsyncWorker
---------------------
+====================
 
 The ``ofAsyncWorker`` is a handy utility function for creating an
 ``IAsyncObservable`` from an async worker function, where the worker

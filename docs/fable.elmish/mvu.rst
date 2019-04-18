@@ -8,7 +8,8 @@ Elmish.Reaction, we do not need any commands (``Cmd``) or subscriptions
 with Elmish. Instead we use a `ReactiveX <http://reactivex.io/>`_
 (AsyncRx) style query that transforms the stream of messages (``Msg``).
 
-<img src="https://raw.githubusercontent.com/dbrattli/Fable.Reaction/master/gh-pages/images/R-MVU.png" width="550">
+.. image:: https://raw.githubusercontent.com/dbrattli/Fable.Reaction/master/gh-pages/images/R-MVU.png
+    :width: 550px
 
 * **Model**, application state as immutable data
 
@@ -21,4 +22,8 @@ with Elmish. Instead we use a `ReactiveX <http://reactivex.io/>`_
 In addition, Fable Reaction may also have a reaction query that
 transforms the "stream" of messages.
 
-* **Query**, a function that takes the message stream and produces a new (transformed) message stream. Note that this also replaces the need for Elm(ish) commands (Cmd) since the reaction is free to produce any messages (out of thin air), transform, filter, time-shift messages or combine side-effects such as web requests (fetch) etc.
+* **Query**, a function that takes the message stream and produces a new
+  (transformed) message stream. Note that this also replaces the need for
+  Elm(ish) commands (Cmd) since the reaction is free to produce any
+  messages (out of thin air), transform, filter, time-shift messages or
+  combine side-effects such as web requests (fetch) etc.

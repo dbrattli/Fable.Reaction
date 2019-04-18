@@ -1,5 +1,6 @@
+=====================
 HOWTO use with Elmish
-=======================
+=====================
 
 To use Fable Reaction with Elmish you need to call the
 ``Program.withQuery`` with your reactive query. The query function takes

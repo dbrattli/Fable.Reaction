@@ -13,6 +13,7 @@ AsyncRx
    install
    observables
    observers
+   operators
    types
    disposables
    query
