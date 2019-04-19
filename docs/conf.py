@@ -33,6 +33,11 @@ release = '2.1.0'
 # ones.
 extensions = ['recommonmark', 'sphinxcontrib.fsharp', 'alabaster']
 
+source_suffix = '.rst'
+
+# The master toctree document.
+master_doc = 'index'
+
 primary_domain = "fsharp"
 
 # Add any paths that contain templates here, relative to this directory.
