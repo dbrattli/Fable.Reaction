@@ -1,4 +1,4 @@
-
+=========
 WebSocket
 =========
 
@@ -6,8 +6,8 @@ Fable.Reaction enables you to route stream of messages to the server and
 back again using "message channels".
 
 Note that server side support for WebSocket message handling must also
-be in place using e.g.
-[Reaction.Giraffe](https://dbrattli.github.io/Reaction/extras/Giraffe.html).
+be in place using e.g. `Reaction.Giraffe
+<https://dbrattli.github.io/Reaction/extras/Giraffe.html>`_.
 
 Message Channel
 ===============
@@ -28,19 +28,19 @@ A message channnel works like this:
 This enables us to compose the message channel into the qury without
 resorting to imperative programming.
 
-- **msgChannel<'msg>**, ``(uri: string) (encode: 'msg -> string) (decode: string -> 'msg option) (source: IAsyncObservable<'msg>) : IAsyncObservable<'msg>``
+.. val:: msgChannel<'msg>
+    :type: uri:string -> encode:('msg -> string) -> decode:(string -> 'msg option) -> source:IAsyncObservable<'msg> -> IAsyncObservable<'msg>
 
-Example
-=======
+    **Example**
 
-.. code:: fsharp
+    .. code:: fsharp
 
-    let query (msgs: IAsyncObservable<Msg>) =
-        msgs
-        |> AsyncRx.msgChannel "ws://localhost:8085/ws" Msg.Encode Msg.Decode
+        let query (msgs: IAsyncObservable<Msg>) =
+            msgs
+            |> AsyncRx.msgChannel "ws://localhost:8085/ws" Msg.Encode Msg.Decode
 
-    Program.mkProgram init update view
-    |> Program.withQuery query
-    |> Program.withReact "elmish-app"
-    |> Program.withDebugger
-    |> Program.run
+        Program.mkProgram init update view
+        |> Program.withQuery query
+        |> Program.withReact "elmish-app"
+        |> Program.withDebugger
+        |> Program.run

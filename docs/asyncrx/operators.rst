@@ -2,6 +2,10 @@
 Operators
 =========
 
+.. module:: AsyncRx
+
+    T esting module
+
 The following parameterized async observerable returning functions
 (operators) are currently supported. Other operators may be implemented
 on-demand, but the goal is to keep it simple and not make this into a
@@ -16,102 +20,75 @@ To use the operators open either the `Reaction` namespace.
 
     xs = AsyncRx.single 42
 
-You can also open the ``Reaction.AsyncObserable`` module if you don't
-want to prepend every operator with ``AsyncObservable``. Be aware of
-possible namespace conflicts with operators such as ``map``•.
+You can also open the ``Reaction.AsyncRx`` module if you don't
+want to prepend every operator with ``AsyncRx``. Be aware of
+possible namespace conflicts with operators such as ``map``.
 
 .. code:: fsharp
 
-    open Reaction
+    open Reaction.AsyncRx
 
-    xs = AsyncRx.single 42
+    xs = single 42
 
 For the examples below we assume that ``Reaction.AsyncRx`` is opened.
 
 Creating
 ========
 
-Functions for creating (`'a -> IAsyncObservable<'a>`) an async observable.
+Functions for creating (``'a -> IAsyncObservable<'a>``) an async observable.
 
-### empty
+.. val:: empty
+    :type: : unit -> IAsyncObservable<'a>
 
-Returns an async observable sequence with no elements. You must usually
-indicate which type the resulting observable should be since empty
-itself doesn't produce any values.
+    Returns an async observable sequence with no elements. You must usually
+    indicate which type the resulting observable should be since empty
+    itself doesn't produce any values.
 
-.. code:: fsharp
+    **Example:**
 
-    val empty : unit : IAsyncObservable<'a>
+    .. code:: fsharp
 
-**Example:**
+        let xs = AsyncRx.empty<int> ()
 
-.. code:: fsharp
+.. val:: single
+    :type: x:'a -> IAsyncObservable<'a>
 
-    let xs = AsyncRx.empty<int> ()
+    Returns an observable sequence containing the single specified
+    element.
 
-single
-------
+    **Example:**
 
-Returns an observable sequence containing the single specified
-element.
+    .. code:: fsharp
 
-.. code:: fsharp
+        let xs = AsyncRx.single 42
 
-    val single : x: 'a -> IAsyncObservable<'a> =
+.. val:: fail
+    :type: error:exn -> IAsyncObservable<'a>
 
-**Example:**
+    Returns the observable sequence that terminates exceptionally
+    with the specified exception.
 
-.. code:: fsharp
+    **Example:**
 
-    let xs = AsyncRx.single 42
+    .. code:: fsharp
 
-fail
-----
+        exception MyError of string
 
-Returns the observable sequence that terminates exceptionally
-with the specified exception.
+        let error = MyError "error"
+        let xs = AsyncRx.fail<int> error
 
-.. code:: fsharp
+.. val:: defer
+    :type: factory:(unit -> IAsyncObservable<'a>) -> IAsyncObservable<'a>
 
-    val fail error: exn -> IAsyncObservable<'a> =
+    Returns an observable sequence that invokes the specified factory
+    function whenever a new observer subscribes.
 
-**Example:**
+.. val:: create
+    :type: subscribe:(IAsyncObserver<'a> -> Async<IAsyncDisposable>) -> IAsyncObservable<'a>
 
-.. code:: fsharp
+    Creates an async observable (`AsyncObservable<'a>`) from the
+    given subscribe function.
 
-    exception MyError of string
-
-    let error = MyError "error"
-    let xs = AsyncRx.fail<int> error
-
-defer
------
-
-Returns an observable sequence that invokes the specified factory
-function whenever a new observer subscribes.
-
-.. code:: fsharp
-
-    val defer : factory: (unit -> IAsyncObservable<'a>) -> IAsyncObservable<'a>
-
-create
-------
-
-Creates an async observable (`AsyncObservable<'a>`) from the
-given subscribe function.
-
-.. code:: fsharp
-
-    val create : subscribe: (IAsyncObserver<'a> -> Async<IAsyncDisposable>) -> IAsyncObservable<'a>
-
-**Example:**
-
-.. code:: fsharp
-
-    exception MyError of string
-
-    let error = MyError "error"
-    let xs = AsyncRx.fail error
 
 - **ofSeq** : `seq<'a> -> IAsyncObservable<'a>`, Returns the async observable sequence whose elements are pulled
     from the given enumerable sequence.
