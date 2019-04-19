@@ -21,8 +21,6 @@ Reaction AsyncRx was designed spesifically for targeting `Fable
 JavaScript, and thus the same F# code may be used both client and server
 side for full stack software development.
 
-
-
 See `Fable Reaction <https://github.com/dbrattli/Fable.Reaction>`_ for
 use of Reaction with Elmish and the model view update (MVU) style
 architecture.

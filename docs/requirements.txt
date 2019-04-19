@@ -1,1 +1,2 @@
 pip install alabaster
+pip install sphinxcontrib_fsharp
