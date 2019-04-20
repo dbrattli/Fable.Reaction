@@ -87,24 +87,23 @@ Functions for creating (``'a -> IAsyncObservable<'a>``) an async observable.
 
 
 .. val:: ofSeq
-    :type: `seq<'a> -> IAsyncObservable<'a>`
+    :type: seq<'a> -> IAsyncObservable<'a>
 
     Returns the async observable sequence whose elements are pulled
     from the given enumerable sequence.
-
 
 .. val:: ofAsyncSeq
     :type: AsyncSeq<'a> -> IAsyncObservable<'a>
 
     Convert async sequence into an async observable *(Not available in Fable)*.
 
-..val:: timer
+.. val:: timer
     :type: int -> IAsyncObservable<int>
 
     Returns an observable sequence that triggers the value 0
     after the given duetime.
 
-..val:: interval
+.. val:: interval
     :type: int -> IAsyncObservable<int>
 
     Returns an observable sequence that triggers the increasing
@@ -116,7 +115,7 @@ Transforming
 Functions for transforming (``IAsyncObservable<'a> ->
 IAsyncObservable<'b>``) an async observable.
 
-..val:: map
+.. val:: map
     :type: mapper:('a -> 'b) -> source: IAsyncObservable<'a> -> IAsyncObservable<'b>
 
     Returns an observable sequence whose elements are the result of invoking
@@ -130,34 +129,34 @@ IAsyncObservable<'b>``) an async observable.
 
         let xs = AsyncRx.single 42 |> AsyncRx.map mapper
 
-..val:: mapi
+.. val:: mapi
     :type: mapper:('a*int -> 'b) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 
-..val:: mapAsync
+.. val:: mapAsync
     :type: ('a -> Async<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 
-..val:: mapiAsync
+.. val:: mapiAsync
     :type: ('a*int -> Async<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 
-..val:: flatMap
+.. val:: flatMap
     :type: ('a -> IAsyncObservable<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 
-..val:: flatMapi
+.. val:: flatMapi
     :type: ('a*int -> IAsyncObservable<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 
-..val:: flatMapAsync
+.. val:: flatMapAsync
     :type: ('a -> Async\<IAsyncObservable\<'b\>\>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 
-..val:: flatMapiAsync
+.. val:: flatMapiAsync
     :type: ('a*int -> Async<IAsyncObservable\<'b\>\>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 
-..val:: flatMapLatest
+.. val:: flatMapLatest
     :type: ('a -> IAsyncObservable<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 
-..val:: flatMapLatestAsync
+.. val:: flatMapLatestAsync
     :type: ('a -> Async<IAsyncObservable\<'b\>\>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 
-..val:: catch
+.. val:: catch
     :type: (exn -> IAsyncObservable<'a>) -> IAsyncObservable<'a> -> IAsyncObservable<'a>
 
 Filtering
@@ -166,7 +165,7 @@ Filtering
 Functions for filtering (``IAsyncObservable<'a> ->
 IAsyncObservable<'a>``) an async observable.
 
-..val:: filter
+.. val:: filter
     :type: predicate:('a -> bool) -> IAsyncObservable<'a> -> IAsyncObservable<'a>
 
     Filters the elements of an observable sequence based on a
@@ -190,7 +189,7 @@ IAsyncObservable<'a>``) an async observable.
 Aggregating
 ===========
 
-..val:: scan
+.. val:: scan
     :type: initial:'s -> accumulator:('s -> 'a -> 's) -> source: IAsyncObservable<'a> -> IAsyncObservable<'s>
 
     Applies an accumulator function over an observable sequence for every
@@ -206,7 +205,7 @@ Aggregating
 
         let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scan 0 scanner
 
-..val:: scanAsync
+.. val:: scanAsync
     :type: initial: 's -> accumulator: ('s -> 'a -> Async<'s>) -> source: IAsyncObservable<'a> -> IAsyncObservable<'s>
 
     Applies an async accumulator function over an observable
@@ -222,7 +221,7 @@ Aggregating
 
         let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scanAsync 0 scannerAsync
 
-..val:: groupBy
+.. val:: groupBy
     :type: keyMapper: ('a -> 'g) -> source: IAsyncObservable<'a> -> IAsyncObservable<IAsyncObservable<'a>>
 
     Groups the elements of an observable sequence according to a
@@ -260,7 +259,7 @@ IAsyncObservable<'a>``) an async observable.
 - **delay** : int -> IAsyncObservable<'a> -> IAsyncObservable<'a>
 - **debounce** : int -> IAsyncObservable<'a> -> IAsyncObservable<'a>
 
-..val:: sample
+.. val:: sample
     :type: msecs: int -> source: IAsyncObservable<'a> -> IAsyncObservable<'a>
 
     Samples the observable sequence at each interval.
@@ -270,7 +269,7 @@ Leaving
 
 Functions for leaving (``IAsyncObservable<'a> -> 'a``) the async observable.
 
-..val:: toAsyncSeq
+.. val:: toAsyncSeq
     :type: IAsyncObservable<'a> -> AsyncSeq<'a>
 
     *(Not available in Fable)*

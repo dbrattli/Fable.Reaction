@@ -1,9 +1,9 @@
-================
-Reaction AsyncRx
-================
+============
+Introduction
+============
 
-Reaction AsyncRx is a library for asynchronous and reactive programming,
-and is an implementation of Async Observables (`ReactiveX
+AsyncRx is a library for asynchronous and reactive programming, and is
+an implementation of Async Observables (`ReactiveX
 <http://reactivex.io/>`_) for F# and `Fable <http://fable.io/>`_.
 Reaction makes it easy to compose and combine streams of asynchronous
 event based data such as timers, mouse-moves, keyboard input, web
@@ -21,6 +21,6 @@ Reaction AsyncRx was designed spesifically for targeting `Fable
 JavaScript, and thus the same F# code may be used both client and server
 side for full stack software development.
 
-See `Fable Reaction <https://github.com/dbrattli/Fable.Reaction>`_ for
+See :doc:`/people`  for
 use of Reaction with Elmish and the model view update (MVU) style
 architecture.
