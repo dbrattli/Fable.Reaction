@@ -2,10 +2,6 @@
 Operators
 =========
 
-.. module:: AsyncRx
-
-    T esting module
-
 The following parameterized async observerable returning functions
 (operators) are currently supported. Other operators may be implemented
 on-demand, but the goal is to keep it simple and not make this into a
@@ -90,12 +86,27 @@ Functions for creating (``'a -> IAsyncObservable<'a>``) an async observable.
     given subscribe function.
 
 
-- **ofSeq** : `seq<'a> -> IAsyncObservable<'a>`, Returns the async observable sequence whose elements are pulled
+.. val:: ofSeq
+    :type: `seq<'a> -> IAsyncObservable<'a>`
+
+    Returns the async observable sequence whose elements are pulled
     from the given enumerable sequence.
-- **ofAsyncSeq** : `AsyncSeq<'a> -> IAsyncObservable<'a>`, Convert async sequence into an async observable *(Not available in Fable)*.
-- **timer** : `int -> IAsyncObservable<int>`, Returns an observable sequence that triggers the value 0
+
+
+.. val:: ofAsyncSeq
+    :type: `AsyncSeq<'a> -> IAsyncObservable<'a>`
+
+    Convert async sequence into an async observable *(Not available in Fable)*.
+
+..val:: timer
+    :type: `int -> IAsyncObservable<int>`
+
+    Returns an observable sequence that triggers the value 0
     after the given duetime.
-- **interval** `int -> IAsyncObservable<int>`, Returns an observable sequence that triggers the increasing
+
+..val:: interval `int -> IAsyncObservable<int>`
+
+    Returns an observable sequence that triggers the increasing
     sequence starting with 0 after the given period.
 
 Transforming
@@ -104,26 +115,26 @@ Transforming
 Functions for transforming (``IAsyncObservable<'a> ->
 IAsyncObservable<'b>``) an async observable.
 
-map
----
+..val:: map
+    :type: mapper:('a -> 'b) -> source: IAsyncObservable<'a> -> IAsyncObservable<'b>
 
-Returns an observable sequence whose elements are the result of invoking
-the mapper function on each element of the source.
+    Returns an observable sequence whose elements are the result of invoking
+    the mapper function on each element of the source.
 
-.. code:: fsharp
+    **Example:**
 
-    val map : mapper: ('a -> 'b) -> source: IAsyncObservable<'a> -> IAsyncObservable<'b>
+    .. code:: fsharp
 
-**Example:**
+        let mapper x = x * 10
 
-.. code:: fsharp
+        let xs = AsyncRx.single 42 |> AsyncRx.map mapper
 
-    let mapper x = x * 10
+..val:: mapi
+    :type: mapper:('a*int -> 'b) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 
-    let xs = AsyncRx.single 42 |> AsyncRx.map mapper
+..val:: mapAsync
+    :type: ('a -> Async<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 
-- **mapi** : ('a*int -> 'b) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
-- **mapAsync** : ('a -> Async<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 - **mapiAsync** : ('a*int -> Async<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 - **flatMap** : ('a -> IAsyncObservable<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 - **flatMapi** : ('a*int -> IAsyncObservable<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
@@ -139,25 +150,20 @@ Filtering
 Functions for filtering (``IAsyncObservable<'a> ->
 IAsyncObservable<'a>``) an async observable.
 
-filter
-------
+..val:: filter
+    :type: predicate:('a -> bool) -> IAsyncObservable<'a> -> IAsyncObservable<'a>
 
-Filters the elements of an observable sequence based on a
-predicate. Returns an observable sequence that contains elements
-from the input sequence that satisfy the condition.
+    Filters the elements of an observable sequence based on a
+    predicate. Returns an observable sequence that contains elements
+    from the input sequence that satisfy the condition.
 
-.. code:: fsharp
+    **Example:**
 
-    val filter : predicate: ('a -> bool) -> IAsyncObservable<'a> -> IAsyncObservable<'a>
+    .. code:: fsharp
 
+        let predicate x = x < 3
 
-**Example:**
-
-.. code:: fsharp
-
-    let predicate x = x < 3
-
-    let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.filter predicate
+        let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.filter predicate
 
 - **filterAsync** : ('a -> Async\<bool\>) -> IAsyncObservable<'a> -> IAsyncObservable<'a>
 - **distinctUntilChanged** : IAsyncObservable<'a> -> IAsyncObservable<'a>
@@ -168,64 +174,52 @@ from the input sequence that satisfy the condition.
 Aggregating
 ===========
 
-scan
-----
+..val:: scan
+    :type: initial:'s -> accumulator:('s -> 'a -> 's) -> source: IAsyncObservable<'a> -> IAsyncObservable<'s>
 
-Applies an accumulator function over an observable sequence for every
-value `'a` and returns each intermediate result `'s`. The `initial` seed
-value is used as the initial accumulator value. Returns an observable
-sequence containing the accumulated values `'s`.
+    Applies an accumulator function over an observable sequence for every
+    value `'a` and returns each intermediate result `'s`. The `initial` seed
+    value is used as the initial accumulator value. Returns an observable
+    sequence containing the accumulated values `'s`.
 
-.. code:: fsharp
+    **Example:**
 
-    val scan : initial: 's -> accumulator: ('s -> 'a -> 's) -> source: IAsyncObservable<'a> -> IAsyncObservable<'s>
+    .. code:: fsharp
 
-**Example:**
+        let scanner a x = a + x
 
-.. code:: fsharp
+        let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scan 0 scanner
 
-    let scanner a x = a + x
+..val:: scanAsync
+    :type: initial: 's -> accumulator: ('s -> 'a -> Async<'s>) -> source: IAsyncObservable<'a> -> IAsyncObservable<'s>
 
-    let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scan 0 scanner
+    Applies an async accumulator function over an observable
+    sequence and returns each intermediate result. The seed value is
+    used as the initial accumulator value. Returns an observable
+    sequence containing the accumulated values.
 
-scanAsync
----------
+    **Example:**
 
-Applies an async accumulator function over an observable
-sequence and returns each intermediate result. The seed value is
-used as the initial accumulator value. Returns an observable
-sequence containing the accumulated values.
+    .. code:: fsharp
 
-.. code:: fsharp
+        let scannerAsync a x = async { return a + x }
 
-    val scan : initial: 's -> accumulator: ('s -> 'a -> Async<'s>) -> source: IAsyncObservable<'a> -> IAsyncObservable<'s>
+        let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scanAsync 0 scannerAsync
 
-**Example:**
+..val:: groupBy
+    :type: keyMapper: ('a -> 'g) -> source: IAsyncObservable<'a> -> IAsyncObservable<IAsyncObservable<'a>>
 
-.. code:: fsharp
+    Groups the elements of an observable sequence according to a
+    specified key mapper function. Returns a sequence of observable
+    groups, each of which corresponds to a given key.
 
-    let scannerAsync a x = async { return a + x }
+    **Example:**
 
-    let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.scanAsync 0 scannerAsync
+    .. code:: fsharp
 
-groupBy
--------
-
-Groups the elements of an observable sequence according to a
-specified key mapper function. Returns a sequence of observable
-groups, each of which corresponds to a given key.
-
-.. code:: fsharp
-
-    val groupBy : keyMapper: ('a -> 'g) -> source: IAsyncObservable<'a> -> IAsyncObservable<IAsyncObservable<'a>>
-
-**Example:**
-
-.. code:: fsharp
-
-    let xs = AsyncRx.ofSeq [1; 2; 3; 4; 5; 6]
-        |> AsyncRx.groupBy (fun x -> x % 2)
-        |> AsyncRx.flatMap (fun x -> x)
+        let xs = AsyncRx.ofSeq [1; 2; 3; 4; 5; 6]
+            |> AsyncRx.groupBy (fun x -> x % 2)
+            |> AsyncRx.flatMap (fun x -> x)
 
 Combining
 =========
@@ -250,14 +244,10 @@ IAsyncObservable<'a>``) an async observable.
 - **delay** : int -> IAsyncObservable<'a> -> IAsyncObservable<'a>
 - **debounce** : int -> IAsyncObservable<'a> -> IAsyncObservable<'a>
 
-sample
-------
+..val:: sample
+    :type: msecs: int -> source: IAsyncObservable<'a> -> IAsyncObservable<'a>
 
-Samples the observable sequence at each interval.
-
-.. code:: fsharp
-
-    val sample : msecs: int source: IAsyncObservable<'a> -> IAsyncObservable<'a>
+    Samples the observable sequence at each interval.
 
 Leaving
 =======
