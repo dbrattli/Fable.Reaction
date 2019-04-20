@@ -94,17 +94,18 @@ Functions for creating (``'a -> IAsyncObservable<'a>``) an async observable.
 
 
 .. val:: ofAsyncSeq
-    :type: `AsyncSeq<'a> -> IAsyncObservable<'a>`
+    :type: AsyncSeq<'a> -> IAsyncObservable<'a>
 
     Convert async sequence into an async observable *(Not available in Fable)*.
 
 ..val:: timer
-    :type: `int -> IAsyncObservable<int>`
+    :type: int -> IAsyncObservable<int>
 
     Returns an observable sequence that triggers the value 0
     after the given duetime.
 
-..val:: interval `int -> IAsyncObservable<int>`
+..val:: interval
+    :type: int -> IAsyncObservable<int>
 
     Returns an observable sequence that triggers the increasing
     sequence starting with 0 after the given period.
@@ -135,14 +136,29 @@ IAsyncObservable<'b>``) an async observable.
 ..val:: mapAsync
     :type: ('a -> Async<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 
-- **mapiAsync** : ('a*int -> Async<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
-- **flatMap** : ('a -> IAsyncObservable<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
-- **flatMapi** : ('a*int -> IAsyncObservable<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
-- **flatMapAsync** : ('a -> Async\<IAsyncObservable\<'b\>\>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
-- **flatMapiAsync** : ('a*int -> Async<IAsyncObservable\<'b\>\>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
-- **flatMapLatest** : ('a -> IAsyncObservable<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
-- **flatMapLatestAsync** : ('a -> Async<IAsyncObservable\<'b\>\>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
-- **catch** : (exn -> IAsyncObservable<'a>) -> IAsyncObservable<'a> -> IAsyncObservable<'a>
+..val:: mapiAsync
+    :type: ('a*int -> Async<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
+
+..val:: flatMap
+    :type: ('a -> IAsyncObservable<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
+
+..val:: flatMapi
+    :type: ('a*int -> IAsyncObservable<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
+
+..val:: flatMapAsync
+    :type: ('a -> Async\<IAsyncObservable\<'b\>\>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
+
+..val:: flatMapiAsync
+    :type: ('a*int -> Async<IAsyncObservable\<'b\>\>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
+
+..val:: flatMapLatest
+    :type: ('a -> IAsyncObservable<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
+
+..val:: flatMapLatestAsync
+    :type: ('a -> Async<IAsyncObservable\<'b\>\>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
+
+..val:: catch
+    :type: (exn -> IAsyncObservable<'a>) -> IAsyncObservable<'a> -> IAsyncObservable<'a>
 
 Filtering
 =========
@@ -254,4 +270,7 @@ Leaving
 
 Functions for leaving (``IAsyncObservable<'a> -> 'a``) the async observable.
 
-- **toAsyncSeq** : IAsyncObservable<'a> -> AsyncSeq<'a> *(Not available in Fable)*
+..val:: toAsyncSeq
+    :type: IAsyncObservable<'a> -> AsyncSeq<'a>
+
+    *(Not available in Fable)*
