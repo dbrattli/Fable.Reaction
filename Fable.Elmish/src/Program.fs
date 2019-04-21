@@ -5,6 +5,7 @@ open System.Collections.Generic
 
 open Elmish
 open Reaction
+open Reaction.Error
 
 [<RequireQualifiedAccess>]
 module Program =
@@ -40,7 +41,7 @@ module Program =
                     dispatch x
                 }
                 member __.OnErrorAsync err = async {
-                    program.onError ("[Reaction] Stream error", err)
+                    onError ("[Reaction] Stream error", err)
                 }
                 member __.OnCompletedAsync () = async {
                     debug ("[Reaction] Stream completed:", name)
@@ -67,7 +68,7 @@ module Program =
         // The overridden view will be called on every model update (every message) so try to keep
         // it as simple and fast as possible. Re-subscribe has a penalty, but that is ok since it
         // should not happen for every message (model change).
-        let view model dispatch =
+        let view userView model dispatch =
             let currentKeys = Set.ofSeq subscriptions.Keys
 
             let (Stream streams) = Stream [obs, initialName] |> stream model
@@ -80,16 +81,17 @@ module Program =
             if removes.Count > 0 then
                 Async.StartImmediate (dispose dispatch removes)
 
-            program.view model dispatch'
+            userView model dispatch'
 
-        { program with view = view }
+        program
+        |> Program.map id id view id id
 
     /// Attach a simple Reaction query to the message (Msg) stream of an Elmish program. The
     /// supplied query function is called once by the Elmish runtime.
     let withQuery (query: IAsyncObservable<'msg> -> IAsyncObservable<'msg>) (program: Elmish.Program<_,_,_,_>) =
         let mb, stream = AsyncRx.mbStream<'msg> ()
 
-        let subscribe _ : Cmd<'msg> =
+        let subscribe userSubscribe model =
             let sub dispatch =
                 let main = async {
                     let msgObserver =
@@ -98,10 +100,10 @@ module Program =
                                 dispatch x
                             }
                             member __.OnErrorAsync err = async {
-                                program.onError ("[Reaction] Query error", err)
+                                onError ("[Reaction] Query error", err)
                             }
                             member __.OnCompletedAsync () = async {
-                                program.onError ("[Reaction] Query completed", Exception ())
+                                onError ("[Reaction] Query completed", Exception ())
                             }
                         }
 
@@ -109,9 +111,14 @@ module Program =
                     do! msgs.RunAsync msgObserver
                 }
                 Async.StartImmediate main
-            Cmd.ofSub sub
 
-        let view model _ =
-            program.view model (OnNext >> mb.Post)
+            Cmd.batch [
+                [sub]
+                userSubscribe model
+            ]
 
-        { program with view = view; subscribe = subscribe }
+        let view userView model dispatch =
+            userView model (OnNext >> mb.Post)
+
+        program
+        |> Program.map id id view id id

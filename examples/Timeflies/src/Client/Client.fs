@@ -1,11 +1,12 @@
 module Client
 
-open Fable.Helpers.React
-open Fable.Helpers.React.Props
-open Fable.Import
+open Fable.React
+open Fable.React.Props
+open Fable.Core
 open Reaction
 open Elmish
 open Elmish.React
+open Browser.Dom
 
 // The model holds data that you want to keep track of while the
 // application is running
@@ -32,28 +33,28 @@ let view (model : Model) (dispatch : Dispatch<Msg>) =
     div [ Style [ FontFamily "Consolas, monospace"; Height "100%"] ]
         [
             [ for KeyValue(i, (c, x, y)) in letters do
-                yield span [ Key (c + string i); Style [Top y; Left x; Position "fixed"] ]
+                yield span [ Key (c + string i); Style [Top y; Left x; Position (PositionOptions.Fixed)] ]
                     [ str c ] ] |> ofList
         ]
 
 let init () : Model =
     { Letters = Map.empty }
 
-let getOffset (element: Browser.Element) =
+let getOffset (element: Browser.Types.Element) =
     let doc = element.ownerDocument
     let docElem = doc.documentElement
     let clientTop  = docElem.clientTop
     let clientLeft = docElem.clientLeft
-    let scrollTop  = Browser.window.pageYOffset
-    let scrollLeft = Browser.window.pageXOffset
+    let scrollTop  = window.pageYOffset
+    let scrollLeft = window.pageXOffset
 
     int (scrollTop - clientTop), int (scrollLeft - clientLeft)
 
-let container = Browser.document.querySelector "#elmish-app"
+let container = document.querySelector "#elmish-app"
 let top, left = getOffset container
 
 // Query for message stream transformation (expression style)
-let query msgs =
+let query (model : Model) (msgs:  Stream<Msg, string>) =
     asyncRx {
         let chars =
             Seq.toList "TIME FLIES LIKE AN ARROW"
@@ -63,9 +64,9 @@ let query msgs =
         yield! AsyncRx.ofMouseMove ()
             |> AsyncRx.delay (100 * i)
             |> AsyncRx.map (fun m -> Letter (i, string c, int m.clientX + i * 10 + 15 - left, int m.clientY - top))
-    }
+    } |> AsyncRx.toStream "msgs"
 
 Program.mkSimple init update view
-|> Program.withQuery query
+|> Program.withMsgStream query "msgs"
 |> Program.withReact "elmish-app"
 |> Program.run

@@ -1,8 +1,11 @@
 namespace Reaction
 
-open Fable.Core
-open Fable.Import.Browser
 open System.Threading
+
+open Fable.Core
+open Browser
+open Browser.Types
+open Fable.Import
 
 /// AsyncRx Extensions
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
@@ -10,7 +13,7 @@ module AsyncRx =
     /// Returns an observable that produces a notification when the
     /// promise resolves. The observable will also complete after
     /// producing an event.
-    let ofPromise (pr: Fable.Import.JS.Promise<_>) =
+    let ofPromise (pr: Fable.Core.JS.Promise<_>) =
         Create.ofAsyncWorker(fun obv _ -> async {
             try
                 let! result = Async.AwaitPromise pr
@@ -48,7 +51,7 @@ module AsyncRx =
         AsyncRx.create subscribe
 
     /// Returns an async observable of mouse events.
-    let ofMouseMove () : IAsyncObservable<Fable.Import.Browser.MouseEvent> =
+    let ofMouseMove () : IAsyncObservable<MouseEvent> =
         ofEvent "mousemove"
 
     /// Websocket channel operator. Passes string items as ws messages to

@@ -1,6 +1,8 @@
 namespace Reaction
 
-open Fable.Import.Browser
+open Browser
+open Fable.Import
+open Browser.Types
 
 module WebSocket =
 

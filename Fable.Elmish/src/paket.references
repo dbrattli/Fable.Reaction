@@ -1,5 +1,7 @@
 FSharp.Core
 Fable.Core
 Fable.React
+Fable.Browser.WebSocket
+Fable.Browser.Event
 Fable.Elmish
 Reaction.AsyncRx

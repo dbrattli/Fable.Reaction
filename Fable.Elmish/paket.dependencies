@@ -1,9 +1,11 @@
 source https://www.nuget.org/api/v2
 storage: none
 
-nuget Fable.Core ~> 2
-nuget Fable.React ~> 2
-nuget Fable.Elmish ~> 2
+nuget Fable.Core ~> 3
+nuget Fable.React ~> 5
+nuget Fable.Elmish ~> 3
+nuget Fable.Browser.WebSocket
+nuget Fable.Browser.Event
 nuget Reaction.AsyncRx ~> 2
 
 nuget Microsoft.NET.Test.Sdk ~> 15
