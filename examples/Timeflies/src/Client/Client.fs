@@ -42,7 +42,6 @@ let init () : Model =
 let getOffset (element: Browser.Element) =
     let doc = element.ownerDocument
     let docElem = doc.documentElement
-    let body = doc.body
     let clientTop  = docElem.clientTop
     let clientLeft = docElem.clientLeft
     let scrollTop  = Browser.window.pageYOffset
@@ -67,6 +66,6 @@ let query msgs =
     }
 
 Program.mkSimple init update view
-|> Program.withSimpleQuery query
+|> Program.withQuery query
 |> Program.withReact "elmish-app"
 |> Program.run

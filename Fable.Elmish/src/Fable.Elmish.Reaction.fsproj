@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Fable.Elmish.Reaction</PackageId>
-    <Version>2.4.0</Version>
-    <PackageVersion>2.4.0</PackageVersion>
+    <Version>2.5.1</Version>
+    <PackageVersion>2.5.1</PackageVersion>
     <Authors>Dag Brattli</Authors>
     <Company>Brattli Labs</Company>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
