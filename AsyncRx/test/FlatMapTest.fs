@@ -45,8 +45,8 @@ let tests = testList "Filter Tests" [
         Expect.containsAll actual expected "Should contain all"
     }
 
+    /// return x >>= f is the same thing as f x
     testAsync "Test flatMap monad law left identity" {
-        // return x >>= f is the same thing as f x
 
         // Arrange
         let f x = AsyncRx.single (x * 10)
@@ -67,8 +67,8 @@ let tests = testList "Filter Tests" [
         Expect.equal x 420 "Should be equal"
     }
 
+    /// m >>= return is no different than just m
     testAsync "Test flatMap monad law right identity" {
-        // m >>= return is no different than just m
 
         // Arrange
         let m = AsyncRx.single 42
@@ -88,9 +88,8 @@ let tests = testList "Filter Tests" [
         Expect.equal x 42 "Should be equal"
     }
 
+    /// (m >>= f) >>= g is just like doing m >>= (\x -> f x >>= g)
     testAsync "Test flatMap monad law associativity" {
-        // (m >>= f) >>= g is just like doing m >>= (\x -> f x >>= g)
-
         // Arrange
         let m = AsyncRx.single 42
         let f x = AsyncRx.single (x * 1000)
