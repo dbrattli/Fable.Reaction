@@ -85,7 +85,6 @@ Functions for creating (``'a -> IAsyncObservable<'a>``) an async observable.
     Creates an async observable (`AsyncObservable<'a>`) from the
     given subscribe function.
 
-
 .. val:: ofSeq
     :type: seq<'a> -> IAsyncObservable<'a>
 
@@ -310,14 +309,56 @@ Combining
 
 Functions for combining multiple async observables into one.
 
-- **merge** : IAsyncObservable<'a> -> IAsyncObservable<'a> -> IAsyncObservable<'a>
-- **mergeInner** : IAsyncObservable\<IAsyncObservable<'a>\> -> IAsyncObservable<'a>
-- **switchLatest** : IAsyncObservable<IAsyncObservable<'a>> -> IAsyncObservable<'a>
-- **concat** : seq<IAsyncObservable<'a>> -> IAsyncObservable<'a>
-- **startWith** : seq<'a> -> IAsyncObservable<'a> -> IAsyncObservable<'a>
-- **combineLatest** : IAsyncObservable<'b> -> IAsyncObservable<'a> -> IAsyncObservable<'a*'b>
-- **withLatestFrom** : IAsyncObservable<'b> -> IAsyncObservable<'a> -> IAsyncObservable<'a*'b>
-- **zipSeq** : seq<'b> -> IAsyncObservable<'a> -> IAsyncObservable<'a*'b>
+.. val:: merge
+    :type: IAsyncObservable<'a> -> IAsyncObservable<'a> -> IAsyncObservable<'a>
+
+    Merges an observable sequence with another observable sequence.
+
+.. val:: mergeInner
+    :type: IAsyncObservable\<IAsyncObservable<'a>\> -> IAsyncObservable<'a>
+
+    Merges an observable sequence of observable sequences into an
+    observable sequence.
+
+.. val:: switchLatest
+    :type: IAsyncObservable<IAsyncObservable<'a>> -> IAsyncObservable<'a>
+
+    Transforms an observable sequence of observable sequences into an
+    observable sequence producing values only from the most recent
+    observable sequence.
+
+.. val:: concat
+    :type: seq<IAsyncObservable<'a>> -> IAsyncObservable<'a>
+
+    Concatenates an observable sequence with another observable
+    sequence.
+
+.. val:: startWith
+    :type: seq<'a> -> IAsyncObservable<'a> -> IAsyncObservable<'a>
+
+    Prepends a sequence of values to an observable sequence. Returns the
+    source sequence prepended with the specified values.
+
+.. val:: combineLatest
+    :type: IAsyncObservable<'b> -> IAsyncObservable<'a> -> IAsyncObservable<'a*'b>
+
+    Merges the specified observable sequences into one observable
+    sequence by combining elements of the sources into tuples. Returns
+    an observable sequence containing the combined results.
+
+.. val:: withLatestFrom
+    :type: IAsyncObservable<'b> -> IAsyncObservable<'a> -> IAsyncObservable<'a*'b>
+
+    Merges the specified observable sequences into one observable
+    sequence by combining the values into tuples only when the first
+    observable sequence produces an element. Returns the combined
+    observable sequence.
+
+.. val:: zipSeq
+    :type: seq<'b> -> IAsyncObservable<'a> -> IAsyncObservable<'a*'b>
+
+    Zip given sequence with source. Combines one and one item from each
+    stream into one tuple.
 
 Time-shifting
 =============
@@ -325,8 +366,17 @@ Time-shifting
 Functions for time-shifting (``IAsyncObservable<'a> ->
 IAsyncObservable<'a>``) an async observable.
 
-- **delay** : int -> IAsyncObservable<'a> -> IAsyncObservable<'a>
-- **debounce** : int -> IAsyncObservable<'a> -> IAsyncObservable<'a>
+.. val:: delay
+    :type: int -> IAsyncObservable<'a> -> IAsyncObservable<'a>
+
+    Time shifts the observable sequence by the given timeout. The
+    relative time intervals between the values are preserved.
+
+..val:: debounce
+    :type: int -> IAsyncObservable<'a> -> IAsyncObservable<'a>
+
+    Ignores values from an observable sequence which are followed by
+    another value before the given timeout.
 
 .. val:: sample
     :type: msecs: int -> source: IAsyncObservable<'a> -> IAsyncObservable<'a>
