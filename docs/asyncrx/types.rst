@@ -60,8 +60,8 @@ collections and values.
 | Asynchronous push | 'a -> `Async<unit> <https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/control.async-class-%5Bfsharp%5D>`_ | **AsyncObservable<'a>**                                                                                                                   |
 +-------------------+----------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
 
-Observers
-=========
+Async Observers
+===============
 
 Observers (``IAsyncObserver<'a>``) may be subscribed to observables in
 order to receive notifications. An observer is defined as an
