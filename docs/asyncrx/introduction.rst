@@ -21,6 +21,6 @@ Reaction AsyncRx was designed spesifically for targeting `Fable
 JavaScript, and thus the same F# code may be used both client and server
 side for full stack software development.
 
-See :doc:`/people`  for
+See :doc:`/fable.elmish/index`  for
 use of Reaction with Elmish and the model view update (MVU) style
 architecture.

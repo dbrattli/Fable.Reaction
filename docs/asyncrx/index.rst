@@ -11,8 +11,6 @@ AsyncRx
 
    introduction
    install
-   observables
-   observers
    operators
    types
    disposables

@@ -2,7 +2,7 @@
 Install
 =======
 
-Reaction Asyncrx is available as a `NuGet
+Reaction.AsyncRx is available as a `NuGet
 <https://www.nuget.org/packages/Reaction.AsyncRx/>`_ package for ``NETStandard
 2.0``.
 
