@@ -6,4 +6,4 @@ nuget Giraffe ~> 1
 nuget Microsoft.AspNetCore
 nuget Microsoft.AspNetCore.StaticFiles
 nuget Microsoft.AspNetCore.WebSockets
-nuget Reaction.AsyncRx prerelease
+nuget Reaction.AsyncRx ~> 2.1

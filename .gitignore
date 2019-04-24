@@ -460,3 +460,5 @@ bundle.js.map
 gh-pages/_book
 AspNetCore.Middleware/.vscode
 AsyncRx/.vscode
+.mypy_cache
+.vscode

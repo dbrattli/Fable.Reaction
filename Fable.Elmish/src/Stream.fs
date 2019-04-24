@@ -30,8 +30,7 @@ module Stream =
         Stream []
 
     /// Map stream from one message type to another.
-    let map (f: 'a -> 'msg) : Stream<'a, 'name> -> Stream<'msg, 'name> =
-        function
+    let map (f: 'a -> 'msg) : Stream<'a, 'name> -> Stream<'msg, 'name> = function
         | Stream xss ->
             xss
             |> List.map (fun (xs, name) -> xs |> AsyncRx.map f, name)

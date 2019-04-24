@@ -2,6 +2,7 @@ namespace Reaction
 
 open Fable.Core
 open Fable.Import.Browser
+open System.Threading
 
 /// AsyncRx Extensions
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
@@ -20,23 +21,35 @@ module AsyncRx =
                 do! obv.OnErrorAsync ex
         })
 
-    /// Returns an async observable of mouse events.
-    let ofMouseMove () : IAsyncObservable<Fable.Import.Browser.MouseEvent> =
-        let subscribe (obv: IAsyncObserver<Fable.Import.Browser.MouseEvent>) : Async<IAsyncDisposable> =
-            async {
-                let onMouseMove (ev: Fable.Import.Browser.MouseEvent) =
-                    async {
-                        do! obv.OnNextAsync ev
-                    } |> Async.StartImmediate
+    /// Returns an async observable of Window events.
+    let ofEvent<'ev> event : IAsyncObservable<'ev> =
+        let cts = new CancellationTokenSource()
 
-                window.addEventListener_mousemove onMouseMove
+        let subscribe (obv: IAsyncObserver<'ev'>) : Async<IAsyncDisposable> =
+            async {
+                let mb = MailboxProcessor.Start(fun inbox ->
+                    let rec messageLoop _ = async {
+                        let! ev = inbox.Receive ()
+                        do! obv.OnNextAsync ev
+
+                        return! messageLoop ()
+                    }
+                    messageLoop ()
+                , cts.Token)
+
+                window.addEventListener (event, unbox mb.Post)
                 let cancel () = async {
-                    window.removeEventListener ("mousemove", unbox onMouseMove)
+                    cts.Cancel ()
+                    window.removeEventListener (event, unbox mb.Post)
                 }
                 return AsyncDisposable.Create cancel
             }
 
         AsyncRx.create subscribe
+
+    /// Returns an async observable of mouse events.
+    let ofMouseMove () : IAsyncObservable<Fable.Import.Browser.MouseEvent> =
+        ofEvent "mousemove"
 
     /// Websocket channel operator. Passes string items as ws messages to
     /// the server. Received ws messages will be forwarded down stream.

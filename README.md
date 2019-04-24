@@ -11,4 +11,4 @@ Fable/Reaction is a collection of projects that combines the power of asynchrono
 
 ## Documentation
 
-Please check out the [documentation](https://dbrattli.github.io/Reaction/)
+Please check out the [documentation](https://fablereaction.readthedocs.io/en/latest/index.html)

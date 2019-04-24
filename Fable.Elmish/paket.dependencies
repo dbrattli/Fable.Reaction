@@ -5,3 +5,6 @@ nuget Fable.Core ~> 2
 nuget Fable.React ~> 2
 nuget Fable.Elmish ~> 2
 nuget Reaction.AsyncRx ~> 2
+
+nuget Microsoft.NET.Test.Sdk ~> 15
+nuget Expecto ~> 8
