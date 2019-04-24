@@ -132,32 +132,73 @@ IAsyncObservable<'b>``) an async observable.
 .. val:: mapi
     :type: mapper:('a*int -> 'b) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 
+    Returns an observable sequence whose elements are the result of
+    invoking the mapper function and incorporating the element's index
+    on each element of the source.
+
 .. val:: mapAsync
     :type: ('a -> Async<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
+
+    Returns an observable sequence whose elements are the result of
+    invoking the async mapper function on each element of the source.
 
 .. val:: mapiAsync
     :type: ('a*int -> Async<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 
+    Returns an observable sequence whose elements are the result of
+    invoking the async mapper function by incorporating the element's
+    index on each element of the source.
+
 .. val:: flatMap
     :type: ('a -> IAsyncObservable<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
+
+    Projects each element of an observable sequence into an observable
+    sequence and merges the resulting observable sequences back into one
+    observable sequence.
 
 .. val:: flatMapi
     :type: ('a*int -> IAsyncObservable<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 
+    Projects each element of an observable sequence into an observable
+    sequence by incorporating the element's index on each element of the
+    source. Merges the resulting observable sequences back into one
+    observable sequence.
+
 .. val:: flatMapAsync
     :type: ('a -> Async\<IAsyncObservable\<'b\>\>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
+
+    Asynchronously projects each element of an observable sequence into
+    an observable sequence and merges the resulting observable sequences
+    back into one observable sequence.
 
 .. val:: flatMapiAsync
     :type: ('a*int -> Async<IAsyncObservable\<'b\>\>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 
+    Asynchronously projects each element of an observable sequence into
+    an observable sequence by incorporating the element's index on each
+    element of the source. Merges the resulting observable sequences
+    back into one observable sequence.
+
 .. val:: flatMapLatest
     :type: ('a -> IAsyncObservable<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
+
+    Transforms the items emitted by an source sequence into observable
+    streams, and mirror those items emitted by the most-recently
+    transformed observable sequence.
 
 .. val:: flatMapLatestAsync
     :type: ('a -> Async<IAsyncObservable\<'b\>\>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 
+    Asynchronosly transforms the items emitted by an source sequence
+    into observable streams, and mirror those items emitted by the
+    most-recently transformed observable sequence.
+
 .. val:: catch
     :type: (exn -> IAsyncObservable<'a>) -> IAsyncObservable<'a> -> IAsyncObservable<'a>
+
+    Returns an observable sequence containing the first sequence's
+    elements, followed by the elements of the handler sequence in case
+    an exception occurred.
 
 Filtering
 =========
@@ -180,11 +221,39 @@ IAsyncObservable<'a>``) an async observable.
 
         let xs = AsyncRx.ofSeq <| seq { 1..5 } |> AsyncRx.filter predicate
 
-- **filterAsync** : ('a -> Async\<bool\>) -> IAsyncObservable<'a> -> IAsyncObservable<'a>
-- **distinctUntilChanged** : IAsyncObservable<'a> -> IAsyncObservable<'a>
-- **takeUntil** : IAsyncObservable<'b> -> IAsyncObservable<'a> -> IAsyncObservable<'a>
-- **choose** : ('a -> 'b option) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
-- **chooseAsync** : ('a -> Async<'b option>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
+.. val:: filterAsync
+    :type:  ('a -> Async<bool>) -> IAsyncObservable<'a> -> IAsyncObservable<'a>
+
+    Filters the elements of an observable sequence based on an async
+    predicate. Returns an observable sequence that contains elements
+    from the input sequence that satisfy the condition.
+
+.. val:: distinctUntilChanged
+    :type: IAsyncObservable<'a> -> IAsyncObservable<'a>
+
+    Return an observable sequence only containing the distinct
+    contiguous elementsfrom the source sequence.
+
+.. val:: takeUntil
+    :type: IAsyncObservable<'b> -> IAsyncObservable<'a> -> IAsyncObservable<'a>
+
+    Returns the values from the source observable sequence until the
+    other observable sequence produces a value.
+
+.. val:: choose
+    :type: ('a -> 'b option) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
+
+    Applies the given function to each element of the stream and returns
+    the stream comprised of the results for each element where the
+    function returns Some with some value.
+
+.. val:: chooseAsync
+    :type: ('a -> Async<'b option>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
+
+    Applies the given async function to each element of the stream and
+    returns the stream comprised of the results for each element
+    where the function returns Some with some value.
+
 
 Aggregating
 ===========
