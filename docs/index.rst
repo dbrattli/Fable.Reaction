@@ -8,7 +8,7 @@ Welcome to Fable/Reaction!
 
 Fable/Reaction is a collection of projects that combines the power of
 asynchronous reactive (AsyncRx) functional programming (RFP) with F#,
-[Fable](http://fable.io/) and [Elmish](https://elmish.github.io/)
+`Fable <http://fable.io/>`_ and `Elmish <https://elmish.github.io/>`_
 applications.
 
 .. toctree::
