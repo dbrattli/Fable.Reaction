@@ -19,5 +19,6 @@ the model view update (MVU) style architecture.
    streams
    scaling
    websocket
+   demo.rst
 
 * :ref:`search`

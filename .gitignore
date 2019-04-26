@@ -454,11 +454,9 @@ bower_components
 
 ### WebSharper ###
 Scripts/
-bundle.js
+**/js/bundle.js
 bundle.js.map
 .editorconfig
 gh-pages/_book
-AspNetCore.Middleware/.vscode
-AsyncRx/.vscode
 .mypy_cache
 .vscode
