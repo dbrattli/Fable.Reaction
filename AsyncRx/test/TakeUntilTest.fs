@@ -1,8 +1,8 @@
 module Tests.TakeUntil
 
 open System.Threading.Tasks
-open Reaction
-open Reaction.Streams
+open FSharp.Control.AsyncRx
+open FSharp.Control.AsyncRx.Streams
 
 open NUnit.Framework
 open FsUnit

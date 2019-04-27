@@ -1,6 +1,7 @@
 module Tests.Stream
 
-open Reaction
+open FSharp.Control
+open Elmish.Streams
 
 open Expecto
 

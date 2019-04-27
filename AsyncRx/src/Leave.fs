@@ -1,11 +1,11 @@
-namespace Reaction
+namespace FSharp.Control
 
 #if !FABLE_COMPILER
 open System.Threading
 open FSharp.Control
 
 [<RequireQualifiedAccess>]
-module Leave =
+module internal Leave =
     /// Convert async observable to async sequence, non-blocking.
     /// Producer will be awaited until item is consumed by the async
     /// enumerator.

@@ -1,13 +1,13 @@
-namespace Reaction
+namespace FSharp.Control
 
 open System.Collections.Generic
 open System.Threading
 
 open Core
 
-module Streams =
+module Subjects =
     /// A cold stream that only supports a single subscriber
-    let singleStream<'a> () : IAsyncObserver<'a> * IAsyncObservable<'a> =
+    let singleSubject<'a> () : IAsyncObserver<'a> * IAsyncObservable<'a> =
         let mutable oobv: IAsyncObserver<'a> option = None
         let cts = new CancellationTokenSource ()
 
@@ -49,9 +49,9 @@ module Streams =
         let obs = { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
         AsyncObserver obv :> IAsyncObserver<'a>, obs
 
-    /// A mailbox stream is a subscribable mailbox. Each message is
+    /// A mailbox subject is a subscribable mailbox. Each message is
     /// broadcasted to all subscribed observers.
-    let mbStream<'a> () : MailboxProcessor<Notification<'a>>*IAsyncObservable<'a> =
+    let mbSubject<'a> () : MailboxProcessor<Notification<'a>>*IAsyncObservable<'a> =
         let obvs = new List<IAsyncObserver<'a>>()
         let cts = new CancellationTokenSource()
 
@@ -94,8 +94,8 @@ module Streams =
 
     /// A stream is both an observable sequence as well as an observer.
     /// Each notification is broadcasted to all subscribed observers.
-    let stream<'a> () : IAsyncObserver<'a> * IAsyncObservable<'a> =
-        let mb, obs = mbStream<'a> ()
+    let subject<'a> () : IAsyncObserver<'a> * IAsyncObservable<'a> =
+        let mb, obs = mbSubject<'a> ()
 
         let obv = { new IAsyncObserver<'a> with
             member this.OnNextAsync x = async {

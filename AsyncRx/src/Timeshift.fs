@@ -1,13 +1,13 @@
-namespace Reaction
+namespace FSharp.Control
 
 open System
 open System.Threading;
 
-open Reaction.Core
+open FSharp.Control.Core
 
 
 [<RequireQualifiedAccess>]
-module Timeshift =
+module internal Timeshift =
 
     /// Time shifts the observable sequence by the given timeout. The
     /// relative time intervals between the values are preserved.

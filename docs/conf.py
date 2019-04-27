@@ -18,7 +18,7 @@ import alabaster
 
 # -- Project information -----------------------------------------------------
 
-project = 'Reaction'
+project = 'Elmish.Streams'
 copyright = '2019, Dag Brattli'
 author = 'Dag Brattli'
 

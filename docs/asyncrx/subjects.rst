@@ -1,8 +1,8 @@
-=======
-Streams
-=======
+========
+Subjects
+========
 
-You can think of a "Stream" as being a tube that is open at both sides. Streams
+You can think of a "Subject" as being a tube that is open at both sides. Subjects
 combines both the ``IAsyncObservable<'a>`` and ``IAsyncObserver<'a>``
 interfaces. Whatever you put in (e.g ``OnNextAsync``) at one side
 (``IAsyncObserver<'a>``) will come out of the other end
@@ -18,17 +18,17 @@ solves the problem of having a single object trying to be two things at once
 There are currently 3 types of streams in Reaction, **stream**,
 **mbStream** and  **singleStream**.
 
-.. val:: stream
+.. val:: subject
     :type: unit -> IAsyncObserver<'a> * IAsyncObservable<'a>
 
-    The stream will forward any notification pushed to the
+    The subject will forward any notification pushed to the
     ``IAsyncObserver<'a>`` side to all observers that have subscribed to the
     ``IAsyncObservable<'a>`` side. The stream is hot in the sense that if
     there are no observers, then the notification will be lost.
 
     .. code:: fsharp
 
-        let dispatch, obs = AsyncRx.stream ()
+        let dispatch, obs = AsyncRx.subject ()
 
         let main = async {
             let! sub = obs.SubscribeAsync obv
@@ -38,17 +38,17 @@ There are currently 3 types of streams in Reaction, **stream**,
 
         Async.StartImmediate main ()
 
-.. val:: mbStream
+.. val:: mbSubject
     :type: unit -> MailboxProcessor<Notification<'a>> * IAsyncObservable<'a>
 
-    The Mailbox Stream is the same as a ``stream`` except that the observer is
+    The Mailbox Subject is the same as a ``subject`` except that the observer is
     exposed as a ``MailboxProcessor<Notification<'a>>``. The mailbox stream is
     hot in the sense that if there are no observers, then any pushed
     notification will be lost.
 
     .. code:: fsharp
 
-        let dispatch, obs = AsyncRx.mbStream ()
+        let dispatch, obs = AsyncRx.mbSubject ()
 
         let main = async {
             let! sub = obs.SubscribeAsync obv
@@ -58,7 +58,7 @@ There are currently 3 types of streams in Reaction, **stream**,
 
         Async.StartImmediate main ()
 
-.. val:: singleStream
+.. val:: singleSubject
     :type: unit -> IAsyncObserver<'a> * IAsyncObservable<'a>
 
     The single stream will forward any notification pushed to the
@@ -70,7 +70,7 @@ There are currently 3 types of streams in Reaction, **stream**,
 
     .. code:: fsharp
 
-        let dispatch, obs = AsyncRx.singleStream ()
+        let dispatch, obs = AsyncRx.singleSubject ()
 
         let main = async {
             let! sub = obs.SubscribeAsync obv

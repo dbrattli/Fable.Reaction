@@ -1,10 +1,10 @@
-namespace Reaction
+namespace FSharp.Control
 
 open System.Threading
-open Reaction.Core
+open FSharp.Control.Core
 
 [<RequireQualifiedAccess>]
-module Aggregation =
+ module internal Aggregation =
     /// Applies an async accumulator function over an observable
     /// sequence and returns each intermediate result. The seed value is
     /// used as the initial accumulator value. Returns an observable
@@ -88,7 +88,7 @@ module Aggregation =
                                         do! group.OnNextAsync x
                                         return groups, false
                                     | None ->
-                                        let obv, obs = Streams.singleStream ()
+                                        let obv, obs = Subjects.singleSubject ()
                                         do! aobv.OnNextAsync obs
                                         do! obv.OnNextAsync x
                                         return groups.Add (groupKey, obv), false

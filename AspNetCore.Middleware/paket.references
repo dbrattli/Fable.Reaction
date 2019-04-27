@@ -3,4 +3,4 @@ Giraffe
 Microsoft.AspNetCore
 Microsoft.AspNetCore.StaticFiles
 Microsoft.AspNetCore.WebSockets
-Reaction.AsyncRx
+FSharp.Control.AsyncRx

@@ -1,9 +1,9 @@
-namespace Reaction
+namespace FSharp.Control
 
 open Core
 
 [<RequireQualifiedAccess>]
-module Tap =
+module internal Tap =
     /// Tap asynchronously into the stream performing side effects by the given async actions.
     let tapAsync (onNextAsync: 'a -> Async<unit>) (onErrorAsync: exn -> Async<unit>) (onCompletedAsync: unit -> Async<unit>)
         (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =

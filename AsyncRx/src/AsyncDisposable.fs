@@ -1,4 +1,4 @@
-namespace Reaction
+namespace FSharp.Control
 
 /// Overloads and extensions for AsyncDisposable
 

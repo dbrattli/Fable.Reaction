@@ -2,7 +2,7 @@ module Tests.Debounce
 
 open System.Threading.Tasks
 
-open Reaction
+open FSharp.Control
 open Test.Reaction.Context
 
 open NUnit.Framework

@@ -1,6 +1,6 @@
 module Tests.Map
 
-open Reaction
+open FSharp.Control
 open Tests.Utils
 
 open Expecto

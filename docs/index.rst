@@ -3,10 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Fable/Reaction!
+Welcome to Elmish Streams!
 ==========================
 
-Fable/Reaction is a collection of projects that combines the power of
+Elmish Streams is a collection of projects that combines the power of
 asynchronous reactive (AsyncRx) functional programming (RFP) with F#,
 `Fable <http://fable.io/>`_ and `Elmish <https://elmish.github.io/>`_
 applications.

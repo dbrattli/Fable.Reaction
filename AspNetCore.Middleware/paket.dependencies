@@ -2,8 +2,11 @@ storage: none
 source https://api.nuget.org/v3/index.json
 
 nuget FSharp.Core
-nuget Giraffe ~> 1
+
+nuget Giraffe ~> 3
+
 nuget Microsoft.AspNetCore
 nuget Microsoft.AspNetCore.StaticFiles
 nuget Microsoft.AspNetCore.WebSockets
-nuget Reaction.AsyncRx ~> 2.1
+
+nuget FSharp.Control.AsyncRx ~> 1

@@ -4,4 +4,4 @@ Fable.React
 Fable.Browser.WebSocket
 Fable.Browser.Event
 Fable.Elmish
-Reaction.AsyncRx
+FSharp.Control.AsyncRx

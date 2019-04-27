@@ -1,4 +1,6 @@
-namespace Reaction
+namespace Elmish.Streams
+
+open FSharp.Control
 
 /// Subscription -- A named Async Observable to be subscribed.
 type Subscription<'msg, 'name> = IAsyncObservable<'msg>*'name
@@ -56,7 +58,7 @@ module Stream =
     let tap tag : Stream<'msg, 'name> -> Stream<'msg, 'name> = function
         | Stream xss ->
             xss
-            |> List.map (fun (xs, name) -> xs |> AsyncRx.tapOnNext (printfn "[Reaction] \"%s\" (%A) - %A" tag   name), name)
+            |> List.map (fun (xs, name) -> xs |> AsyncRx.tapOnNext (printfn "[Elmish.Streams] \"%s\" (%A) - %A" tag   name), name)
             |> Stream
 
     /// Applies the given chooser function to each element of the stream and

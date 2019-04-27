@@ -1,4 +1,4 @@
-namespace Reaction
+namespace FSharp.Control
 
 type QueryBuilder() =
     member this.Zero () : IAsyncObservable<_> = Create.empty ()

@@ -23,7 +23,7 @@ let ``Test callCC``() = toTask <| async {
         else
             abort (OnNext -1)
 
-    let xs = reaction {
+    let xs = asyncRx {
         let! x = single 5
 
         yield! callCC (fun abort ->

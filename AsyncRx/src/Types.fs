@@ -1,4 +1,4 @@
-namespace Reaction
+namespace FSharp.Control
 
 type IAsyncDisposable =
     abstract member DisposeAsync: unit -> Async<unit>

@@ -11,7 +11,7 @@ open Elmish
 open Elmish.React
 open ReactLeaflet
 
-open Reaction
+open FSharp.Control.AsyncRx
 open Reaction.AsyncObservable
 
 // The model holds data that you want to keep track of while the application is running

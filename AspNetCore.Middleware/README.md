@@ -1,3 +1,3 @@
-# Reaction AspNetCore Middleware
+# Elmish Streams AspNetCore Middleware
 
 TBD

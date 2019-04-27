@@ -1,9 +1,9 @@
-namespace Reaction
+namespace FSharp.Control
 
 open Core
 
 [<RequireQualifiedAccess>]
-module Transformation =
+module internal Transformation =
     /// Returns an observable sequence whose elements are the result of
     /// invoking the async mapper function on each element of the source.
     let mapAsync (mapperAsync: 'a -> Async<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
@@ -227,7 +227,7 @@ module Transformation =
     /// subscribers have unsubscribed it will unsubscribe from the source
     /// Observable.
     let share (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
-        let dispatch, stream = Streams.stream<'a> ()
+        let dispatch, stream = Subjects.subject<'a> ()
 
         let mb = MailboxProcessor.Start(fun inbox ->
             let rec messageLoop (count: int) (subscription: IAsyncDisposable) = async {

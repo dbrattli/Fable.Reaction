@@ -1,9 +1,9 @@
-namespace Reaction
+namespace FSharp.Control
 
 open System.Collections.Generic
 
 [<RequireQualifiedAccess>]
-module Combine =
+module internal Combine =
     type Key = int
     type Model<'a> = {
         Subscriptions: Map<Key, IAsyncDisposable>

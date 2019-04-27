@@ -1,10 +1,12 @@
-namespace Reaction
+namespace Elmish.Streams
 
 open System.Threading
 
 open Fable.Core
 open Browser
 open Browser.Types
+
+open FSharp.Control
 
 
 /// AsyncRx Extensions
@@ -14,7 +16,7 @@ module AsyncRx =
     /// promise resolves. The observable will also complete after
     /// producing an event.
     let ofPromise (pr: Fable.Core.JS.Promise<_>) =
-        Create.ofAsyncWorker(fun obv _ -> async {
+        AsyncRx.ofAsyncWorker(fun obv _ -> async {
             try
                 let! result = Async.AwaitPromise pr
                 do! obv.OnNextAsync result
@@ -58,21 +60,21 @@ module AsyncRx =
     /// the server. Received ws messages will be forwarded down stream.
     /// JSON encode/decode of application messages is left to the client.
     let inline channel (uri: string) (source: IAsyncObservable<string>) : IAsyncObservable<string> =
-        Reaction.WebSocket.channel uri source
+        Elmish.Streams.WebSocket.channel uri source
 
     /// Websocket message channel operator. Items {'msg} will be encoded
     /// to JSON using `encode` and passed as over the ws channel to the server.
     /// Data received on the ws channel as strings (JSON) will be
     /// decoded using `decode` and forwarded down stream as messages {'msg}.
     let inline msgChannel<'msg> (uri: string) (encode: 'msg -> string) (decode: string -> 'msg option) (source: IAsyncObservable<'msg>) : IAsyncObservable<'msg> =
-        Reaction.WebSocket.msgChannel uri encode decode source
+        Elmish.Streams.WebSocket.msgChannel uri encode decode source
 
     /// Websocket message channel operator. Items {'msg} will be encoded
     /// to JSON using `encode` and passed as over the ws channel to the server.
     /// Data received on the ws channel as strings (JSON) will be
     /// decoded using `decode` and forwarded down stream as messages {Result<'msg, exn>}.
     let msgResultChannel<'msg> (uri: string) (encode: 'msg -> string) (decode: string -> Result<'msg, exn>) (source: IAsyncObservable<'msg>) : IAsyncObservable<Result<'msg, exn>> =
-        Reaction.WebSocket.msgResultChannel uri encode decode source
+        Elmish.Streams.WebSocket.msgResultChannel uri encode decode source
 
     /// Turn the observable into a named stream
     let inline toStream (name: 'name) (source: IAsyncObservable<'a>) : Stream<'a, 'name> =

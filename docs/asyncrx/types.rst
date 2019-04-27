@@ -2,7 +2,7 @@
 Types
 =====
 
-Reaction is built around the interfaces ``IAsyncDisposable``,
+FSharp.Control.AsyncRx is built around the interfaces ``IAsyncDisposable``,
 ``IAsyncObserver`` and ``IAsyncObservable``. This enables a familiar Rx
 programming syntax similar to `FSharp.Control.Reactive
 <http://fsprojects.github.io/FSharp.Control.Reactive/reference/fsharp-control-reactive-observablemodule.html>`_
@@ -35,10 +35,10 @@ asynchronously to an async observable with an async observer:
 Async Observables
 =================
 
-Reaction is an implementation of Async Observable. The difference
+FSharp.Control.AsyncRx is an implementation of Async Observable. The difference
 between an "Async Observable" and an "Observable" is that with "Async
 Observables" you need to await methods such as ``Subscribe``,
-``OnNext``, ``OnError``, and ``OnCompleted``. In Reaction they are thus
+``OnNext``, ``OnError``, and ``OnCompleted``. In FSharp.Control.AsyncRx they are thus
 called ``SubscribeAsync``, ``OnNextAsync``, ``OnErrorAsync``, and
 ``OnCompletedAsync``. This enables ``SubscribeAsync`` to await async
 operations i.e setup network connections, and observers (``OnNext``) may

@@ -7,19 +7,19 @@ goal is to have some kind of create function that returns an
 ``IAsyncObservable<'a>``. We will go through a few options for creating
 such a custom stream.
 
-1. Use a Stream
-===============
+1. Use a Subject
+================
 
-A Stream in Reaction return both an observer (``IAsyncObserver``) and an
+A Subject in AsyncRx return both an observer (``IAsyncObserver``) and an
 observable (``IAsyncObservable``). Note that we need to use
 ``Async.Start`` to start the worker function so it runs concurrently.
 
 .. code:: fsharp
 
-    open Reaction
+    open FSharp.Control.AsyncRx
 
     let myStream () =
-        let dispatch, obs = AsyncRx.stream<Msg> ()
+        let dispatch, obs = AsyncRx.subject<Msg> ()
 
         let worker () = async {
             while true do
@@ -74,7 +74,7 @@ can be used to detect if cancellation (dispose) have been requested.
 
 .. code:: fsharp
 
-    open Reaction
+    open FSharp.Control.AsyncRx
     open System.Threading
 
     let myStream' () =

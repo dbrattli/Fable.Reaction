@@ -4,6 +4,6 @@ group Client
     Fable.Elmish
     Fable.Elmish.React
     Fable.Import.Browser
-    Fable.Elmish.Reaction
+    Fable.Elmish.Streams
     #Fulma
     dotnet-fable

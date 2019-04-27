@@ -1,7 +1,7 @@
 module Tests.Observer
 
-open Reaction
-open Reaction.Core
+open FSharp.Control
+open FSharp.Control.Core
 
 open Expecto
 open Tests.Utils

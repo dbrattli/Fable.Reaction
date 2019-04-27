@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Reaction AsyncRx
+FSharp AsyncRx
 ================
 
 Async Observables for asynchronous and reactive programming.
@@ -17,7 +17,7 @@ Async Observables for asynchronous and reactive programming.
    types
    disposables
    query
-   streams
+   subjects
    errors
    custom
 

@@ -1,21 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <PackageId>Fable.Elmish.Reaction</PackageId>
-    <Version>3.0.1</Version>
-    <PackageVersion>3.0.1</PackageVersion>
+    <TargetFrameworks>netstandard2.0;netstandard1.6;net461</TargetFrameworks>
+    <PackageId>Elmish.Streams</PackageId>
+    <Version>3.0.0</Version>
     <Authors>Dag Brattli</Authors>
     <Company>Brattli Labs</Company>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Error.fs" />
-    <Compile Include="WebSocket.fs" />
-    <Compile Include="Stream.fs" />
-    <Compile Include="AsyncRx.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="../../Fable.Elmish/src/Program.fs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="*.fsproj; *.fs" PackagePath="fable\" />

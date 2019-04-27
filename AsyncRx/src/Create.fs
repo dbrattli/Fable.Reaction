@@ -1,4 +1,4 @@
-namespace Reaction
+namespace FSharp.Control
 
 open System.Threading
 open System
@@ -11,7 +11,7 @@ open Core
 
 
 [<RequireQualifiedAccess>]
-module Create =
+module internal Create =
 
     /// Creates an async observable (`AsyncObservable{'a}`) from the
     /// given subscribe function.

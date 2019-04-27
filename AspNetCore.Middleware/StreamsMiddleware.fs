@@ -1,4 +1,4 @@
-namespace Reaction.AspNetCore
+namespace Elmish.Streams.AspNetCore
 
 open System
 open System.Collections.Generic
@@ -10,14 +10,14 @@ open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Logging
 
-open Reaction
+open FSharp.Control
 
 module Middleware =
     type ConnectionId = string
     type Query<'msg> = ConnectionId -> IAsyncObservable<'msg*ConnectionId> -> IAsyncObservable<'msg*ConnectionId>
 
     [<CLIMutable>]
-    type ReactionConfig<'msg> =
+    type StreamsConfig<'msg> =
         {
             /// A query for the stream of all messages
             QueryAll: IAsyncObservable<'msg*ConnectionId> -> IAsyncObservable<'msg*ConnectionId>
@@ -31,17 +31,17 @@ module Middleware =
             RequestPath: string
         }
 
-    type GetOptions<'msg> = ReactionConfig<'msg> -> ReactionConfig<'msg>
+    type GetOptions<'msg> = StreamsConfig<'msg> -> StreamsConfig<'msg>
 
-    type ReactionMiddleware<'msg> (next: RequestDelegate, getOptions: GetOptions<'msg>)  =
+    type ElmishStreamsMiddleware<'msg> (next: RequestDelegate, getOptions: GetOptions<'msg>)  =
         let sockets = List<WebSocket> ()
-        let obvAll, streamAll = AsyncRx.stream<'msg*ConnectionId> ()
-        let obv, stream = AsyncRx.stream<'msg*ConnectionId> ()
+        let obvAll, streamAll = AsyncRx.subject<'msg*ConnectionId> ()
+        let obv, stream = AsyncRx.subject<'msg*ConnectionId> ()
         let mutable subscription : IAsyncDisposable option = None
 
         member this.Invoke (ctx: HttpContext) =
             let loggerFactory  = ctx.RequestServices.GetService<ILoggerFactory> ()
-            let logger = loggerFactory.CreateLogger("Reaction.Middleware")
+            let logger = loggerFactory.CreateLogger("Elmish.Streams.Middleware")
 
             let defaultOptions = {
                 QueryAll = fun msgs -> msgs
@@ -68,14 +68,14 @@ module Middleware =
                         logger.LogInformation ("Established WebSocket connection with ID: {ConnectionID}", connectionId)
 
                         sockets.Add webSocket
-                        do! this.Reaction connectionId webSocket options logger
+                        do! this.Streams connectionId webSocket options logger
 
                     | false -> ctx.Response.StatusCode <- 400
                 else
                     return! next.Invoke ctx |> Async.AwaitTask
             } |> Async.StartAsTask
 
-        member private this.Reaction (connectionId: ConnectionId) (webSocket: WebSocket) (options: ReactionConfig<'msg>) (logger: ILogger): Async<unit> =
+        member private this.Streams (connectionId: ConnectionId) (webSocket: WebSocket) (options: StreamsConfig<'msg>) (logger: ILogger): Async<unit> =
             async {
                 let buffer : byte [] = Array.zeroCreate 4096
                 let! ct = Async.CancellationToken
@@ -96,11 +96,11 @@ module Middleware =
                             closure <- WebSocketCloseStatus.ProtocolError
                             finished <- true
                     | OnError ex ->
-                        logger.LogError ("Reaction stream error (OnError): {Error}", ex.ToString ())
+                        logger.LogError ("Streams stream error (OnError): {Error}", ex.ToString ())
                         closure <- WebSocketCloseStatus.InternalServerError
                         finished <- true
                     | OnCompleted ->
-                        logger.LogInformation ("Reaction stream completed (OnCompleted)")
+                        logger.LogInformation ("Streams stream completed (OnCompleted)")
                         finished <- true
                     | _ -> ()
                 }
@@ -132,5 +132,5 @@ module Middleware =
             }
 
     type IApplicationBuilder with
-        member this.UseReaction<'msg> (getOptions: GetOptions<'msg>) =
-            this.UseMiddleware<ReactionMiddleware<'msg>> getOptions
+        member this.UseElmishStreams<'msg> (getOptions: GetOptions<'msg>) =
+            this.UseMiddleware<ElmishStreamsMiddleware<'msg>> getOptions

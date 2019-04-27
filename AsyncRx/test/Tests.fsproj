@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../src/Reaction.AsyncRx.fsproj" />
+    <ProjectReference Include="../src/FSharp.Control.AsyncRx.fsproj" />
   </ItemGroup>
 
   <Import Project="..\.paket\Paket.Restore.targets" />

@@ -1,7 +1,7 @@
 module Tests.GroupBy
 
 open System.Threading.Tasks
-open Reaction
+open FSharp.Control
 
 open NUnit.Framework
 open FsUnit

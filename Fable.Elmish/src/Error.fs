@@ -1,4 +1,4 @@
-namespace Reaction
+namespace Elmish.Streams
 
 open Fable.Core.JS
 

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AsyncRx", "src\Reaction.AsyncRx.fsproj", "{8D83B5B9-A2E2-45F4-8B8E-B4A65CFF4CC9}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AsyncRx", "src\FSharp.Control.AsyncRx.fsproj", "{8D83B5B9-A2E2-45F4-8B8E-B4A65CFF4CC9}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Tests", "test\Tests.fsproj", "{B384F8B3-C04F-4F47-8DB0-B1E9B6339B5C}"
 EndProject

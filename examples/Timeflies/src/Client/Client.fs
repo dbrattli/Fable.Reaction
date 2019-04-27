@@ -3,9 +3,10 @@ module Client
 open Fable.React
 open Fable.React.Props
 open Fable.Core
-open Reaction
+open FSharp.Control
 open Elmish
 open Elmish.React
+open Elmish.Streams
 open Browser.Dom
 
 // The model holds data that you want to keep track of while the
@@ -68,5 +69,5 @@ let query (model : Model) (msgs:  Stream<Msg, string>) =
 
 Program.mkSimple init update view
 |> Program.withMsgStream query "msgs"
-|> Program.withReact "elmish-app"
+|> Program.withReactBatched "elmish-app"
 |> Program.run

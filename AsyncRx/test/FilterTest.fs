@@ -1,6 +1,6 @@
 module Tests.Filter
 
-open Reaction
+open FSharp.Control
 
 open Expecto
 open Tests.Utils

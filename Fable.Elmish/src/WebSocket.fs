@@ -1,8 +1,8 @@
-namespace Reaction
+namespace Elmish.Streams
 
 open Browser
-open Fable.Import
 open Browser.Types
+open FSharp.Control
 
 module WebSocket =
 
@@ -63,7 +63,6 @@ module WebSocket =
                     })
 
                 let onClose ev =
-                    //printfn "onClose"
                     Async.StartImmediate (async {
                         do! down.OnCompletedAsync ()
                         do! cancel ();

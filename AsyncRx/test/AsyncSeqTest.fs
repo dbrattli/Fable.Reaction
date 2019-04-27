@@ -3,7 +3,7 @@ module Tests.ToAsyncSeq
 open System.Collections.Generic
 open System.Threading.Tasks
 
-open Reaction
+open FSharp.Control
 
 open NUnit.Framework
 open FsUnit

@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <PackageId>Reaction.AsyncRx</PackageId>
-    <Version>2.1.2</Version>
-    <PackageVersion>2.1.2</PackageVersion>
+    <PackageId>FSharp.Control.AsyncRx</PackageId>
+    <Version>1.0.0</Version>
+    <PackageVersion>1.0.0</PackageVersion>
     <Authors>Dag Brattli</Authors>
     <Company>Brattli Labs</Company>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -15,7 +15,7 @@
     <Compile Include="AsyncDisposable.fs" />
     <Compile Include="AsyncObserver.fs" />
     <Compile Include="Core.fs" />
-    <Compile Include="Stream.fs" />
+    <Compile Include="Subject.fs" />
     <Compile Include="Create.fs" />
     <Compile Include="Leave.fs" />
     <Compile Include="Filter.fs" />

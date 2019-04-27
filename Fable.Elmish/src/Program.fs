@@ -1,11 +1,11 @@
-namespace Reaction
+namespace Elmish.Streams
 
-open System
 open System.Collections.Generic
 
 open Elmish
-open Reaction
-open Reaction.Error
+open Elmish.Streams.Error
+open FSharp.Control
+
 
 [<RequireQualifiedAccess>]
 module Program =
@@ -18,7 +18,7 @@ module Program =
     /// **Description**
     /// Transforms the Elmish message stream. The supplied `stream` function takes the model and a
     /// named message stream, and returns a (possibly) transformed named message stream. The
-    /// `stream`functio will be called each time the model is updated. This makes it possible to
+    /// `stream` function will be called each time the model is updated. This makes it possible to
     /// dynamically change the stream handling at runtime based on the current model. If the name
     /// of a stream changes, the old stream will be disposed and the new stream will be subscribed
     /// and active.
@@ -30,7 +30,7 @@ module Program =
     ///
     /// **Output Type**
     ///   * `Program<'a,'model,'msg,'b>`
-    let withMsgStream (stream: 'model -> Stream<'msg, 'name> -> Stream<'msg, 'name>) (initialName: 'name) (program: Elmish.Program<_,_,_,_>) =
+    let withStream (stream: 'model -> Stream<'msg, 'name> -> Stream<'msg, 'name>) (initialName: 'name) (program: Elmish.Program<_,_,_,_>) =
         let subscriptions = new Dictionary<'name, IAsyncDisposable> ()
         let mb, obs = AsyncRx.mbStream<'msg> ()
         let dispatch' = OnNext >> mb.Post
@@ -41,10 +41,10 @@ module Program =
                     dispatch x
                 }
                 member __.OnErrorAsync err = async {
-                    onError ("[Reaction] Stream error", err)
+                    onError ("[Elmish.Streams] Stream error", err)
                 }
                 member __.OnCompletedAsync () = async {
-                    debug ("[Reaction] Stream completed:", name)
+                    debug ("[Elmish.Streams] Stream completed:", name)
                     subscriptions.Remove name |> ignore
                 }
             }
@@ -52,7 +52,7 @@ module Program =
         let subscribe (dispatch: Dispatch<'msg>) (adds: Subscription<'msg, 'name> list) =
             async {
                 for msgs, name in adds do
-                    debug ("[Reaction] Subscribing stream:", name)
+                    debug ("[Elmish.Streams] Subscribing stream:", name)
                     let! disposable = msgs.SubscribeAsync (msgObserver name dispatch)
                     subscriptions.Add (name, disposable)
             }
@@ -61,7 +61,7 @@ module Program =
             async {
                 for name in removes do
                     do! subscriptions.[name].DisposeAsync ()
-                    debug ("[Reaction] Disposing stream:", name)
+                    debug ("[Elmish.Streams] Disposing stream:", name)
                     subscriptions.Remove name |> ignore
             }
 
@@ -85,40 +85,3 @@ module Program =
 
         program
         |> Program.map id id view id id
-
-    /// Attach a simple Reaction query to the message (Msg) stream of an Elmish program. The
-    /// supplied query function is called once by the Elmish runtime.
-    let withQuery (query: IAsyncObservable<'msg> -> IAsyncObservable<'msg>) (program: Elmish.Program<_,_,_,_>) =
-        let mb, stream = AsyncRx.mbStream<'msg> ()
-
-        let subscribe userSubscribe model =
-            let sub dispatch =
-                let main = async {
-                    let msgObserver =
-                        { new IAsyncObserver<'msg> with
-                            member __.OnNextAsync x = async {
-                                dispatch x
-                            }
-                            member __.OnErrorAsync err = async {
-                                onError ("[Reaction] Query error", err)
-                            }
-                            member __.OnCompletedAsync () = async {
-                                onError ("[Reaction] Query completed", Exception ())
-                            }
-                        }
-
-                    let msgs = query stream
-                    do! msgs.RunAsync msgObserver
-                }
-                Async.StartImmediate main
-
-            Cmd.batch [
-                [sub]
-                userSubscribe model
-            ]
-
-        let view userView model dispatch =
-            userView model (OnNext >> mb.Post)
-
-        program
-        |> Program.map id id view id subscribe

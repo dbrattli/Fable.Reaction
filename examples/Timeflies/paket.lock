@@ -801,9 +801,6 @@ NUGET
     NETStandard.Library (2.0.3) - restriction: >= netcoreapp2.2
       Microsoft.NETCore.Platforms (>= 1.1) - restriction: || (&& (>= net45) (< netstandard1.3)) (&& (< net45) (>= netstandard1.1) (< netstandard1.2) (< win8)) (&& (< net45) (>= netstandard1.2) (< netstandard1.3) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.3) (< netstandard1.4) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.4) (< netstandard1.5) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.5) (< netstandard1.6) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.6) (< netstandard2.0) (< win8) (< wpa81)) (&& (< net45) (>= netstandard2.0) (< win8) (< wpa81)) (&& (>= net46) (< netstandard1.4)) (>= net461) (>= netcoreapp2.0) (&& (>= netstandard1.0) (< portable-net45+win8+wpa81)) (&& (< netstandard1.0) (>= portable-net45+win8) (< win8)) (&& (< netstandard1.0) (< portable-net45+win8) (>= portable-net45+win8+wpa81)) (&& (< netstandard1.0) (>= portable-net45+win8+wp8+wpa81) (< portable-net45+win8+wpa81)) (&& (< netstandard1.0) (>= win8)) (&& (< netstandard1.3) (< win8) (>= wpa81)) (>= uap10.0) (>= wp8)
     Newtonsoft.Json (12.0.1) - restriction: >= netcoreapp2.0
-    Reaction.AsyncRx (2.1) - restriction: >= netstandard2.0
-      FSharp.Control.AsyncSeq (>= 2.0.21) - restriction: >= netstandard2.0
-      FSharp.Core (>= 4.5.4) - restriction: >= netstandard2.0
     runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl (4.3.3) - restriction: >= netcoreapp2.0
     runtime.debian.9-x64.runtime.native.System.Security.Cryptography.OpenSsl (4.3.3) - restriction: >= netcoreapp2.0
     runtime.fedora.23-x64.runtime.native.System.Security.Cryptography.OpenSsl (4.3.3) - restriction: >= netcoreapp2.0
@@ -1050,14 +1047,17 @@ NUGET
       Fable.Core (>= 3.0) - restriction: >= netstandard2.0
       FSharp.Core (>= 4.6.2) - restriction: >= netstandard2.0
   remote: /Users/dbrattli/Developer/packages
-    Fable.Elmish.Reaction (3.0.0)
+    Fable.Elmish.Streams (3.0.1)
       Fable.Browser.Event (>= 1.0) - restriction: >= netstandard2.0
       Fable.Browser.WebSocket (>= 1.0) - restriction: >= netstandard2.0
       Fable.Core (>= 3.0) - restriction: >= netstandard2.0
       Fable.Elmish (>= 3.0) - restriction: >= netstandard2.0
       Fable.React (>= 5.1) - restriction: >= netstandard2.0
+      FSharp.Control.AsyncRx (>= 1.0) - restriction: >= netstandard2.0
       FSharp.Core (>= 4.6.2) - restriction: >= netstandard2.0
-      Reaction.AsyncRx (>= 2.1) - restriction: >= netstandard2.0
+    FSharp.Control.AsyncRx (1.0.0) - restriction: >= netstandard2.0
+      FSharp.Control.AsyncSeq (>= 2.0.21) - restriction: >= netstandard2.0
+      FSharp.Core (>= 4.5.4) - restriction: >= netstandard2.0
 
 GROUP Server
 STORAGE: NONE

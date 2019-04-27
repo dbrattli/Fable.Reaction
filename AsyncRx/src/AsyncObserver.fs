@@ -1,4 +1,4 @@
-namespace Reaction
+namespace FSharp.Control
 
 type AsyncObserver<'a> (fn: Notification<'a> -> Async<unit>) =
 
