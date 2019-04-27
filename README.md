@@ -1,4 +1,4 @@
-# Elmish |> AsyncRx
+# Elmish |> AsyncRx = Elmish Streams
 
 <img src="/AsyncRx/logo/logo.png" width="100">
 
