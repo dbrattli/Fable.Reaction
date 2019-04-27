@@ -28,4 +28,9 @@ want that to bubble out of and not into the reactive framework.
 
 The following error handling operators have been implemented:
 
-- **catch** : ``(exn -> IAsyncObservable<'a>) -> IAsyncObservable<'a> -> IAsyncObservable<'a>``,
+.. val:: catch
+    :type: (exn -> IAsyncObservable<'a>) -> IAsyncObservable<'a> -> IAsyncObservable<'a>
+
+    Returns an observable sequence containing the first sequence's
+    elements, followed by the elements of the handler sequence in case
+    an exception occurred.

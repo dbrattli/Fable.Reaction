@@ -1,6 +1,6 @@
-=====================
-HOWTO use with Elmish
-=====================
+===============
+Getting Started
+===============
 
 To use Fable Reaction with Elmish you need to call the
 ``Program.withQuery`` with your reactive query. The query function takes
@@ -17,7 +17,7 @@ an ``IAsyncObservable<'msg>`` and returns a possibibly transformed
         msgs |> AsyncRx.delay 1000
 
     Program.mkSimple init update view
-    |> Program.withSimpleQuery query       // 4. Enable the query in Elmish
+    |> Program.withQuery query       // 4. Enable the query in Elmish
     |> Program.withReact "elmish-app"
     |> Program.run
 

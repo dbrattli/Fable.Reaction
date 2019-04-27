@@ -85,7 +85,7 @@ let tests = testList "Merge Tests" [
         do! obv.AwaitIgnore ()
 
         // Assert
-        //obv.Notifications |> should haveCount 6
+        Expect.equal obv.Notifications.Count 6 "Wrong count"
         let actual = obv.Notifications |> Seq.toList
         Expect.contains actual (OnNext 1) "Should contain the element"
         Expect.contains actual (OnNext 2) "Should contain the element"

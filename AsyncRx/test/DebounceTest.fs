@@ -15,21 +15,28 @@ let toTask computation : Task = Async.StartAsTask computation :> _
 let ``Test debounce single value``() = toTask <| async {
     // Arrange
 
-    let dispatch, obs = stream ()
-    let xs = obs |> debounce 100
-    let obv = TestObserver<int>()
+    let dispatch, obs = AsyncRx.stream ()
+    let xs = obs |> AsyncRx.debounce 100
+    let obv = TestObserver<int> ()
     let ctx = TestSynchronizationContext ()
     let mutable latest = -1
 
     // Act
     let task = async {
         let! sub = xs.SubscribeAsync obv
+        printfn "A"
         do! dispatch.OnNextAsync 42
-        do! ReactionContext.SleepAsync 150
+        printfn "B"
+        do! Async.Sleep 250
+        printfn "C"
         do! dispatch.OnCompletedAsync ()
+        printfn "D"
 
+
+        printfn "Await ----------------------"
         let! latest' = obv.Await ()
         latest <- latest'
+        printfn "Exiting task ---------------"
         ()
     }
     do! ctx.RunAsync task
@@ -46,8 +53,8 @@ let ``Test debounce single value``() = toTask <| async {
 let ``Test debounce two immediate values``() = toTask <| async {
     // Arrange
 
-    let dispatch, obs = stream ()
-    let xs = obs |> debounce 100
+    let dispatch, obs = AsyncRx.stream ()
+    let xs = obs |> AsyncRx.debounce 100
     let obv = TestObserver<int>()
     let ctx = TestSynchronizationContext ()
     let mutable latest = -1
@@ -57,7 +64,7 @@ let ``Test debounce two immediate values``() = toTask <| async {
         let! sub = xs.SubscribeAsync obv
         do! dispatch.OnNextAsync 42
         do! dispatch.OnNextAsync 43
-        do! ReactionContext.SleepAsync 150
+        do! Async.Sleep 150
         do! dispatch.OnCompletedAsync ()
 
         let! latest' = obv.Await ()
@@ -77,17 +84,17 @@ let ``Test debounce two immediate values``() = toTask <| async {
 [<Test>]
 let ``Test debounce two separate values``() = toTask <| async {
     // Arrange
-    let dispatch, obs = stream ()
-    let xs = obs |> debounce 100
+    let dispatch, obs = AsyncRx.stream ()
+    let xs = obs |> AsyncRx.debounce 100
     let obv = TestObserver<int>()
     let ctx = TestSynchronizationContext ()
     let mutable latest = -1
 
     let task = async {
         do! dispatch.OnNextAsync 42
-        do! ReactionContext.SleepAsync 150
+        do! Async.Sleep 150
         do! dispatch.OnNextAsync 43
-        do! ReactionContext.SleepAsync 150
+        do! Async.Sleep 150
         do! dispatch.OnCompletedAsync ()
 
         let! latest' = obv.Await ()

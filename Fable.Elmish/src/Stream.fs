@@ -69,6 +69,12 @@ module Stream =
             |> List.map (fun (xs, name) -> xs |> AsyncRx.choose chooser, name)
             |> Stream
 
+    /// Applies the given chooser function to each element of the stream and
+    /// returns the stream comprised of the results for each element where the
+    /// function returns with None value.
+    let chooseNot chooser =
+        filter (chooser >> Option.isNone)
+
     /// Selects the stream with the given name and applies the given chooser
     /// function to each element of the stream and returns the stream comprised
     /// of the results for each element where the function returns with

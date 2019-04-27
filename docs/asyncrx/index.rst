@@ -3,16 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-AsyncRx
-=======
+Reaction AsyncRx
+================
+
+Async Observables for asynchronous and reactive programming.
 
 .. toctree::
    :maxdepth: 1
 
    introduction
    install
-   observables
-   observers
    operators
    types
    disposables
