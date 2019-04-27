@@ -86,3 +86,28 @@ module Stream =
             |> List.filter (fun (xs, name') -> name = name')
             |> List.map (fun (xs, name') -> xs |> AsyncRx.choose chooser, name')
             |> Stream
+
+    /// **Description**
+    ///
+    /// **Parameters**
+    ///   * `stream` - parameter of type `'model -> Stream<'subMsg,'name> -> Stream<'subMsg,'name>`
+    ///   * `model` - parameter of type `'model`
+    ///   * `toMsg` - parameter of type `'subMsg -> 'msg`
+    ///   * `toSubMsg` - parameter of type `'msg -> 'subMsg option`
+    ///   * `name` - parameter of type `'name`
+    ///   * `msgs` - parameter of type `Stream<'msg,'name>`
+    ///
+    /// **Output Type**
+    ///   * `Stream<'msg,'name>`
+    ///
+    /// **Exceptions**
+    ///
+    let subStream<'subMsg, 'model, 'msg, 'name> (stream: 'model -> Stream<'subMsg, 'name> -> Stream<'subMsg, 'name>) (model: 'model) (toMsg: 'subMsg -> 'msg) (toSubMsg: 'msg -> 'subMsg option) (name : 'name) (msgs: Stream<'msg, 'name>) =
+        let msgs' = msgs |> chooseNot toSubMsg
+        let subMsgs = Stream [ msgs |> AsyncRx.choose toSubMsg, name]
+        let subMsgs' = stream model subMsgs |> map toMsg
+
+        batch [
+            subMsgs'
+            msgs'
+        ]

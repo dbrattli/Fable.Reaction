@@ -5,7 +5,7 @@ open System.Threading
 open Fable.Core
 open Browser
 open Browser.Types
-open Fable.Import
+
 
 /// AsyncRx Extensions
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
