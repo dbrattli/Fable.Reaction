@@ -90,7 +90,7 @@ module Timeshift =
                             agent.Post (n, index)
                         }
 
-                        Async.Start worker
+                        Async.Start' worker
                     }
                 let! dispose = AsyncObserver obv |> source.SubscribeAsync
 

@@ -3,7 +3,7 @@ namespace Reaction
 open System.Threading
 
 module Core =
-    let infinite = Seq.initInfinite (fun index -> index)
+    let infinite = Seq.initInfinite id
 
     let noopAsync = fun _ -> async { () }
 
@@ -58,3 +58,14 @@ module Core =
                 OnCompleted  |> agent.Post
             }
         }
+
+    type Async with
+        /// Starts the asynchronous computation in the thread pool, or
+        /// immediately for Fable. Do not await its result. If no cancellation
+        /// token is provided then the default cancellation token is used.
+        static member Start' (computation:Async<unit>, ?cancellationToken: CancellationToken) : unit =
+            #if FABLE_COMPILER
+                Async.StartImmediate (computation, ?cancellationToken=cancellationToken)
+            #else
+                Async.Start (computation, ?cancellationToken=cancellationToken)
+            #endif

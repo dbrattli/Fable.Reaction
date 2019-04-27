@@ -25,7 +25,7 @@ module Create =
             let safeObv = safeObserver aobv
 
             async {
-                Async.Start ((worker safeObv token), token)
+                Async.Start' ((worker safeObv token), token)
                 return disposable
             }
         { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
@@ -163,7 +163,7 @@ module Create =
                         do! aobv.OnCompletedAsync ()
                 }
 
-                Async.Start((handler msecs 0), token)
+                Async.Start' (handler msecs 0, token)
                 return cancel
             }
 
