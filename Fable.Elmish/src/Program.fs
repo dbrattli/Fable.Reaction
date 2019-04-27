@@ -121,4 +121,4 @@ module Program =
             userView model (OnNext >> mb.Post)
 
         program
-        |> Program.map id id view id id
+        |> Program.map id id view id subscribe
