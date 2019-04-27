@@ -1,8 +1,8 @@
-====================================
-Elmish Examples using Fable Reaction
-====================================
+=============================
+Examples using Elmish Streams
+=============================
 
-Examples of how to use Fable Reaction with Elmish can be found in the
+Examples of how to use Elmish Streams can be found in the
 examples folder. Current list of examples includes:
 
 * `Counter

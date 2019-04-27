@@ -2,8 +2,8 @@
 Getting Started
 ===============
 
-To use Fable Reaction with Elmish you need to call the
-``Program.withQuery`` with your reactive query. The query function takes
+To use Elmish Streams with Elmish you need to call the
+``Program.withStream`` with your reactive query. The query function takes
 an ``IAsyncObservable<'msg>`` and returns a possibibly transformed
 ``IAsyncObservable<'msg>``.
 
