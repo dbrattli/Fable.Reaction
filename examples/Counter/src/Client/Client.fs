@@ -1,23 +1,27 @@
 module Client
 
-open Fable.Core
-open Fable.PowerPack.Fetch
-open Fable.Helpers.React
-open Fable.Helpers.React.Props
-
-open Thoth.Json
-open Shared
-open Fulma
 open Elmish
 open Elmish.React
-open Reaction
+open Fable.React
+open Fable.React.Props
+open Fetch.Types
+open Fulma
+open Thoth.Json
 
+open Shared
 
-// The model holds data that you want to keep track of while the application is running
-// in this case, we are keeping track of a counter
-// we mark it as optional, because initially it will not be available from the client
-// the initial value will be requested from server
-type Model = { Counter: Counter option }
+open FSharp.Control
+open Elmish.Streams
+
+// The application model holds data that you want to keep track of while the
+// application is running in this case, we are keeping track of a counter.
+// Initially the model will not be available, so we add it together with a case
+// that tells if we are currently loading.
+type AppModel = { Counter: Counter }
+
+type Model =
+    | App of AppModel
+    | Loading
 
 // The Msg type defines what events/actions can occur while the application is running
 // the state of the application changes *only* in reaction to these events
@@ -26,48 +30,78 @@ type Msg =
 | Decrement
 | InitialCountLoaded of Result<Counter, exn>
 
-// defines the initial state and initial command (= side-effect) of the application
+
+
+// Fetch a data structure from specified url and using the decoder
+let fetchWithDecoder<'T> (url: string) (decoder: Decoder<'T>) (init: RequestProperties list) =
+    promise {
+        let! response = GlobalFetch.fetch(RequestInfo.Url url, Fetch.requestProps init)
+        let! body = response.text()
+        return Decode.unsafeFromString decoder body
+    }
+
+// Inline the function so Fable can resolve the generic parameter at compile time
+let inline fetchAs<'T> (url: string) (init: RequestProperties list) =
+    // In this example we use Thoth.Json cached auto decoders
+    // More info at: https://mangelmaxime.github.io/Thoth/json/v3.html#caching
+    let decoder = Decode.Auto.generateDecoderCached<'T>()
+    fetchWithDecoder url decoder init
+
+let initialCounter = fetchAs<Counter> "/api/init"
+
+// defines the initial state
 let init () : Model =
-    { Counter = None }
+    Loading
+
+let loadCount =
+    AsyncRx.ofPromise (initialCounter [])
+    |> AsyncRx.map (Ok >> InitialCountLoaded)
+    |> AsyncRx.catch (Error >> InitialCountLoaded >> AsyncRx.single)
+    |> AsyncRx.toStream "loading"
+
+let stream model msgs =
+    match model with
+    | Loading -> loadCount
+    | _ -> msgs
 
 // The update function computes the next state of the application based on the current state and the incoming events/messages
-// It can also run side-effects (encoded as commands) like calling the server via Http.
-// these commands in turn, can dispatch messages to which the update function will react.
 let update (msg : Msg) (currentModel : Model) : Model =
-    match currentModel.Counter, msg with
-    | Some x, Increment ->
-        let nextModel = { currentModel with Counter = Some (x + 1) }
-        nextModel
-    | Some x, Decrement ->
-        let nextModel = { currentModel with Counter = Some (x - 1) }
-        nextModel
-    | _, InitialCountLoaded (Ok initialCount)->
-        let nextModel = { Counter = Some initialCount }
-        nextModel
-
+    match currentModel, msg with
+    | Loading, InitialCountLoaded (Ok initialCount) ->
+        App { Counter = initialCount }
+    | App model, msg ->
+        match model.Counter, msg with
+        | counter, Increment ->
+            App { model with Counter = { Value = counter.Value + 1 } }
+        | counter, Decrement ->
+            App { model with Counter = { Value = counter.Value - 1 } }
+        | _ -> currentModel
     | _ -> currentModel
+
 
 let safeComponents =
     let components =
         span [ ]
            [
-             a [ Href "https://github.com/giraffe-fsharp/Giraffe" ] [ str "Giraffe" ]
+             a [ Href "https://saturnframework.github.io" ] [ str "Saturn" ]
              str ", "
              a [ Href "http://fable.io" ] [ str "Fable" ]
              str ", "
              a [ Href "https://elmish.github.io/elmish/" ] [ str "Elmish" ]
              str ", "
-             a [ Href "https://mangelmaxime.github.io/Fulma" ] [ str "Fulma" ]
+             a [ Href "https://fulma.github.io/Fulma" ] [ str "Fulma" ]
+             str ", "
+             a [ Href "http://elmish-streams.rtfd.io/" ] [ str "Elmish.Streams" ]
            ]
 
-    p [ ]
+    span [ ]
         [ strong [] [ str "SAFE Template" ]
           str " powered by: "
           components ]
 
 let show = function
-| { Counter = Some x } -> string x
-| { Counter = None   } -> "Loading..."
+| App { Counter = counter } -> string counter.Value
+| Loading -> "Loading..."
 
 let button txt onClick =
     Button.button
@@ -94,22 +128,18 @@ let view (model : Model) (dispatch : Msg -> unit) =
                 [ Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ]
                     [ safeComponents ] ] ]
 
-let loadCountCmd =
-    let decoder = Decode.int
-    AsyncRx.ofPromise (fetchAs<int> "/api/init" decoder [])
-        |> AsyncRx.map (Ok >> InitialCountLoaded)
-        |> AsyncRx.catch (Error >> InitialCountLoaded >> AsyncRx.single)
-
-
-let query model msgs =
-    match model.Counter with
-    | Some x ->
-        Subscribe (msgs, "msgs")
-    | _ ->
-        Subscribe (loadCountCmd, "initial")
-
+#if DEBUG
+open Elmish.Debug
+open Elmish.HMR
+#endif
 
 Program.mkSimple init update view
-|> Program.withQuery query
-|> Program.withReact "elmish-app"
+|> Program.withStream stream "msgs"
+#if DEBUG
+|> Program.withConsoleTrace
+#endif
+|> Program.withReactBatched "elmish-app"
+#if DEBUG
+|> Program.withDebugger
+#endif
 |> Program.run

@@ -1,6 +1,4 @@
 group Server
     FSharp.Core
-    Giraffe
-    Microsoft.AspNetCore
-    Microsoft.AspNetCore.StaticFiles
-    Fable.JsonConverter
+    Saturn
+    Thoth.Json.Giraffe
