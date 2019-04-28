@@ -2,20 +2,18 @@
 WebSocket
 =========
 
-Fable.Reaction enables you to route stream of messages to the server and
+Elmish Streams enables you to route stream of messages to the server and
 back again using "message channels".
 
 Note that server side support for WebSocket message handling must also
-be in place using e.g. `Reaction.Giraffe
-<https://dbrattli.github.io/Reaction/extras/Giraffe.html>`_.
+be in place using ``Elmish.Streams.AspNetCoreMiddleWare``.
 
 Message Channel
 ===============
 
-A message channel is a `Reaction
-<https://github.com/dbrattli/Reaction>`_ operator that composes a
-WebSocket stream of messages into the reactive query. This basically
-routes the messages to the server and (possibly) back again.
+A message channel is an ``AsyncRx`` operator that composes a WebSocket stream
+of messages into the reactive query. This basically routes the messages to the
+server and (possibly) back again.
 
 A message channnel works like this:
 
@@ -35,12 +33,13 @@ resorting to imperative programming.
 
     .. code:: fsharp
 
-        let query (msgs: IAsyncObservable<Msg>) =
+        let stream (msgs: Stream<Msgs, string>) =
             msgs
             |> AsyncRx.msgChannel "ws://localhost:8085/ws" Msg.Encode Msg.Decode
+            |> AsyncRx.toStream "msgs"
 
         Program.mkProgram init update view
-        |> Program.withQuery query
+        |> Program.withStream stream
         |> Program.withReact "elmish-app"
         |> Program.withDebugger
         |> Program.run

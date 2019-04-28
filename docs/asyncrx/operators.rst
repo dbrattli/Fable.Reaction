@@ -8,15 +8,15 @@ on-demand, but the goal is to keep it simple and not make this into a
 full featured `ReactiveX <http://reactivex.io/>`_ implementation (if
 possible).
 
-To use the operators open either the `FSharp.Control.AsyncRx` namespace.
+To use the operators open either the `FSharp.Control` namespace.
 
 .. code:: fsharp
 
-    open FSharp.Control.AsyncRx
+    open FSharp.Control
 
     xs = AsyncRx.single 42
 
-You can also open the ``Reaction.AsyncRx`` module if you don't
+You can also open the ``FSharp.Control.AsyncRx`` module if you don't
 want to prepend every operator with ``AsyncRx``. Be aware of
 possible namespace conflicts with operators such as ``map``.
 
@@ -25,8 +25,6 @@ possible namespace conflicts with operators such as ``map``.
     open FSharp.Control.AsyncRx.AsyncRx
 
     xs = single 42
-
-For the examples below we assume that ``Reaction.AsyncRx`` is opened.
 
 Creating
 ========

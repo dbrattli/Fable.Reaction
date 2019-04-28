@@ -35,15 +35,14 @@ asynchronously to an async observable with an async observer:
 Async Observables
 =================
 
-FSharp.Control.AsyncRx is an implementation of Async Observable. The difference
-between an "Async Observable" and an "Observable" is that with "Async
-Observables" you need to await methods such as ``Subscribe``,
-``OnNext``, ``OnError``, and ``OnCompleted``. In FSharp.Control.AsyncRx they are thus
-called ``SubscribeAsync``, ``OnNextAsync``, ``OnErrorAsync``, and
-``OnCompletedAsync``. This enables ``SubscribeAsync`` to await async
-operations i.e setup network connections, and observers (``OnNext``) may
-finally await side effects such as writing to disk (observers are all
-about side-effects right?).
+AsyncRx is an implementation of Async Observable. The difference between an
+"Async Observable" and an "Observable" is that with "Async Observables" you
+need to await methods such as ``Subscribe``, ``OnNext``, ``OnError``, and
+``OnCompleted``. In AsyncRx they are thus called ``SubscribeAsync``,
+``OnNextAsync``, ``OnErrorAsync``, and ``OnCompletedAsync``. This enables
+``SubscribeAsync`` to await async operations i.e setup network connections, and
+observers (``OnNext``) may finally await side effects such as writing to disk
+(observers are all about side-effects right?).
 
 This diagram shows the how Async Observables relates to other
 collections and values.

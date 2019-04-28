@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Elmish Streams!
-==========================
+Elmish Streams
+==============
 
 Elmish Streams is a collection of projects that combines the power of
 asynchronous reactive (AsyncRx) functional programming (RFP) with F#,

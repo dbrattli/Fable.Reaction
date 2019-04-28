@@ -16,7 +16,7 @@ observable (``IAsyncObservable``). Note that we need to use
 
 .. code:: fsharp
 
-    open FSharp.Control.AsyncRx
+    open FSharp.Control
 
     let myStream () =
         let dispatch, obs = AsyncRx.subject<Msg> ()
@@ -39,7 +39,7 @@ the worker function so it runs concurrently.
 
 .. code:: fsharp
 
-    open Reaction
+    open FSahrp.Control
 
     let myStream () =
         let subscribeAsync (obs: IAsyncObserver<Msg>) : Async<IAsyncDisposable> =
@@ -74,8 +74,8 @@ can be used to detect if cancellation (dispose) have been requested.
 
 .. code:: fsharp
 
-    open FSharp.Control.AsyncRx
     open System.Threading
+    open FSharp.Control
 
     let myStream' () =
         let worker (obv: IAsyncObserver<Msg>) (token: CancellationToken)  = async {
@@ -84,4 +84,4 @@ can be used to detect if cancellation (dispose) have been requested.
                 do! obv.OnNextAsync msg
         }
 
-        Create.ofAsyncWorker(worker)
+        AsyncRx.ofAsyncWorker(worker)

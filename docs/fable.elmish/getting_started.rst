@@ -9,15 +9,18 @@ an ``IAsyncObservable<'msg>`` and returns a possibibly transformed
 
 .. code:: fsharp
 
-    open Reaction // 1. Open Reaction
+    open Elmish.Streams // 1. Open Elmish Streams
 
     // (your Elmish program here)
 
-    let query msgs = // 3. Add reactive query
-        msgs |> AsyncRx.delay 1000
+    let stream model msgs = // 3. Add reactive stream
+        msgs
+        |> AsyncRx.delay 1000
+        |> AsyncRx.toStream "msgs"
+
 
     Program.mkSimple init update view
-    |> Program.withQuery query       // 4. Enable the query in Elmish
+    |> Program.withStream stream       // 4. Enable the stream in Elmish
     |> Program.withReact "elmish-app"
     |> Program.run
 
@@ -32,15 +35,20 @@ will start with the initialCountLoaded message.
 .. code:: fsharp
 
     // Add open statements to top of file
-    open Reaction
+    open Elmish.Streams
 
     let loadCount =
         ofPromise (fetchAs<int> "/api/init" [])
             |> AsyncRx.map (Ok >> InitialCountLoaded)
             |> AsyncRx.catch (Error >> InitialCountLoaded >> single)
+            |> AsyncRx.toStream "loading"
 
-    let query msgs =
-        loadCount ++ msgs
+    let stream model msgs =
+        match model with
+        | Loading ->
+            loadCount
+        | _ ->
+            msgs
 
 
 Doing side effects per message
@@ -55,9 +63,9 @@ operation if a new query is made before the previous result is ready.
 .. code:: fsharp
 
     // Add open statements to top of file
-    open Reaction
+    open Elmish.Streams
 
-    let query msgs =
+    let stream model msgs =
         msgs
         |> AsyncRx.choose Msg.asKeyboardEvent
         |> AsyncRx.map targetValue
@@ -65,4 +73,5 @@ operation if a new query is made before the previous result is ready.
         |> AsyncRx.debounce 750          // Pause for 750ms
         |> AsyncRx.distinctUntilChanged  // Only if the value has changed
         |> AsyncRx.flatMapLatest searchWikipedia
+        |> AsyncRx.toStream "msgs"
 
