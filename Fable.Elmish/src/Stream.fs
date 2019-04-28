@@ -91,6 +91,8 @@ module Stream =
 
     /// **Description**
     ///
+    /// Composes a sub-stream of a sub-component into the main component.
+    ///
     /// **Parameters**
     ///   * `stream` - parameter of type `'model -> Stream<'subMsg,'name> -> Stream<'subMsg,'name>`
     ///   * `model` - parameter of type `'model`
@@ -101,8 +103,6 @@ module Stream =
     ///
     /// **Output Type**
     ///   * `Stream<'msg,'name>`
-    ///
-    /// **Exceptions**
     ///
     let subStream<'subMsg, 'model, 'msg, 'name> (stream: 'model -> Stream<'subMsg, 'name> -> Stream<'subMsg, 'name>) (model: 'model) (toMsg: 'subMsg -> 'msg) (toSubMsg: 'msg -> 'subMsg option) (name : 'name) (msgs: Stream<'msg, 'name>) =
         let msgs' = msgs |> chooseNot toSubMsg

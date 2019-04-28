@@ -2,7 +2,7 @@
 Reactive MVU Architecture
 =========================
 
-Elmish.Streams is very similar to `Elm <http://elm-lang.org/>`_ and
+Elmish Streams is very similar to `Elm <http://elm-lang.org/>`_ and
 `Elmish <https://elmish.github.io/>`_ in regards to the `MVU
 architecture <https://guide.elm-lang.org/architecture/>`_. But when using
 Elmish.Streams, we do not need any commands (``Cmd``) or subscriptions

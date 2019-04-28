@@ -1,32 +1,39 @@
 ===================================
-Scaling Fable.Reaction Applications
+Scaling Elmish Streams Applications
 ===================================
 
-From ``Fable.Elmish.Reaction`` ~> 2 ``withQuery`` now takes a query that
+``Fable.Elmish.Streams`` ~> 2 ``withStream`` takes a stream function that
 takes the current Model (``'model``) as the first argument like this:
 
 .. code:: fsharp
 
-    let withQuery (query: 'model -> IAsyncObservable<'msg> -> IAsyncObservable<'msg>*'key) (program: Elmish.Program<_,_,_,_>) =
+    let withStream (stream: 'model -> IAsyncObservable<'msg> -> IAsyncObservable<'msg>*'key) (program: Elmish.Program<_,_,_,_>) =
 
 And there is a helper for calling sub-queries for pages and componets
 that will help you with (un)wrapping to and from (sub-)messages.
 
 .. code:: fsharp
 
-    let withSubQuery subquery submodel msgs wrapMsg unwrapMsg : IAsyncObservable<_> * string =
+    val subStream: stream  : 'model -> Stream<'subMsg,'name> -> Stream<'subMsg,'name> ->
+                   model   : 'model             ->
+                   toMsg   : 'subMsg -> 'msg    ->
+                   toSubMsg: 'msg -> 'subMsg option ->
+                   name    : 'name              ->
+                   msgs    : Stream<'msg,'name>
+                   -> Stream<'msg,'name>
 
-Thus a sub-query can be called like this:
+Thus a sub-stream can be called like this:
 
 .. code:: fsharp
 
-    let query (model: Model) (msgs: IAsyncObservable<Msg>) =
+    let stream (model: Model) (msgs: Stream<Msg, string>) =
         match model.PageModel with
         | HomePageModel ->
-            msgs, "home"
+            msgs
         ...
         | TomatoModel m ->
-            Program.withSubQuery Tomato.query m msgs TomatoMsg Msg.asTomatoMsg
+            msgs |>
+            Stream.withSubStream Tomato.stream m TomatoMsg Msg.asTomatoMsg "tomato"
 
 The ``Msg.asTomatoMsg`` is a helper function you can declare as an
 extension on Msg (``'msg -> 'submsg option``). It takes a stream of
@@ -42,8 +49,3 @@ messages and returns a stream of sub-messages e.g:
             | TomatoMsg tmsg -> Some tmsg
             | _ -> None
 
-Pages with multiple components (or Programs with concurrently active
-Pages) will need to compose the returned async observables from each
-sub-component together using e.g. ``AsyncRx.merge`` and join the keys to
-keep them unique, e.g. (+) for strings. We can make helper functions for
-this as well.

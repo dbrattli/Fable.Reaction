@@ -9,11 +9,12 @@ an ``IAsyncObservable<'msg>`` and returns a possibibly transformed
 
 .. code:: fsharp
 
-    open Elmish.Streams // 1. Open Elmish Streams
+    open FSharp.Control.AsyncRx // 1. Enable AsyncRx
+    open Elmish.Streams // 2. Enable Elmish Streams
 
     // (your Elmish program here)
 
-    let stream model msgs = // 3. Add reactive stream
+    let stream model msgs = // 3. Add the reactive stream
         msgs
         |> AsyncRx.delay 1000
         |> AsyncRx.toStream "msgs"

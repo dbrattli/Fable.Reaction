@@ -94,13 +94,13 @@ Helper code to render the letters at the correct position on the page.
     let top, left = getOffset container
 
 
-Query (expression style) that transforms the stream of mouse moves into
-a stream of letters where each letter is delayed according to its
-position in the stream.
+Message stream (expression style) that transforms the stream of mouse moves
+into a stream of letters where each letter is delayed according to its position
+in the stream.
 
 .. code:: fsharp
 
-    let query msgs =
+    let stream (model : Model) (msgs:  Stream<Msg, string>) =
         asyncRx {
             let chars =
                 Seq.toList "TIME FLIES LIKE AN ARROW"
@@ -110,9 +110,10 @@ position in the stream.
             yield! AsyncRx.ofMouseMove ()
                 |> AsyncRx.delay (100 * i)
                 |> AsyncRx.map (fun m -> Letter (i, string c, int m.clientX + i * 10 + 15 - left, int m.clientY - top))
-        }
+        } |> AsyncRx.toStream "msgs"
 
     Program.mkSimple init update view
-    |> Program.withQuery query
-    |> Program.withReact "elmish-app"
+    |> Program.withMsgStream stream "msgs"
+    |> Program.withReactBatched "elmish-app"
     |> Program.run
+    

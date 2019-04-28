@@ -54,8 +54,8 @@ let getOffset (element: Browser.Types.Element) =
 let container = document.querySelector "#elmish-app"
 let top, left = getOffset container
 
-// Query for message stream transformation (expression style)
-let query (model : Model) (msgs:  Stream<Msg, string>) =
+// Message stream transformation (expression style)
+let stream (model : Model) (msgs:  Stream<Msg, string>) =
     asyncRx {
         let chars =
             Seq.toList "TIME FLIES LIKE AN ARROW"
@@ -68,6 +68,6 @@ let query (model : Model) (msgs:  Stream<Msg, string>) =
     } |> AsyncRx.toStream "msgs"
 
 Program.mkSimple init update view
-|> Program.withMsgStream query "msgs"
+|> Program.withStream stream "msgs"
 |> Program.withReactBatched "elmish-app"
 |> Program.run

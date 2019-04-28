@@ -22,7 +22,7 @@ possible namespace conflicts with operators such as ``map``.
 
 .. code:: fsharp
 
-    open FSharp.Control.AsyncRx.AsyncRx
+    open FSharp.Control.AsyncRx
 
     xs = single 42
 
