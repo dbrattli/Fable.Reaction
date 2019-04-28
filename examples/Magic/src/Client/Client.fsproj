@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+    </PropertyGroup>
+    <!-- <ItemGroup>
+        <ProjectReference Include="C:\src\libraries\Fable.Reaction\src\Fable.Reaction.fsproj" />
+    </ItemGroup> -->
+    <ItemGroup>
+        <Compile Include="..\Shared\Shared.fs" />
+        <Compile Include="Utils.fs" />
+        <Compile Include="Magic.fs" />
+        <Compile Include="Info.fs" />
+        <Compile Include="Client.fs" />
+    </ItemGroup>
+    <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>
