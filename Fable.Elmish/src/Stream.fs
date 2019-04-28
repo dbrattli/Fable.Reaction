@@ -104,7 +104,7 @@ module Stream =
     /// **Output Type**
     ///   * `Stream<'msg,'name>`
     ///
-    let subStream<'subMsg, 'model, 'msg, 'name> (stream: 'model -> Stream<'subMsg, 'name> -> Stream<'subMsg, 'name>) (model: 'model) (toMsg: 'subMsg -> 'msg) (toSubMsg: 'msg -> 'subMsg option) (name : 'name) (msgs: Stream<'msg, 'name>) =
+    let subStream<'subMsg, 'subModel, 'msg, 'name> (stream: 'subModel -> Stream<'subMsg, 'name> -> Stream<'subMsg, 'name>) (model: 'subModel) (toMsg: 'subMsg -> 'msg) (toSubMsg: 'msg -> 'subMsg option) (name : 'name) (msgs: Stream<'msg, 'name>) =
         let msgs' = msgs |> chooseNot toSubMsg
         let subMsgs = Stream [ msgs |> AsyncRx.choose toSubMsg, name]
         let subMsgs' = stream model subMsgs |> map toMsg

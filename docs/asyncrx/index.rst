@@ -1,8 +1,8 @@
 .. Documentation master file, created by
    sphinx-quickstart on Sun Apr 14 23:22:54 2019.
 
-FSharp AsyncRx
-==============
+AsyncRx
+=======
 
 Async Observables for asynchronous and reactive programming.
 

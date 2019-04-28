@@ -2,6 +2,10 @@
 Streams
 =======
 
+A stream in Elmish Streams is a collection of named async observables
+(AsyncRx). By naming the observables we can subscribe or dispose them
+individually at runtime (based on the current model).
+
 .. type:: Subscription<'msg,'name>
     :manifest: IAsyncObservable<'msg>*'name
 
@@ -11,6 +15,12 @@ Streams
     :kind: Stream of Subscription<'msg, 'name> list
 
     Container for subscriptions that may produce messages
+
+This is extremely powerful since you can change the behaviour of your
+stream whenever your model is updated. The stream will transform any
+message before it hits the update function.
+
+Below is a number of helper functions for working on streams.
 
 .. module:: Stream
 
@@ -65,3 +75,12 @@ Streams
         stream comprised of the results for each element where the
         function returns with Some value.
 
+    .. val:: subStream
+        :type: (stream :'subModel -> Stream<'subMsg,'name> -> Stream<'subMsg,'name>) ->
+               (model:'subModel) ->
+               (toMsg:'subMsg -> 'msg) ->
+               (toSubMsg:'msg -> 'subMsg option) ->
+               (name:'name) ->
+               (msgs:Stream<'msg,'name>) -> Stream<'msg,'name>
+
+        Composes a sub-stream of a sub-component into the main component.

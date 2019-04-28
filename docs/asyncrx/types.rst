@@ -109,5 +109,3 @@ is defined as the following discriminated union:
         | OnError of exn
         | OnCompleted
 
-You can read more about observers in the [Observers](./Observers.md)
-section.
