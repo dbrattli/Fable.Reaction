@@ -24,8 +24,8 @@ with Elmish. Instead we use a `ReactiveX <http://reactivex.io/>`_
 * **Update**, a pure function that produces a new model based on a
   received message and the previous model
 
-In addition, Elmish Streams may also have a stream that
-transforms the "stream" of messages.
+In addition, Elmish Streams also have a stream that transforms the
+"stream" of messages.
 
 * **Stream**, a function that takes the message stream and produces a
   new (transformed) message stream. Note that this also replaces the
