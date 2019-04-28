@@ -1,4 +1,8 @@
-# Elmish |> AsyncRx = Elmish Streams
+# Elmish Streams
+
+```fs
+Elmish |> AsyncRx
+```
 
 <img src="/AsyncRx/logo/logo.png" width="100">
 
@@ -11,4 +15,4 @@ Elmish.Streams is a collection of projects that combines the power of asynchrono
 
 ## Documentation
 
-Please check out the [documentation](https://fablereaction.readthedocs.io/en/latest/index.html)
+Please check out the [documentation](http://elmish-streams.rtfd.io/)
