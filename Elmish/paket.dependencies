@@ -3,5 +3,5 @@ source /Users/dbrattli/Developer/packages
 
 storage: none
 
-nuget Elmish ~> 2
-nuget Reaction.AsyncRx ~> 1
+nuget Elmish ~> 3
+nuget FSharp.Control.AsyncRx ~> 1
