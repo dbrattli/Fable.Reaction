@@ -1,6 +1,5 @@
 FSharp.Core
 Giraffe
 Microsoft.AspNetCore
-Microsoft.AspNetCore.StaticFiles
 Microsoft.AspNetCore.WebSockets
 FSharp.Control.AsyncRx

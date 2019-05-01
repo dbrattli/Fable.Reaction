@@ -14,15 +14,13 @@ open FSharp.Control
 
 module Middleware =
     type ConnectionId = string
-    type Query<'msg> = ConnectionId -> IAsyncObservable<'msg*ConnectionId> -> IAsyncObservable<'msg*ConnectionId>
+    type Stream<'msg> = IAsyncObservable<'msg*ConnectionId>
 
     [<CLIMutable>]
     type StreamsConfig<'msg> =
         {
-            /// A query for the stream of all messages
-            QueryAll: IAsyncObservable<'msg*ConnectionId> -> IAsyncObservable<'msg*ConnectionId>
             /// A query for the stream of messages to a given client
-            Query: ConnectionId -> IAsyncObservable<'msg*ConnectionId> -> IAsyncObservable<'msg*ConnectionId>
+            Stream: ConnectionId -> Stream<'msg> -> Stream<'msg>
             /// Encoder for serializing a message to JSON string
             Encode: 'msg -> string
             /// Decoder for deserializing a JSON string to a message
@@ -35,17 +33,14 @@ module Middleware =
 
     type ElmishStreamsMiddleware<'msg> (next: RequestDelegate, getOptions: GetOptions<'msg>)  =
         let sockets = List<WebSocket> ()
-        let obvAll, streamAll = AsyncRx.subject<'msg*ConnectionId> ()
         let obv, stream = AsyncRx.subject<'msg*ConnectionId> ()
-        let mutable subscription : IAsyncDisposable option = None
 
         member this.Invoke (ctx: HttpContext) =
             let loggerFactory  = ctx.RequestServices.GetService<ILoggerFactory> ()
             let logger = loggerFactory.CreateLogger("Elmish.Streams.Middleware")
 
             let defaultOptions = {
-                QueryAll = fun msgs -> msgs
-                Query = fun _ msgs -> msgs
+                Stream = fun _ msgs -> msgs
                 Encode = fun msg -> ""
                 Decode = fun str -> None
                 RequestPath = "/ws"
@@ -54,31 +49,27 @@ module Middleware =
             let options = getOptions defaultOptions
 
             async {
-                // One time setup of the broadcast query (all sockets)
-                if subscription.IsNone then
-                    let queryAll = options.QueryAll streamAll
-                    let! disposable = queryAll.SubscribeAsync obv
-                    subscription <- Some disposable
-
                 if ctx.Request.Path = PathString options.RequestPath then
                     match ctx.WebSockets.IsWebSocketRequest with
                     | true ->
-                        let! webSocket = ctx.WebSockets.AcceptWebSocketAsync() |> Async.AwaitTask
+                        let! webSocket =
+                            ctx.WebSockets.AcceptWebSocketAsync ()
+                            |> Async.AwaitTask
                         let connectionId = ctx.Connection.Id
                         logger.LogInformation ("Established WebSocket connection with ID: {ConnectionID}", connectionId)
 
                         sockets.Add webSocket
-                        do! this.Streams connectionId webSocket options logger
+                        do! this.HandleWebSocket connectionId webSocket options logger
+                        sockets.Remove webSocket |> ignore
 
                     | false -> ctx.Response.StatusCode <- 400
                 else
                     return! next.Invoke ctx |> Async.AwaitTask
             } |> Async.StartAsTask
 
-        member private this.Streams (connectionId: ConnectionId) (webSocket: WebSocket) (options: StreamsConfig<'msg>) (logger: ILogger): Async<unit> =
+        member private this.HandleWebSocket (connectionId: ConnectionId) (webSocket: WebSocket) (options: StreamsConfig<'msg>) (logger: ILogger): Async<unit> =
             async {
-                let buffer : byte [] = Array.zeroCreate 4096
-                let! ct = Async.CancellationToken
+                let! cancellation = Async.CancellationToken
                 let mutable finished = false
                 let mutable closure = WebSocketCloseStatus.NormalClosure
 
@@ -105,11 +96,13 @@ module Middleware =
                     | _ -> ()
                 }
 
-                let msgs = options.Query connectionId stream
+                // Stitch stream and subscribe
+                let msgs = options.Stream connectionId stream
                 do! msgs.RunAsync msgObserver
 
+                let buffer : byte [] = Array.zeroCreate 4096
                 while not finished do
-                    let! result = webSocket.ReceiveAsync (new ArraySegment<byte>(buffer), ct) |> Async.AwaitTask
+                    let! result = webSocket.ReceiveAsync (new ArraySegment<byte>(buffer), cancellation) |> Async.AwaitTask
                     finished <- result.CloseStatus.HasValue
 
                     if not finished then
@@ -118,7 +111,7 @@ module Middleware =
                         let msg' = options.Decode receiveString
                         match msg' with
                         | Some msg ->
-                            do! obvAll.OnNextAsync (msg, connectionId)
+                            do! obv.OnNextAsync (msg, connectionId)
                         | None -> ()
                     else
                         closure <- result.CloseStatus.Value
@@ -128,9 +121,8 @@ module Middleware =
                     do! webSocket.CloseAsync (closure, "Closing", CancellationToken.None) |> Async.AwaitTask
                 with
                 | _ -> ()
-                sockets.Remove webSocket |> ignore
             }
 
     type IApplicationBuilder with
-        member this.UseElmishStreams<'msg> (getOptions: GetOptions<'msg>) =
+        member this.UseStream<'msg> (getOptions: GetOptions<'msg>) =
             this.UseMiddleware<ElmishStreamsMiddleware<'msg>> getOptions
