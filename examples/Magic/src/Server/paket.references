@@ -6,5 +6,5 @@ group Server
     Microsoft.AspNetCore.WebSockets
     Fable.JsonConverter
     Thoth.Json.Net
-    Reaction.AsyncRx
-    Reaction.AspNetCore.Middleware
+    FSharp.Control.AsyncRx
+    #Reaction.AspNetCore.Middleware

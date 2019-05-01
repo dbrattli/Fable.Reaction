@@ -1,10 +1,11 @@
 group Client
+
 FSharp.Core
 Fable.Elmish.Debugger
 Fable.Elmish.React
 Fable.Elmish.HMR
+Fable.Fetch
 Fable.Core
-dotnet-fable
 Fulma
-Fulma.Extensions
-Fable.Elmish.Reaction
+Fulma.Extensions.Wikiki.Switch
+Fable.Elmish.Streams

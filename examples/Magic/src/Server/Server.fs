@@ -11,8 +11,8 @@ open Microsoft.Extensions.DependencyInjection
 
 open FSharp.Control.Tasks.V2
 open Giraffe
-open Reaction
-open Reaction.AspNetCore.Middleware
+open FSharp.Control
+open Elmish.Streams.AspNetCore.Middleware
 open Shared
 
 open Giraffe.Serialization
@@ -22,59 +22,58 @@ let port = 8085us
 
 
 type LetterMsg =
-  | Set of string
-  | Get of AsyncReplyChannel<string>
+    | Set of string
+    | Get of AsyncReplyChannel<string>
 
 let mailbox =
-  MailboxProcessor.Start(fun inbox ->
-    let rec loop letterString =
-      async {
-        let! msg = inbox.Receive()
+    MailboxProcessor.Start(fun inbox ->
+        let rec loop letterString =
+            async {
+                let! msg = inbox.Receive()
 
-        match msg with
-        | Set letterString ->
-            return! loop letterString
+                match msg with
+                | Set letterString ->
+                    return! loop letterString
 
-        | Get reply ->
-            reply.Reply letterString
+                | Get reply ->
+                    reply.Reply letterString
 
-            return! loop letterString
-      }
+                    return! loop letterString
+            }
 
-    loop "Magic Released!"
-  )
+        loop "Magic Released!"
+    )
 
 let getInitLetterString () : Task<string> =
-  Get
-  |> mailbox.PostAndAsyncReply
-  |> Async.StartAsTask
+    Get
+    |> mailbox.PostAndAsyncReply
+    |> Async.StartAsTask
 
 let webApp =
-  route "/api/init" >=>
-    fun next ctx ->
-      task {
-        let! letterString = getInitLetterString()
-        return! Successful.OK letterString next ctx
-      }
+    route "/api/init" >=>
+        fun next ctx ->
+            task {
+                let! letterString = getInitLetterString()
+                return! Successful.OK letterString next ctx
+            }
 
-
-let query (connectionId: ConnectionId) (msgs: IAsyncObservable<Msg*ConnectionId>) : IAsyncObservable<Msg*ConnectionId> =
-  msgs
-  |> AsyncRx.flatMap(fun (msg,id) ->
-       match msg with
-       | Msg.LetterStringChanged letterString ->
+let stream (connectionId: ConnectionId) (msgs: IAsyncObservable<Msg*ConnectionId>) : IAsyncObservable<Msg*ConnectionId> =
+    msgs
+    |> AsyncRx.flatMap(fun (msg,id) ->
+        match msg with
+        | Msg.LetterStringChanged letterString ->
           mailbox.Post (Set letterString)
 
-       | _ -> ()
+        | _ -> ()
 
-       AsyncRx.single (msg,id))
+        AsyncRx.single (msg,id))
 
 
 let configureApp (app : IApplicationBuilder) =
     app.UseWebSockets()
-       .UseReaction<Msg>(fun options ->
+       .UseStream<Msg>(fun options ->
        { options with
-           Query = query
+           Stream = stream
            Encode = Msg.Encode
            Decode = Msg.Decode
        })

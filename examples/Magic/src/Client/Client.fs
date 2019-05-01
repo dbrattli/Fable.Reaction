@@ -3,12 +3,13 @@ module Client
 open Elmish
 open Elmish.React
 
-open Fable.Helpers.React
-open Fable.Helpers.React.Props
+open Fable.React
+open Fable.React.Props
+open Fetch.Types
 
 open Fulma
-open Reaction
-open Fable.PowerPack.Fetch
+open Elmish.Streams
+open FSharp.Control
 
 open Thoth.Json
 
@@ -93,69 +94,70 @@ let viewApp model dispatch =
       ]
 
 let view (model : Model) (dispatch : Msg -> unit) =
-  div []
-    [
-      Navbar.navbar [ Navbar.Color IsPrimary ]
-        [
-          Navbar.Item.div []
-            [
-              Heading.h2 []
-                [ str "Fable.Reaction Playground" ]
+    div [] [
+        Navbar.navbar [ Navbar.Color IsPrimary ] [
+            Navbar.Item.div [] [
+                Heading.h2 [] [
+                    str "Elmish.Streams Playground"
+                ]
             ]
         ]
 
-      Container.container []  [ viewApp model dispatch ]
+        Container.container []  [ viewApp model dispatch ]
 
-      Footer.footer []
-        [
-          Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ]
-            [ safeComponents ]
+        Footer.footer [] [
+            Content.content [ Content.Modifiers [
+                                Modifier.TextAlignment (Screen.All, TextAlignment.Centered)
+                            ] ] [
+                safeComponents
+            ]
         ]
     ]
 
 let asMagicMsg msg =
-  match msg with
-  | MagicMsg msg ->
-      Some msg
-  | _ ->
-      None
+    match msg with
+    | MagicMsg msg ->
+        Some msg
+    | _ ->
+        None
 
 let asInfoMsg msg =
-  match msg with
-  | InfoMsg msg ->
-      Some msg
-  | _ ->
-      None
+    match msg with
+    | InfoMsg msg ->
+        Some msg
+    | _ ->
+        None
+
+// Fetch a data structure from specified url and using the decoder
+let fetchWithDecoder<'T> (url: string) (decoder: Decoder<'T>) (init: RequestProperties list) =
+    promise {
+        let! response = GlobalFetch.fetch(RequestInfo.Url url, Fetch.requestProps init)
+        let! body = response.text()
+        return Decode.unsafeFromString decoder body
+    }
+
+// Inline the function so Fable can resolve the generic parameter at compile time
+let inline fetchAs<'T> (url: string) (init: RequestProperties list) =
+    // In this example we use Thoth.Json cached auto decoders
+    // More info at: https://mangelmaxime.github.io/Thoth/json/v3.html#caching
+    let decoder = Decode.Auto.generateDecoderCached<'T>()
+    fetchWithDecoder url decoder init
 
 let stream model msgs =
-  match model with
-  | Loading ->
-    AsyncRx.ofPromise (fetchAs<string> "/api/init" Decode.string [])
-    |> AsyncRx.map (Ok >> InitialLetterStringLoaded)
-    |> AsyncRx.catch (Result.Error >> InitialLetterStringLoaded >> AsyncRx.single)
-    |> AsyncRx.toStream "loading"
+    match model with
+    | Loading ->
+        AsyncRx.ofPromise (fetchAs<string> "/api/init" [])
+        |> AsyncRx.map (Ok >> InitialLetterStringLoaded)
+        |> AsyncRx.catch (Result.Error >> InitialLetterStringLoaded >> AsyncRx.single)
+        |> AsyncRx.toStream "loading"
 
-  | Error exn ->
-      msgs
-
-  | App model ->
-      let magicMsgs =
+    | Error exn ->
         msgs
-        |> Stream.choose asMagicMsg
-        |> Magic.stream model.Magic
-        |> Stream.map MagicMsg
-      let infoMsgs =
-        msgs
-        |> Stream.choose asInfoMsg
-        |> Info.stream model.Info
-        |> Stream.map InfoMsg
 
-      Stream.batch
-        [
-          msgs
-          magicMsgs
-          infoMsgs
-        ]
+    | App model ->
+        msgs
+        |> Stream.subStream Magic.stream model.Magic MagicMsg asMagicMsg "magic"
+        |> Stream.subStream Info.stream model.Info InfoMsg asInfoMsg "info"
 
 #if DEBUG
 open Elmish.Debug
@@ -163,13 +165,12 @@ open Elmish.HMR
 #endif
 
 Program.mkSimple init update view
-|> Program.withMsgStream stream "msgs"
+|> Program.withStream stream "msgs"
 #if DEBUG
 //|> Program.withConsoleTrace
-|> Program.withHMR
 #endif
-|> Program.withReact "elmish-app"
+|> Program.withReactBatched "elmish-app"
 #if DEBUG
-|> Program.withDebugger
+//|> Program.withDebugger
 #endif
 |> Program.run
