@@ -113,7 +113,6 @@ in the stream.
         } |> AsyncRx.toStream "msgs"
 
     Program.mkSimple init update view
-    |> Program.withMsgStream stream "msgs"
+    |> Program.withStream stream "msgs"
     |> Program.withReactBatched "elmish-app"
     |> Program.run
-    
