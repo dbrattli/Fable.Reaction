@@ -13,85 +13,80 @@ open FSharp.Control
 
 open Thoth.Json
 
-type AppModel =
-  {
+type AppModel = {
     Magic : Magic.Model
     Info : Info.Model
-  }
+}
 
 type Model =
-  | Loading
-  | Error of string
-  | App of AppModel
+    | Loading
+    | Error of string
+    | App of AppModel
 
 
 type Msg =
-  | InitialLetterStringLoaded of Result<string, exn>
-  | MagicMsg of Magic.Msg
-  | InfoMsg of Info.Msg
+    | InitialLetterStringLoaded of Result<string, exn>
+    | MagicMsg of Magic.Msg
+    | InfoMsg of Info.Msg
 
 let init () =
-  Loading
+    Loading
 
 let update (msg : Msg) model =
-  match model, msg with
-  | Loading, InitialLetterStringLoaded (Ok letterString) ->
-      App <|
-        {
-          Magic = Magic.init letterString
-          Info = Info.init letterString
+    match model, msg with
+    | Loading, InitialLetterStringLoaded (Ok letterString) ->
+        App {
+            Magic = Magic.init letterString
+            Info = Info.init letterString
         }
 
-  | Loading, InitialLetterStringLoaded (Result.Error exn) ->
-      Error exn.Message
+    | Loading, InitialLetterStringLoaded (Result.Error exn) ->
+        Error exn.Message
 
-  | App model, MagicMsg msg ->
-      { model with Magic = Magic.update msg model.Magic }
-      |> App
+    | App model, MagicMsg msg ->
+        { model with Magic = Magic.update msg model.Magic }
+        |> App
 
-  | App model, InfoMsg msg ->
-      { model with Info = Info.update msg model.Info }
-      |> App
+    | App model, InfoMsg msg ->
+        { model with Info = Info.update msg model.Info }
+        |> App
 
-  | _ -> model
+    | _ -> model
 
 let safeComponents =
-  let components =
-    span []
-     [
-       a [ Href "https://github.com/dbrattli/Reaction" ] [ str "Reaction" ]
-       str ", "
-       a [ Href "https://github.com/giraffe-fsharp/Giraffe" ] [ str "Giraffe" ]
-       str ", "
-       a [ Href "http://fable.io" ] [ str "Fable" ]
-       str ", "
-       a [ Href "https://elmish.github.io/elmish/" ] [ str "Elmish" ]
-       str ", "
-       a [ Href "https://mangelmaxime.github.io/Fulma" ] [ str "Fulma" ]
-     ]
+    let components =
+        span [] [
+            a [ Href "https://github.com/dbrattli/Reaction" ] [ str "Reaction" ]
+            str ", "
+            a [ Href "https://github.com/giraffe-fsharp/Giraffe" ] [ str "Giraffe" ]
+            str ", "
+            a [ Href "http://fable.io" ] [ str "Fable" ]
+            str ", "
+            a [ Href "https://elmish.github.io/elmish/" ] [ str "Elmish" ]
+            str ", "
+            a [ Href "https://mangelmaxime.github.io/Fulma" ] [ str "Fulma" ]
+        ]
 
-  p []
-    [
-      strong [] [ str "SAFE Template" ]
-      str " powered by: "
-      components
+    p [] [
+        strong [] [ str "SAFE Template" ]
+        str " powered by: "
+        components
     ]
 
 
 let viewApp model dispatch =
-  match model with
-  | Loading ->
-      div [] [ str "Initial Values not loaded" ]
+    match model with
+    | Loading ->
+        div [] [ str "Initial Values not loaded" ]
 
-  | Error error ->
-      div [] [ str <| "Something went wrong: " + error ]
+    | Error error ->
+        div [] [ str <| "Something went wrong: " + error ]
 
-  | App model ->
-     div []
-      [
-        Magic.view model.Magic (MagicMsg >> dispatch)
-        Info.view model.Info (InfoMsg >> dispatch)
-      ]
+    | App model ->
+        div [] [
+            Magic.view model.Magic (MagicMsg >> dispatch)
+            Info.view model.Info (InfoMsg >> dispatch)
+        ]
 
 let view (model : Model) (dispatch : Msg -> unit) =
     div [] [
@@ -114,19 +109,13 @@ let view (model : Model) (dispatch : Msg -> unit) =
         ]
     ]
 
-let asMagicMsg msg =
-    match msg with
-    | MagicMsg msg ->
-        Some msg
-    | _ ->
-        None
+let asMagicMsg = function
+    | MagicMsg msg -> Some msg
+    | _ -> None
 
-let asInfoMsg msg =
-    match msg with
-    | InfoMsg msg ->
-        Some msg
-    | _ ->
-        None
+let asInfoMsg = function
+    | InfoMsg msg -> Some msg
+    | _ -> None
 
 // Fetch a data structure from specified url and using the decoder
 let fetchWithDecoder<'T> (url: string) (decoder: Decoder<'T>) (init: RequestProperties list) =
@@ -156,8 +145,8 @@ let stream model msgs =
 
     | App model ->
         msgs
-        |> Stream.subStream Magic.stream model.Magic MagicMsg asMagicMsg "magic"
-        |> Stream.subStream Info.stream model.Info InfoMsg asInfoMsg "info"
+        |> Stream.subStream Magic.stream model.Magic asMagicMsg MagicMsg "magic"
+        |> Stream.subStream Info.stream model.Info asInfoMsg InfoMsg "info"
 
 #if DEBUG
 open Elmish.Debug

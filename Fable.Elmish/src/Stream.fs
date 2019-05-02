@@ -91,23 +91,25 @@ module Stream =
 
     /// **Description**
     ///
-    /// Composes a sub-stream of a sub-component into the main component.
+    /// Composes a sub-stream of a sub-component into the message stream of the main component. Returns the
+    /// main message stream where the sub-messages have been sent thought the sub-component and the result
+    /// is then merged back into the main message stream.
     ///
     /// **Parameters**
     ///   * `stream` - parameter of type `'model -> Stream<'subMsg,'name> -> Stream<'subMsg,'name>`
-    ///   * `model` - parameter of type `'model`
-    ///   * `toMsg` - parameter of type `'subMsg -> 'msg`
+    ///   * `model` - parameter of type `'subModel`
     ///   * `toSubMsg` - parameter of type `'msg -> 'subMsg option`
+    ///   * `toMsg` - parameter of type `'subMsg -> 'msg`
     ///   * `name` - parameter of type `'name`
     ///   * `msgs` - parameter of type `Stream<'msg,'name>`
     ///
     /// **Output Type**
     ///   * `Stream<'msg,'name>`
     ///
-    let subStream<'subMsg, 'subModel, 'msg, 'name> (stream: 'subModel -> Stream<'subMsg, 'name> -> Stream<'subMsg, 'name>) (model: 'subModel) (toMsg: 'subMsg -> 'msg) (toSubMsg: 'msg -> 'subMsg option) (name : 'name) (msgs: Stream<'msg, 'name>) =
-        let msgs' = msgs |> chooseNot toSubMsg
+    let subStream (stream: 'subModel -> Stream<'subMsg, 'name> -> Stream<'subMsg, 'name>) (subModel: 'subModel) (toSubMsg: 'msg -> 'subMsg option) (toMsg: 'subMsg -> 'msg) (name : 'name) (msgs: Stream<'msg, 'name>) =
         let subMsgs = Stream [ msgs |> AsyncRx.choose toSubMsg, name]
-        let subMsgs' = stream model subMsgs |> map toMsg
+        let subMsgs' = stream subModel subMsgs |> map toMsg
+        let msgs' = msgs |> chooseNot toSubMsg
 
         batch [
             subMsgs'

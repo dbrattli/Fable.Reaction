@@ -35,10 +35,8 @@ module WebSocket =
                                 printfn "OnNext failed, closing channel"
                                 Async.StartImmediate (cancel ())
                         | OnError ex ->
-                            //printfn "OnError: closing"
                             Async.StartImmediate (cancel ())
                         | OnCompleted ->
-                            //printfn "OnCompleted: closing"
                             Async.StartImmediate (cancel ())
                 }
 
@@ -47,7 +45,6 @@ module WebSocket =
                     Async.StartImmediate (down.OnNextAsync msg)
 
                 let onOpen _ =
-                    //printfn "onOpen"
                     let action = async {
                         let! disposable' = source.SubscribeAsync serverObs
                         disposable <- disposable'
@@ -55,17 +52,16 @@ module WebSocket =
                     Async.StartImmediate action
 
                 let onError ev =
-                    //printfn "onError"
                     let ex = WSError (ev.ToString ())
                     Async.StartImmediate (async {
                         do! down.OnErrorAsync ex
-                        do! cancel ();
+                        do! cancel ()
                     })
 
                 let onClose ev =
                     Async.StartImmediate (async {
                         do! down.OnCompletedAsync ()
-                        do! cancel ();
+                        do! cancel ()
                     })
 
                 websocket.onmessage <- onMessage

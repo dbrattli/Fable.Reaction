@@ -7,4 +7,4 @@ group Server
     Fable.JsonConverter
     Thoth.Json.Net
     FSharp.Control.AsyncRx
-    #Reaction.AspNetCore.Middleware
+    Elmish.Streams.AspNetCore.Middleware

@@ -9,8 +9,6 @@
         <Compile Include="Version.fs" />
         <Compile Include="Server.fs" />
     </ItemGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\..\AspNetCore.Middleware\Elmish.Streams.AspNetCore.Middleware.fsproj" />
-    </ItemGroup>
+
     <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
