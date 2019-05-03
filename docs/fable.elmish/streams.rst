@@ -89,6 +89,7 @@ Below is a number of helper functions for working on streams.
         function returns with None value.
 
         .. code:: fsharp
+
             let asMagicMsg = function
                 | MagicMsg msg -> Some msg
                 | _ -> None
@@ -129,6 +130,7 @@ Below is a number of helper functions for working on streams.
         the streams of the components and sub-components.
 
         .. code:: fsharp
+
             let asMagicMsg = function
                 | MagicMsg msg -> Some msg
                 | _ -> None

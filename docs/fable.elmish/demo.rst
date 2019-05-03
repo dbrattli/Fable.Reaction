@@ -12,10 +12,15 @@ Time Flies Like an Arrow
     <script src="../_static/bundle.js"></script>
 
 The Timeflies example (`source code
-<https://github.com/dbrattli/Reaction/blob/master/examples/Timeflies/src/Client/Client.fs>`_)
+<https://github.com/dbrattli/Elmish.Streams/blob/master/examples/Timeflies/src/Client/Client.fs>`_)
 implements the classic `Time
 Flies <https://blogs.msdn.microsoft.com/jeffva/2010/03/17/reactive-extensions-for-javascript-the-time-flies-like-an-arrow-sample/>`_
 example from `RxJS <https://rxjs-dev.firebaseapp.com/>`_.
+
+.. raw:: html
+
+    <div style="width: 100%;height: 200px; border: 1px solid black; background-color: wheat"></div>
+
 
 In the Time files demo the stream of mouse moves are transformed into a
 stream of letters where each letter is delayed according to its
