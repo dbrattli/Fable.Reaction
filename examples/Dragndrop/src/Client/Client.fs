@@ -2,11 +2,13 @@ module Client
 
 open Elmish
 open Elmish.React
-open Fable.Helpers.React
-open Fable.Helpers.React.Props
-open Fable.Core.JsInterop
+open Fable.React
+open Fable.React.Props
+open FSharp.Control
 open Fulma
-open Reaction
+open Elmish.Streams
+open Browser.Types
+open Fable.Core.JsInterop
 
 type Project = { Name: string; Logo: string }
 
@@ -20,8 +22,8 @@ type Model = Map<Project, TopLeft>
 // The Msg type defines what events/actions can occur while the application is running
 // the state of the application changes *only* in reaction to these events
 type Msg =
-    | MouseDownEvent of Fable.Import.React.MouseEvent * Project
-    | MouseUpEvent of Fable.Import.React.MouseEvent * Project
+    | MouseDownEvent of Browser.Types.MouseEvent * Project
+    | MouseUpEvent of Browser.Types.MouseEvent * Project
     | MouseDragEvent of float * float * Project
 
     static member asMouseDownEvent = function
@@ -77,7 +79,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
                     div [ OnMouseUp (fun ev -> MouseUpEvent (ev, project) |> dispatch)
                           OnMouseDown (fun ev -> MouseDownEvent (ev, project) |> dispatch)
                           Style [ Top pos.Top; Left pos.Left; Height 200; Width 200; Padding 10;
-                                  Position "absolute"; Cursor "move"; Border 1; BorderStyle "solid"
+                                  Position PositionOptions.Absolute; Cursor "move"; Border 1; BorderStyle "solid"
                                   BackgroundColor "#000000"; Color "#ffffff"; BackgroundImage project.Logo
                                   BackgroundPosition "center"; BackgroundRepeat "no-repeat"
                                   BackgroundSize "200px 200px"]] [
@@ -89,7 +91,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
         Navbar.navbar [ Navbar.Color IsPrimary ] [
             Navbar.Item.div [] [
                 Heading.h2 [] [
-                    str "Fable Reaction Drag'n Drop"
+                    str "Elmish Streams Drag'n Drop"
                 ]
             ]
         ]
@@ -102,8 +104,6 @@ let view (model : Model) (dispatch : Msg -> unit) =
             ]
         ]
     ]
-
-open Fable.Import.Browser
 
 let stream model msgs =
     let mouseMove = AsyncRx.ofMouseMove ()
@@ -143,12 +143,11 @@ open Elmish.HMR
 #endif
 
 Program.mkSimple init update view
-|> Program.withMsgStream stream "msgs"
+|> Program.withStream stream "msgs"
 #if DEBUG
 |> Program.withConsoleTrace
-|> Program.withHMR
 #endif
-|> Program.withReact "elmish-app"
+|> Program.withReactBatched "elmish-app"
 #if DEBUG
 |> Program.withDebugger
 #endif

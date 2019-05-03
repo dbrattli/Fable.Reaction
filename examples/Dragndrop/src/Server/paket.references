@@ -3,4 +3,3 @@ group Server
     Giraffe
     Microsoft.AspNetCore
     Microsoft.AspNetCore.StaticFiles
-    Fable.JsonConverter
