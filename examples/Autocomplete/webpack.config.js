@@ -31,14 +31,14 @@ module.exports = {
         filename: "bundle.js",
     },
     devServer: {
-        contentBase: "./src/Client/public",
-        port: 8080,
         proxy: {
             '/api/*': {
                 target: 'http://localhost:' + port,
                 changeOrigin: true
             }
         },
+        contentBase: "./src/Client/public",
+        port: 8080,
         hot: true,
         inline: true
     },
@@ -73,4 +73,3 @@ module.exports = {
         new webpack.NamedModulesPlugin()
     ]
 }
-

@@ -1,14 +1,15 @@
 module Client
 
 open Fable.Core.JsInterop
-open Fable.Helpers.React
-open Fable.Helpers.React.Props
-open Fable.PowerPack.Fetch
-open Reaction
+open Fable.React
+open Fable.React.Props
+open FSharp.Control
 open Elmish
 open Elmish.React
+open Elmish.Streams
 open Fulma
 open Thoth.Json
+open Fetch
 
 // The model holds data that you want to keep track of while the application is running
 // in this case, we are keeping track of a counter
@@ -19,7 +20,7 @@ type Model = { Result: string list; Loading: bool }
 // The Msg type defines what events/actions can occur while the application is running
 // the state of the application changes *only* in reaction to these events
 type Msg =
-    | KeyboardEvent of Fable.Import.React.KeyboardEvent
+    | KeyboardEvent of Browser.Types.KeyboardEvent
     | Loading
     | QueryResult of Result<string list list, string>
         static member EmptyResult = [[];[];[]]
@@ -140,7 +141,7 @@ let searchWikipedia (term: string) =
         |> AsyncRx.catch (sprintf "%A" >> Error >> QueryResult >> AsyncRx.single)
 
 let stream model msgs =
-    let targetValue (ev: Fable.Import.React.KeyboardEvent) : string =
+    let targetValue (ev: Browser.Types.KeyboardEvent) : string =
         try
             let target = !!ev.target?value : string
             target.Trim ()
@@ -166,6 +167,6 @@ let stream model msgs =
     ]
 
 Program.mkSimple init update view
-|> Program.withMsgStream stream "msgs"
-|> Program.withReact "elmish-app"
+|> Program.withStream stream "msgs"
+|> Program.withReactBatched "elmish-app"
 |> Program.run

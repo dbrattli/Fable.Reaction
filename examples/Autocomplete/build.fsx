@@ -14,11 +14,12 @@ open Fake.IO
 
 let serverPath = Path.getFullName "./src/Server"
 let clientPath = Path.getFullName "./src/Client"
+let clientDeployPath = Path.combine clientPath "deploy"
 let deployDir = Path.getFullName "./deploy"
 
 let platformTool tool winTool =
     let tool = if Environment.isUnix then tool else winTool
-    match Process.tryFindFileOnPath tool with
+    match ProcessUtils.tryFindFileOnPath tool with
     | Some t -> t
     | _ ->
         let errorMsg =
@@ -31,14 +32,13 @@ let nodeTool = platformTool "node" "node.exe"
 let yarnTool = platformTool "yarn" "yarn.cmd"
 
 let runTool cmd args workingDir =
-    let result =
-        Process.execSimple (fun info ->
-            { info with
-                FileName = cmd
-                WorkingDirectory = workingDir
-                Arguments = args })
-            TimeSpan.MaxValue
-    if result <> 0 then failwithf "'%s %s' failed" cmd args
+    let arguments = args |> String.split ' ' |> Arguments.OfArgs
+    Command.RawCommand (cmd, arguments)
+    |> CreateProcess.fromCommand
+    |> CreateProcess.withWorkingDirectory workingDir
+    |> CreateProcess.ensureExitCode
+    |> Proc.run
+    |> ignore
 
 let runDotNet cmd workingDir =
     let result =
@@ -46,17 +46,18 @@ let runDotNet cmd workingDir =
     if result.ExitCode <> 0 then failwithf "'dotnet %s' failed in %s" cmd workingDir
 
 let openBrowser url =
-    let result =
-        //https://github.com/dotnet/corefx/issues/10361
-        Process.execSimple (fun info ->
-            { info with
-                FileName = url
-                UseShellExecute = true })
-            TimeSpan.MaxValue
-    if result <> 0 then failwithf "opening browser failed"
+    //https://github.com/dotnet/corefx/issues/10361
+    Command.ShellCommand url
+    |> CreateProcess.fromCommand
+    |> CreateProcess.ensureExitCodeWithMessage "opening browser failed"
+    |> Proc.run
+    |> ignore
+
 
 Target.create "Clean" (fun _ ->
-    Shell.cleanDirs [deployDir]
+    [ deployDir
+      clientDeployPath ]
+    |> Shell.cleanDirs
 )
 
 Target.create "InstallClient" (fun _ ->
@@ -68,13 +69,9 @@ Target.create "InstallClient" (fun _ ->
     runDotNet "restore" clientPath
 )
 
-Target.create "RestoreServer" (fun _ ->
-    runDotNet "restore" serverPath
-)
-
 Target.create "Build" (fun _ ->
     runDotNet "build" serverPath
-    runDotNet "fable webpack --port free -- -p" clientPath
+    runTool yarnTool "webpack-cli -p" __SOURCE_DIRECTORY__
 )
 
 Target.create "Run" (fun _ ->
@@ -82,18 +79,30 @@ Target.create "Run" (fun _ ->
         runDotNet "watch run" serverPath
     }
     let client = async {
-        runDotNet "fable webpack-dev-server --port free" clientPath
+        runTool yarnTool "webpack-dev-server" __SOURCE_DIRECTORY__
     }
     let browser = async {
         do! Async.Sleep 5000
         openBrowser "http://localhost:8080"
     }
 
-    [ server; client; browser ]
+    let vsCodeSession = Environment.hasEnvironVar "vsCodeSession"
+    let safeClientOnly = Environment.hasEnvironVar "safeClientOnly"
+
+    let tasks =
+        [ if not safeClientOnly then yield server
+          yield client
+          if not vsCodeSession then yield browser ]
+
+    tasks
     |> Async.Parallel
     |> Async.RunSynchronously
     |> ignore
 )
+
+
+
+
 
 
 open Fake.Core.TargetOperators
@@ -102,9 +111,9 @@ open Fake.Core.TargetOperators
     ==> "InstallClient"
     ==> "Build"
 
+
 "Clean"
     ==> "InstallClient"
-    ==> "RestoreServer"
     ==> "Run"
 
-Target.runOrDefault "Build"
+Target.runOrDefaultWithArguments "Build"
