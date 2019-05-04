@@ -460,3 +460,4 @@ bundle.js.map
 gh-pages/_book
 .mypy_cache
 .vscode
+.metals
