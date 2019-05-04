@@ -24,11 +24,13 @@ with Elmish. Instead we use a `ReactiveX <http://reactivex.io/>`_
 * **Update**, a pure function that produces a new model based on a
   received message and the previous model
 
-In addition, Elmish Streams also have a stream that transforms the
-"stream" of messages.
+In addition to the normal MVU architecture, Elmish Streams also have a
+stream that transforms the "stream" of messages going from the view to
+the update function.
 
-* **Stream**, a function that takes the message stream and produces a
-  new (transformed) message stream. Note that this also replaces the
-  need for Elm(ish) commands (Cmd) since the stream is free to
-  produce any messages (out of thin air), transform, filter, time-shift
-  messages or combine side-effects such as web requests (fetch) etc.
+* **Stream**, a function that takes the current model and the message
+  stream and produces a new (transformed) message stream. Note that
+  this also replaces the need for Elm(ish) commands (Cmd) since the
+  stream is free to produce any messages (out of thin air), transform,
+  filter, time-shift messages or combine side-effects such as web
+  requests (fetch) etc.

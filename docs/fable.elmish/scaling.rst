@@ -36,9 +36,9 @@ Thus a sub-stream can be called like this:
         | HomePageModel ->
             msgs
         ...
-        | TomatoModel m ->
+        | TomatoModel tomatoModel ->
             msgs |>
-            Stream.withSubStream Tomato.stream m TomatoMsg Msg.asTomatoMsg "tomato"
+            Stream.withSubStream Tomato.stream tomatoModel Msg.asTomatoMsg TomatoMsg "tomato"
 
 The ``Msg.asTomatoMsg`` is a helper function you can declare as an
 extension on Msg (``'msg -> 'submsg option``). It takes a stream of
