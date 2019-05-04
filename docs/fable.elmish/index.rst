@@ -15,9 +15,9 @@ the model view update (MVU) style architecture.
    getting_started
    install
    mvu
-   examples
    streams
    scaling
+   examples
    websocket
    demo.rst
 

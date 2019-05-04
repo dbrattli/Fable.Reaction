@@ -96,13 +96,11 @@ Below is a number of helper functions for working on streams.
 
             msgs |> Stream.chooseNot asMagicMsg
 
-        The ``chooseNot``function is just a convenience for writing:
+        The ``chooseNot`` function is just a convenience for writing:
 
         .. code::
 
             filter (chooser >> Option.isNone)
-
-
 
     .. val:: chooseNamed
         :type: name:'name -> (chooser:'a -> 'msg option) -> Stream<'a, 'name> -> Stream<'msg, 'name>

@@ -1,6 +1,6 @@
-=============================
-Examples using Elmish Streams
-=============================
+========
+Examples
+========
 
 Examples of how to use Elmish Streams can be found in the
 examples folder. Current list of examples includes:
