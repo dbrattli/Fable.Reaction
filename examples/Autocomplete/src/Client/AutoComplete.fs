@@ -54,16 +54,9 @@ module AutoComplete =
         let active (result : string list) =
             Dropdown.Option.IsActive (result.Length > 0)
 
-        let loading (loading: bool) =
-            if loading then
-                "is-loading"
-            else
-                ""
-
-
         Dropdown.dropdown [ active model.Result ] [
             div [] [
-                div [ Class ("control " + loading model.Loading) ] [
+                Control.div [ Control.Option.IsLoading model.Loading ] [
                     Input.input [ Input.Option.Placeholder "Enter query ..."
                                   Input.Option.Props [ OnKeyUp (KeyboardEvent >> dispatch)]
                                 ]
