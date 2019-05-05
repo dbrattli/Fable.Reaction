@@ -16,7 +16,6 @@ open Elmish.Streams.AspNetCore.Middleware
 open Shared
 
 open Giraffe.Serialization
-open Microsoft.AspNetCore.Builder
 
 let publicPath = Path.GetFullPath "../Client/public"
 let port = 8085us
