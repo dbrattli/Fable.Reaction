@@ -59,15 +59,6 @@ let safeComponents =
 
 
 let view (model: Model) (dispatch : Msg -> unit) =
-    let active (result : string list) =
-        Dropdown.Option.IsActive (result.Length > 0)
-
-    let loading (loading: bool) =
-        if loading then
-            "is-loading"
-        else
-            ""
-
     div [] [
         Navbar.navbar [ Navbar.Color IsPrimary ] [
             Navbar.Item.div [ ] [
