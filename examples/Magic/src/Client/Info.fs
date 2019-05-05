@@ -47,7 +47,7 @@ let viewStatus dispatch model =
                     Switch.switch [
                         Switch.Checked model.Remote
                         Switch.OnChange (fun _ -> dispatch RemoteToggled)
-                        Switch.Id "remote"
+                        Switch.Id "remoteInfo"
                     ] []
                 ]
             ]

@@ -186,7 +186,7 @@ let viewStatus dispatch model =
                     Switch.switch [
                         Switch.Checked <| letterSubscriptionOverWebsockets model
                         Switch.OnChange (fun _ -> dispatch ToggleRemoteLetters)
-                        Switch.Id "remote"
+                        Switch.Id "remoteLetters"
                     ] []
                 ]
             ]
