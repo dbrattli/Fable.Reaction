@@ -2,9 +2,11 @@ namespace Elmish.Streams
 
 open System.Threading
 
-open Fable.Core
 open Browser
 open Browser.Types
+
+open Fable.Core.JsInterop
+open Fetch
 
 open FSharp.Control
 
@@ -16,19 +18,46 @@ module AsyncRx =
     /// promise resolves. The observable will also complete after
     /// producing an event.
     let ofPromise (pr: Fable.Core.JS.Promise<_>) =
-        AsyncRx.ofAsyncWorker(fun obv _ -> async {
-            try
-                let! result = Async.AwaitPromise pr
-                do! obv.OnNextAsync result
-                do! obv.OnCompletedAsync ()
-            with
-            | ex ->
-                do! obv.OnErrorAsync ex
-        })
+        QueryExtension.ofPromise pr
 
+    let msgRequest (url:string) (encode: 'msg -> string) (decode: string -> 'msg option) (msgs: IAsyncObservable<'msg>) =
+        asyncRx {
+            let! body = msgs |> AsyncRx.map encode
+
+            let init = [
+                Body !!body
+                Method Fetch.Types.HttpMethod.POST
+                Fetch.requestHeaders [
+                    HttpRequestHeaders.ContentType "application/json"
+                ]
+            ]
+
+            let! response = GlobalFetch.fetch(RequestInfo.Url url, Fetch.requestProps init)
+            yield! response.text ()
+        }
+
+(*
+        msgs
+        |> AsyncRx.map encode
+        |> AsyncRx.flatMap (fun body ->
+            let init = [
+                Body !!body
+                Method Fetch.Types.HttpMethod.POST
+                Fetch.requestHeaders [
+                    HttpRequestHeaders.ContentType "application/json"
+                ]
+            ]
+            ofPromise (promise {
+                let! response = GlobalFetch.fetch(RequestInfo.Url url, Fetch.requestProps init)
+                return! response.text ()
+            })
+
+         |> AsyncRx.choose decode
+        )
+*)
     /// Returns an async observable of Window events.
     let ofEvent<'ev> event : IAsyncObservable<'ev> =
-        let cts = new CancellationTokenSource()
+        let cts = new CancellationTokenSource ()
 
         let subscribe (obv: IAsyncObserver<'ev'>) : Async<IAsyncDisposable> =
             async {

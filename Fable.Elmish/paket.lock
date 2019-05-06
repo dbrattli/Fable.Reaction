@@ -29,10 +29,21 @@ NUGET
     Fable.Elmish (3.0)
       Fable.Core (>= 3.0) - restriction: >= netstandard2.0
       FSharp.Core (>= 4.6.2) - restriction: >= netstandard2.0
-    Fable.React (5.1)
+    Fable.Fetch (2.0)
+      Fable.Browser.Blob (>= 1.0) - restriction: >= netstandard2.0
+      Fable.Core (>= 3.0) - restriction: >= netstandard2.0
+      Fable.Promise (>= 2.0) - restriction: >= netstandard2.0
+      FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
+    Fable.Promise (2.0) - restriction: >= netstandard2.0
+      Fable.Core (>= 3.0) - restriction: >= netstandard2.0
+      FSharp.Core (>= 4.5.2) - restriction: >= netstandard2.0
+    Fable.React (5.2.3)
       Fable.Browser.Dom (>= 1.0) - restriction: >= netstandard2.0
       Fable.Core (>= 3.0) - restriction: >= netstandard2.0
       FSharp.Core (>= 4.6.2) - restriction: >= netstandard2.0
+    FSharp.Control.AsyncRx (1.0)
+      FSharp.Control.AsyncSeq (>= 2.0.21) - restriction: >= netstandard2.0
+      FSharp.Core (>= 4.5.4) - restriction: >= netstandard2.0
     FSharp.Control.AsyncSeq (2.0.21) - restriction: >= netstandard2.0
       FSharp.Core (>= 3.1.2) - restriction: >= net45
       FSharp.Core (>= 4.3.2) - restriction: && (< net45) (>= netstandard2.0)
@@ -54,9 +65,9 @@ NUGET
       System.Diagnostics.Debug (>= 4.0.11) - restriction: || (&& (< net451) (>= netstandard1.3) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6))
       System.Dynamic.Runtime (>= 4.0.11) - restriction: || (&& (< net451) (>= netstandard1.3) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6))
       System.Linq (>= 4.1) - restriction: || (&& (< net451) (>= netstandard1.3) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6))
-    Microsoft.NET.Test.Sdk (15.9.1)
-      Microsoft.CodeCoverage (>= 15.9.1) - restriction: || (>= net45) (>= netcoreapp1.0)
-      Microsoft.TestPlatform.TestHost (>= 15.9.1) - restriction: >= netcoreapp1.0
+    Microsoft.NET.Test.Sdk (15.9.2)
+      Microsoft.CodeCoverage (>= 15.9.2) - restriction: || (>= net45) (>= netcoreapp1.0)
+      Microsoft.TestPlatform.TestHost (>= 15.9.2) - restriction: >= netcoreapp1.0
       Newtonsoft.Json (>= 9.0.1) - restriction: >= uap10.0
       System.ComponentModel.Primitives (>= 4.1) - restriction: >= uap10.0
       System.ComponentModel.TypeConverter (>= 4.1) - restriction: >= uap10.0
@@ -145,7 +156,7 @@ NUGET
       System.Threading.Timer (>= 4.3) - restriction: || (&& (< net45) (>= netstandard1.2) (< netstandard1.3) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.3) (< netstandard1.4) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.4) (< netstandard1.5) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.5) (< netstandard1.6) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.6) (< netstandard2.0) (< win8) (< wpa81)) (&& (< netstandard1.5) (>= uap10.0) (< uap10.1))
       System.Xml.ReaderWriter (>= 4.3) - restriction: || (&& (< net45) (>= netstandard1.1) (< netstandard1.2) (< win8)) (&& (< net45) (>= netstandard1.2) (< netstandard1.3) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.3) (< netstandard1.4) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.4) (< netstandard1.5) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.5) (< netstandard1.6) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.6) (< netstandard2.0) (< win8) (< wpa81)) (&& (>= net46) (< netstandard1.4)) (&& (>= netstandard1.0) (< portable-net45+win8+wpa81) (< wp8)) (&& (< netstandard1.5) (>= uap10.0) (< uap10.1))
       System.Xml.XDocument (>= 4.3) - restriction: || (&& (< net45) (>= netstandard1.1) (< netstandard1.2) (< win8)) (&& (< net45) (>= netstandard1.2) (< netstandard1.3) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.3) (< netstandard1.4) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.4) (< netstandard1.5) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.5) (< netstandard1.6) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.6) (< netstandard2.0) (< win8) (< wpa81)) (&& (>= netstandard1.0) (< portable-net45+win8+wpa81) (< wp8)) (&& (< netstandard1.5) (>= uap10.0) (< uap10.1))
-    Newtonsoft.Json (12.0.1) - restriction: || (>= netcoreapp1.0) (>= uap10.0)
+    Newtonsoft.Json (12.0.2) - restriction: || (>= netcoreapp1.0) (>= uap10.0)
       Microsoft.CSharp (>= 4.3) - restriction: || (&& (< net20) (>= netstandard1.0) (< netstandard1.3)) (&& (< net20) (>= netstandard1.3) (< netstandard2.0))
       NETStandard.Library (>= 1.6.1) - restriction: || (&& (< net20) (>= netstandard1.0) (< netstandard1.3)) (&& (< net20) (>= netstandard1.3) (< netstandard2.0))
       System.ComponentModel.TypeConverter (>= 4.3) - restriction: || (&& (< net20) (>= netstandard1.0) (< netstandard1.3)) (&& (< net20) (>= netstandard1.3) (< netstandard2.0))
@@ -525,7 +536,3 @@ NUGET
       System.Xml.ReaderWriter (>= 4.3) - restriction: && (< monoandroid) (< monotouch) (< net46) (>= netstandard1.3) (< xamarinios) (< xamarinmac) (< xamarintvos) (< xamarinwatchos)
       System.Xml.XmlDocument (>= 4.3) - restriction: || (&& (< monoandroid) (< monotouch) (>= netstandard1.3) (< xamarinios) (< xamarinmac) (< xamarintvos) (< xamarinwatchos)) (>= net46)
       System.Xml.XPath (>= 4.3) - restriction: || (&& (< monoandroid) (< monotouch) (>= netstandard1.3) (< xamarinios) (< xamarinmac) (< xamarintvos) (< xamarinwatchos)) (>= net46)
-  remote: /Users/dbrattli/Developer/packages
-    FSharp.Control.AsyncRx (1.0.0)
-      FSharp.Control.AsyncSeq (>= 2.0.21) - restriction: >= netstandard2.0
-      FSharp.Core (>= 4.5.4) - restriction: >= netstandard2.0

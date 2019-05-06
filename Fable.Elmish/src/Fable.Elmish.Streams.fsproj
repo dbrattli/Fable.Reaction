@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <Compile Include="Error.fs" />
+    <Compile Include="Query.fs" />
     <Compile Include="WebSocket.fs" />
     <Compile Include="Stream.fs" />
     <Compile Include="AsyncRx.fs" />

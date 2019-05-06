@@ -1,6 +1,6 @@
 namespace FSharp.Control
 
-type QueryBuilder() =
+type QueryBuilder () =
     member this.Zero () : IAsyncObservable<_> = Create.empty ()
     member this.Yield (x: 'a) : IAsyncObservable<'a> = Create.single x
     member this.YieldFrom (xs: IAsyncObservable<'a>) : IAsyncObservable<'a> = xs
@@ -26,4 +26,4 @@ type QueryBuilder() =
 [<AutoOpen>]
 module QueryBuilder =
     /// Query builder for an async reactive event source
-    let asyncRx = new QueryBuilder ()
+    let asyncRx = QueryBuilder ()
