@@ -47,7 +47,7 @@ module Subjects =
                     ()
             }
         let obs = { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
-        AsyncObserver obv :> IAsyncObserver<'a>, obs
+        AsyncObserver.Create obv, obs
 
     /// A mailbox subject is a subscribable mailbox. Each message is
     /// broadcasted to all subscribed observers.

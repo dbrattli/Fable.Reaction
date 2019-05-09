@@ -21,13 +21,13 @@ module AsyncObservable =
         /// Subscribes the observer function (`Notification{'a} -> Async{unit}`)
         /// to the AsyncObservable, ignores the disposable.
         member this.RunAsync<'a> (obv: Notification<'a> -> Async<unit>) = async {
-            do! this.SubscribeAsync (AsyncObserver obv) |> Async.Ignore
+            do! this.SubscribeAsync (AsyncObserver.Create obv) |> Async.Ignore
         }
 
         /// Subscribes the async observer function (`Notification{'a} -> Async{unit}`)
         /// to the AsyncObservable
         member this.SubscribeAsync<'a> (obv: Notification<'a> -> Async<unit>) = async {
-            let! disposable = this.SubscribeAsync (AsyncObserver obv)
+            let! disposable = this.SubscribeAsync (AsyncObserver.Create obv)
             return disposable
         }
 

@@ -4,7 +4,7 @@ open System.Threading
 open FSharp.Control.Core
 
 [<RequireQualifiedAccess>]
- module internal Aggregation =
+module internal Aggregation =
     /// Applies an async accumulator function over an observable
     /// sequence and returns each intermediate result. The seed value is
     /// used as the initial accumulator value. Returns an observable
@@ -28,7 +28,7 @@ open FSharp.Control.Core
                         | OnError e -> do! safeObserver.OnErrorAsync e
                         | OnCompleted -> do! safeObserver.OnCompletedAsync ()
                     }
-                return! AsyncObserver obv |> source.SubscribeAsync
+                return! AsyncObserver.Create obv |> source.SubscribeAsync
             }
         { new IAsyncObservable<'s> with member __.SubscribeAsync o = subscribeAsync o }
 
@@ -59,7 +59,7 @@ open FSharp.Control.Core
                         | OnError e -> do! safeObserver.OnErrorAsync e
                         | OnCompleted -> do! safeObserver.OnCompletedAsync ()
                     }
-                return! AsyncObserver obv |> source.SubscribeAsync
+                return! AsyncObserver.Create obv |> source.SubscribeAsync
             }
         { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
 
@@ -116,7 +116,7 @@ open FSharp.Control.Core
                     async {
                         agent.Post n
                     }
-                let! subscription = AsyncObserver obv |> source.SubscribeAsync
+                let! subscription = AsyncObserver.Create obv |> source.SubscribeAsync
                 let cancel () = async {
                     do! subscription.DisposeAsync ()
                     cts.Cancel()

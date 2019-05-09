@@ -1,6 +1,6 @@
 namespace FSharp.Control
 
-type AsyncObserver<'a> (fn: Notification<'a> -> Async<unit>) =
+type AsyncObserver<'a> private (fn: Notification<'a> -> Async<unit>) =
 
     interface IAsyncObserver<'a> with
         member this.OnNextAsync (x: 'a) =  OnNext x |> fn

@@ -154,7 +154,7 @@ module internal Transformation =
                         | OnCompleted -> innerAgent.Post Completed
                     }
 
-                let! dispose = AsyncObserver obv |> source.SubscribeAsync
+                let! dispose = AsyncObserver.Create obv |> source.SubscribeAsync
                 let cancel () =
                     async {
                         do! dispose.DisposeAsync ()

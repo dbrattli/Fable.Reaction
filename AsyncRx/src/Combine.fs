@@ -175,9 +175,9 @@ module internal Combine =
             )
 
             async {
-                let obvA = AsyncObserver (fun (n : Notification<'a>) -> async { Source n |> agent.Post })
+                let obvA = AsyncObserver.Create (fun (n : Notification<'a>) -> async { Source n |> agent.Post })
                 let! dispose1 = source.SubscribeAsync obvA
-                let obvB = AsyncObserver  (fun (n : Notification<'b>) -> async { Other n |> agent.Post })
+                let obvB = AsyncObserver.Create  (fun (n : Notification<'b>) -> async { Other n |> agent.Post })
                 let! dispose2 = other.SubscribeAsync obvB
 
                 return AsyncDisposable.Composite [ dispose1; dispose2 ]
@@ -230,8 +230,8 @@ module internal Combine =
             )
 
             async {
-                let obvA = AsyncObserver (fun (n : Notification<'a>) -> async { Source n |> agent.Post })
-                let obvB = AsyncObserver  (fun (n : Notification<'b>) -> async { Other n |> agent.Post })
+                let obvA = AsyncObserver.Create (fun (n : Notification<'a>) -> async { Source n |> agent.Post })
+                let obvB = AsyncObserver.Create (fun (n : Notification<'b>) -> async { Other n |> agent.Post })
 
                 let! dispose1 = other.SubscribeAsync obvB
                 let! dispose2 = source.SubscribeAsync obvA
@@ -260,6 +260,6 @@ module internal Combine =
                         | OnCompleted -> do! aobv.OnCompletedAsync ()
 
                     }
-                return! AsyncObserver _obv |> Core.safeObserver |> source.SubscribeAsync
+                return! AsyncObserver.Create _obv |> Core.safeObserver |> source.SubscribeAsync
             }
         { new IAsyncObservable<'a*'b> with member __.SubscribeAsync o = subscribeAsync o }

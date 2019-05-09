@@ -15,6 +15,7 @@
     <Compile Include="AsyncDisposable.fs" />
     <Compile Include="AsyncObserver.fs" />
     <Compile Include="Core.fs" />
+    <Compile Include="Actor.fs" />
     <Compile Include="Subject.fs" />
     <Compile Include="Create.fs" />
     <Compile Include="Leave.fs" />

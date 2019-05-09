@@ -22,7 +22,7 @@ module internal Leave =
             }
 
         asyncSeq {
-            let! dispose = AsyncObserver _obv |> source.SubscribeAsync
+            let! dispose = AsyncObserver.Create _obv |> source.SubscribeAsync
             let mutable running = true
 
             while running do

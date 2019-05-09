@@ -92,7 +92,7 @@ module internal Filter =
                     async {
                         agent.Post n
                     }
-                return! AsyncObserver obv |> source.SubscribeAsync
+                return! AsyncObserver.Create obv |> source.SubscribeAsync
             }
         { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
 
@@ -192,7 +192,7 @@ module internal Filter =
                         | OnCompleted -> ()
                     }
 
-                let! sub2 = AsyncObserver _obv |> other.SubscribeAsync
+                let! sub2 = AsyncObserver.Create _obv |> other.SubscribeAsync
                 let! sub1 = source.SubscribeAsync safeObv
 
                 return AsyncDisposable.Composite [ sub1; sub2 ]

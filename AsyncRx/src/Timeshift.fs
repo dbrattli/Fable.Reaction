@@ -1,7 +1,6 @@
 namespace FSharp.Control
 
 open System
-open System.Threading;
 
 open FSharp.Control.Core
 
@@ -11,7 +10,7 @@ module internal Timeshift =
 
     /// Time shifts the observable sequence by the given timeout. The
     /// relative time intervals between the values are preserved.
-    let delay (msecs: int) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
+    let delay' (msecs: int) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
         let subscribeAsync (aobv : IAsyncObserver<'a>) =
             let agent = MailboxProcessor.Start(fun inbox ->
                 let rec messageLoop state = async {
@@ -37,16 +36,46 @@ module internal Timeshift =
                         let dueTime = DateTime.UtcNow + TimeSpan.FromMilliseconds(float msecs)
                         agent.Post (n, dueTime)
                     }
-                return! AsyncObserver obv |> source.SubscribeAsync
+                return! AsyncObserver.Create obv |> source.SubscribeAsync
             }
         { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
+
+    type Model<'msg> =
+        | Message of 'msg * DateTime
+        | Initially
+
+    let delay (msecs: int) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
+        let init () = Initially
+        let update _ msg = Message msg
+
+        let view (model: Model<Notification<'a>>) (dispatch: IAsyncObserver<'a>) = async {
+            match model with
+            | Initially -> ()
+            | Message (n, dueTime) ->
+                let diff : TimeSpan = dueTime - DateTime.UtcNow
+                let msecs = Convert.ToInt32 diff.TotalMilliseconds
+                if msecs > 0 then
+                    do! Async.Sleep msecs
+                match n with
+                | OnNext x -> do! dispatch.OnNextAsync x
+                | OnError ex -> do! dispatch.OnErrorAsync ex
+                | OnCompleted -> do! dispatch.OnCompletedAsync ()
+        }
+
+        Actor.mvu init update view (fun agent -> async {
+            let obv n = async {
+                let dueTime = DateTime.UtcNow + TimeSpan.FromMilliseconds(float msecs)
+                agent.Post (n, dueTime)
+            }
+            return! AsyncObserver.Create obv |> source.SubscribeAsync
+        })
 
     /// Ignores values from an observable sequence which are followed by
     /// another value before the given timeout.
     let debounce msecs (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
         let subscribeAsync (aobv: IAsyncObserver<'a>) =
             let safeObserver = safeObserver aobv
-            let infinite = Seq.initInfinite (fun index -> index)
+            let infinite = Seq.initInfinite id
 
             let agent = MailboxProcessor.Start(fun inbox ->
                 let rec messageLoop currentIndex = async {
@@ -92,7 +121,7 @@ module internal Timeshift =
 
                         Async.Start' worker
                     }
-                let! dispose = AsyncObserver obv |> source.SubscribeAsync
+                let! dispose = AsyncObserver.Create obv |> source.SubscribeAsync
 
                 let cancel () =
                     async {
