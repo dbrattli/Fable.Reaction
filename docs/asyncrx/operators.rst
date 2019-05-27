@@ -38,6 +38,12 @@ Functions for creating (``'a -> IAsyncObservable<'a>``) an async observable.
     indicate which type the resulting observable should be since empty
     itself doesn't produce any values.
 
+    .. marble::
+        :alt: empty
+
+        [ empty () ]
+                 --|
+
     **Example:**
 
     .. code:: fsharp
@@ -49,6 +55,12 @@ Functions for creating (``'a -> IAsyncObservable<'a>``) an async observable.
 
     Returns an observable sequence containing the single specified
     element.
+
+    .. marble::
+        :alt: single
+
+        [ single 42 ]
+                -42-|
 
     **Example:**
 
@@ -118,6 +130,13 @@ IAsyncObservable<'b>``) an async observable.
     Returns an observable sequence whose elements are the result of invoking
     the mapper function on each element of the source.
 
+    .. marble::
+        :alt: map
+
+        ---1---2---3---4--->
+        [ map (fun i -> i*2) ]
+        ---2---4---6---8--->
+
     **Example:**
 
     .. code:: fsharp
@@ -133,11 +152,25 @@ IAsyncObservable<'b>``) an async observable.
     invoking the mapper function and incorporating the element's index
     on each element of the source.
 
+    .. marble::
+        :alt: map
+
+        ----1----2----3----4---->
+        [ mapi (fun (x, i) -> i*2) ]
+        ----2----4----6----8---->
+
 .. val:: mapAsync
     :type: ('a -> Async<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
 
     Returns an observable sequence whose elements are the result of
     invoking the async mapper function on each element of the source.
+
+    .. marble::
+        :alt: map
+
+        ------1------2------3------4------>
+        [ mapAsync (fun i -> async { return i*2 }) ]
+        ------2------4------6------8------>
 
 .. val:: mapiAsync
     :type: ('a*int -> Async<'b>) -> IAsyncObservable<'a> -> IAsyncObservable<'b>
@@ -209,6 +242,13 @@ IAsyncObservable<'a>``) an async observable.
     Filters the elements of an observable sequence based on a
     predicate. Returns an observable sequence that contains elements
     from the input sequence that satisfy the condition.
+
+    .. marble::
+        :alt: filter
+
+        -----1----2----3----4----|
+        [ filter (fun i -A i>2)  ]
+        ---------------3----4----|
 
     **Example:**
 
