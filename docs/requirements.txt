@@ -1,3 +1,4 @@
 sphinx
 alabaster
 sphinxcontrib_fsharp
+sphinxcontrib_dooble
