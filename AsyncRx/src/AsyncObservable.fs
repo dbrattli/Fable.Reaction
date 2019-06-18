@@ -212,6 +212,16 @@ module AsyncRx =
     let filterAsync (predicate: 'a -> Async<bool>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
         Filter.filterAsync predicate source
 
+    /// Returns a specified number of contiguous elements from the start of
+    /// an observable sequence.
+    let take (count: int) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
+        Filter.take count source
+
+    /// Returns a specified number of contiguous elements from the end of an
+    /// observable sequence.
+    let takeLast (count: int) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
+        Filter.takeLast count source
+
     /// Returns the values from the source observable sequence until the
     /// other observable sequence produces a value.
     let takeUntil (other: IAsyncObservable<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
