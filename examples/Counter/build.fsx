@@ -12,7 +12,6 @@ open System
 open Fake.Core
 open Fake.DotNet
 open Fake.IO
-open Fake.Runtime
 open ServerCode.Version
 
 let serverPath = Path.getFullName "./src/Server"
