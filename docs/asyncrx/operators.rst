@@ -410,7 +410,7 @@ IAsyncObservable<'a>``) an async observable.
     Time shifts the observable sequence by the given timeout. The
     relative time intervals between the values are preserved.
 
-..val:: debounce
+.. val:: debounce
     :type: int -> IAsyncObservable<'a> -> IAsyncObservable<'a>
 
     Ignores values from an observable sequence which are followed by
