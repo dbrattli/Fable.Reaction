@@ -102,19 +102,33 @@ module Middleware =
 
                 let buffer : byte [] = Array.zeroCreate 4096
                 while not finished do
-                    let! result = webSocket.ReceiveAsync (new ArraySegment<byte>(buffer), cancellation) |> Async.AwaitTask
-                    finished <- result.CloseStatus.HasValue
-
-                    if not finished then
-                        logger.LogDebug ("Received message with {bytes} bytes", result.Count)
-                        let receiveString = System.Text.Encoding.UTF8.GetString (buffer, 0, result.Count)
+                    let rec receive messages = async {
+                        let! result = webSocket.ReceiveAsync (new ArraySegment<byte>(buffer), cancellation) |> Async.AwaitTask
+                        if result.CloseStatus.HasValue then
+                            return Choice2Of2 result.CloseStatus.Value
+                        elif result.EndOfMessage then
+                            logger.LogDebug ("Received message end with {bytes} bytes", result.Count)
+                            return
+                                buffer.[0..result.Count] :: messages
+                                |> List.rev
+                                |> Array.concat
+                                |> System.Text.Encoding.UTF8.GetString
+                                |> Choice1Of2
+                        else
+                            logger.LogDebug ("Received message part with {bytes} bytes", result.Count)
+                            return! receive (buffer.[0..result.Count - 1] :: messages)
+                    }
+                    let! response = receive []
+                    match response with
+                    | Choice1Of2 receiveString ->
                         let msg' = options.Decode receiveString
                         match msg' with
                         | Some msg ->
                             do! obv.OnNextAsync (msg, connectionId)
                         | None -> ()
-                    else
-                        closure <- result.CloseStatus.Value
+                    | Choice2Of2 closeStatus ->
+                        finished <- true
+                        closure <- closeStatus
 
                 logger.LogInformation ("Closing WebSocket with ID: {ConnectionID}", connectionId)
                 try
