@@ -12,8 +12,10 @@ module internal Timeshift =
     /// Time shifts the observable sequence by the given timeout. The
     /// relative time intervals between the values are preserved.
     let delay (msecs: int) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
+        let cts = new CancellationTokenSource()
+
         let subscribeAsync (aobv : IAsyncObserver<'a>) =
-            let agent = MailboxProcessor.Start(fun inbox ->
+            let agent = MailboxProcessor.Start((fun inbox ->
                 let rec messageLoop state = async {
                     let! n, dueTime = inbox.Receive()
 
@@ -21,6 +23,7 @@ module internal Timeshift =
                     let msecs = Convert.ToInt32 diff.TotalMilliseconds
                     if msecs > 0 then
                         do! Async.Sleep msecs
+
                     match n with
                     | OnNext x -> do! aobv.OnNextAsync x
                     | OnError ex -> do! aobv.OnErrorAsync ex
@@ -28,8 +31,7 @@ module internal Timeshift =
 
                     return! messageLoop state
                 }
-                messageLoop (0, 0)
-            )
+                messageLoop (0, 0)), cts.Token)
 
             async {
                 let obv n =
@@ -37,7 +39,12 @@ module internal Timeshift =
                         let dueTime = DateTime.UtcNow + TimeSpan.FromMilliseconds(float msecs)
                         agent.Post (n, dueTime)
                     }
-                return! AsyncObserver obv |> source.SubscribeAsync
+                let! subscription = AsyncObserver obv |> source.SubscribeAsync
+                let cancel () = async {
+                    cts.Cancel()
+                    do! subscription.DisposeAsync ()
+                }
+                return AsyncDisposable.Create cancel
             }
         { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
 

@@ -216,6 +216,18 @@ module internal Transformation =
             }
         { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
 
+    let retry (retryCount: int) (source: IAsyncObservable<'a>) =
+        let mutable count = retryCount
+
+        let factory exn =
+            match count with
+            | 0 ->  Create.fail exn
+            | _ ->
+                count <- count - 1
+                source
+
+        catch factory source
+
     type Cmd =
         | Connect
         | Dispose

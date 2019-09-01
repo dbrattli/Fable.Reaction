@@ -1,9 +1,11 @@
 namespace FSharp.Control
 
 open System.Threading
+open Core
 
 #if !FABLE_COMPILER
 open FSharp.Control
+open System
 #endif
 
 /// Overloads and extensions for AsyncObservable
@@ -24,12 +26,16 @@ module AsyncObservable =
             do! this.SubscribeAsync (AsyncObserver obv) |> Async.Ignore
         }
 
+        member this.Run (obv: IAsyncObserver<'a>) =
+            this.RunAsync obv |> Async.Start'
+
         /// Subscribes the async observer function (`Notification{'a} -> Async{unit}`)
         /// to the AsyncObservable
-        member this.SubscribeAsync<'a> (obv: Notification<'a> -> Async<unit>) = async {
-            let! disposable = this.SubscribeAsync (AsyncObserver obv)
-            return disposable
-        }
+        member this.SubscribeAsync<'a> (obv: Notification<'a> -> Async<unit>) : Async<IAsyncDisposable> =
+            async {
+                let! disposable = this.SubscribeAsync (AsyncObserver obv)
+                return disposable
+            }
 
     /// Returns an observable sequence that contains the elements of
     /// the given sequences concatenated together.
@@ -259,6 +265,10 @@ module AsyncRx =
     /// case an exception occurred.
     let catch (handler: exn -> IAsyncObservable<'a>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
         Transformation.catch handler source
+
+    /// Retries the given Observable retryCount number of times.
+    let retry (retryCount: int) (source: IAsyncObservable<'a>) : IAsyncObservable<'a>=
+        Transformation.retry retryCount source
 
     /// Projects each element of an observable sequence into an
     /// observable sequence and merges the resulting observable

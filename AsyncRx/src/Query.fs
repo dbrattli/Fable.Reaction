@@ -9,7 +9,7 @@ type QueryBuilder () =
     member this.Delay (fn) = fn ()
     member this.Bind(source: IAsyncObservable<'a>, fn: 'a -> IAsyncObservable<'b>) : IAsyncObservable<'b> =
         Transformation.flatMap fn source
-    member x.For(source: IAsyncObservable<_>, func) : IAsyncObservable<'b> =
+    member x.For(source: IAsyncObservable<_>, func: 'a -> IAsyncObservable<'b>) : IAsyncObservable<'b> =
         Transformation.concatMap func source
 
     // Async to AsyncObservable conversion
@@ -19,7 +19,7 @@ type QueryBuilder () =
     member this.YieldFrom (xs: Async<'x>) = Create.ofAsync xs
 
     // Sequence to AsyncObservable conversion
-    member x.For(source: seq<_>, func) : IAsyncObservable<'b> =
+    member x.For(source: seq<'a>, func: 'a -> IAsyncObservable<'b>) : IAsyncObservable<'b> =
         Create.ofSeq source
         |> Transformation.concatMap func
 

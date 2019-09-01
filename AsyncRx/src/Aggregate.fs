@@ -118,8 +118,8 @@ open FSharp.Control.Core
                     }
                 let! subscription = AsyncObserver obv |> source.SubscribeAsync
                 let cancel () = async {
-                    do! subscription.DisposeAsync ()
                     cts.Cancel()
+                    do! subscription.DisposeAsync ()
                 }
                 return AsyncDisposable.Create cancel
             }

@@ -9,6 +9,11 @@ open FSharp.Control
 
 open Core
 
+open System.Runtime.CompilerServices
+
+[<assembly:InternalsVisibleTo("Tests")>]
+do()
+
 
 [<RequireQualifiedAccess>]
 module internal Create =
