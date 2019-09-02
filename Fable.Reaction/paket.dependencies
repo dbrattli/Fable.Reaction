@@ -3,7 +3,6 @@ storage: none
 
 nuget Fable.Core ~> 3
 nuget Fable.React ~> 5
-nuget Fable.Elmish ~> 3
 nuget Fable.Browser.WebSocket
 nuget Fable.Browser.Event
 nuget Fable.Fetch

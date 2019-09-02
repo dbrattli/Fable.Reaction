@@ -1,4 +1,4 @@
-namespace Elmish.Streams
+namespace Fable.Reaction
 
 open Browser
 open Browser.Types

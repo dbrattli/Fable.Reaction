@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Elmish.Streams", "src\Elmish.Streams.fsproj", "{23BCF7BB-C6F0-4085-AEBD-45874FF919E1}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Fable.Reaction", "src\Fable.Reaction.fsproj", "{23BCF7BB-C6F0-4085-AEBD-45874FF919E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

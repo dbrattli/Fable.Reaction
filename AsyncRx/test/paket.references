@@ -1,4 +1,5 @@
-FSharp.Core
-coverlet.msbuild
-Microsoft.NET.Test.Sdk
-Expecto
+group Test
+    FSharp.Core
+    coverlet.msbuild
+    Microsoft.NET.Test.Sdk
+    Expecto

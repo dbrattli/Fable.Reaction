@@ -352,9 +352,9 @@ module AsyncRx =
     let subject<'a> () : IAsyncObserver<'a> * IAsyncObservable<'a> =
         Subjects.subject<'a> ()
 
-    /// A mailbox stream is a subscribable mailbox. Each message is
+    /// A mailbox subject is a subscribable mailbox. Each message is
     /// broadcasted to all subscribed observers.
-    let mbStream<'a> () : MailboxProcessor<Notification<'a>>*IAsyncObservable<'a> =
+    let mbSubject<'a> () : MailboxProcessor<Notification<'a>>*IAsyncObservable<'a> =
         Subjects.mbSubject<'a> ()
 
     /// A cold stream that only supports a single subscriber. Will await the

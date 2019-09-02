@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <PackageId>Fable.Elmish.Streams</PackageId>
-    <Version>3.0.3</Version>
-    <PackageVersion>3.0.3</PackageVersion>
+    <PackageId>Fable.Reaction</PackageId>
+    <Version>3.0.7</Version>
+    <PackageVersion>3.0.7</PackageVersion>
     <Authors>Dag Brattli</Authors>
     <Company>Brattli Labs</Company>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -14,9 +14,8 @@
     <Compile Include="Error.fs" />
     <Compile Include="Query.fs" />
     <Compile Include="WebSocket.fs" />
-    <Compile Include="Stream.fs" />
     <Compile Include="AsyncRx.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="Reaction.fs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="*.fsproj; *.fs" PackagePath="fable\" />

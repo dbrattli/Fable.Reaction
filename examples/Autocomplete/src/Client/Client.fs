@@ -1,42 +1,40 @@
 module Client
 
+open FSharp.Control
 open Fable.React
 open Fable.React.Props
-open Elmish
-open Elmish.React
-open Elmish.Streams
+open Fable.Reaction
 open Fulma
 
 open Components
+open Thoth.Json
+open Fetch
 
 // The model holds data that you want to keep track of while the application is running
 // in this case, we are keeping track of a counter
 // we mark it as optional, because initially it will not be available from the client
 // the initial value will be requested from server
-type Model = { AutoComplete : AutoComplete.Model }
+type Model = {
+    Selection: string option
+ }
 
 // The Msg type defines what events/actions can occur while the application is running
 // the state of the application changes *only* in reaction to these events
 type Msg =
-    | AutoCompleteMsg of AutoComplete.Msg
+    | Select of string
 
-let asAutoCompleteMsg = function
-    | AutoCompleteMsg autoCompleteMsg -> Some autoCompleteMsg
-    | _ -> None
-
-// defines the initial state and initial command (= side-effect) of the application
 let init () : Model = {
-    AutoComplete = AutoComplete.init ()
+    Selection = None
 }
 
 // The update function computes the next state of the application based on the current state and the incoming events/messages
 // It can also run side-effects (encoded as commands) like calling the server via Http.
 // these commands in turn, can dispatch messages to which the update function will react.
-let update (msg: Msg) (currentModel: Model) : Model =
+let update (currentModel: Model) (msg: Msg) : Model =
     let model =
         match msg with
-        | AutoCompleteMsg autoMsg ->
-            { currentModel with AutoComplete = AutoComplete.update autoMsg currentModel.AutoComplete }
+        | Select entry ->
+            { currentModel with Selection = Some entry }
     model
 
 let safeComponents =
@@ -58,7 +56,28 @@ let safeComponents =
           components ]
 
 
-let view (model: Model) (dispatch : Msg -> unit) =
+let searchWikipedia (term: string) =
+    promise {
+        let jsonDecode txt =
+            let decoders = Decode.oneOf [ Decode.list Decode.string; (Decode.succeed []) ]
+            Decode.fromString (Decode.list decoders) txt
+
+        let url = sprintf "https://en.wikipedia.org/w/api.php?action=opensearch&origin=*&format=json&search=%s" term
+        let props = [
+            RequestProperties.Mode RequestMode.Cors
+            requestHeaders [ ContentType "application/json" ]
+        ]
+
+        if term.Length = 0 then
+            return Ok []
+        else
+            let! response = fetch url props
+            let! json = response.text ()
+            let result = jsonDecode json |> Result.map (fun x -> x.[1])
+            return result
+    }
+
+let view (model: Model) (dispatch : Dispatch<Msg>) =
     div [] [
         Navbar.navbar [ Navbar.Color IsPrimary ] [
             Navbar.Item.div [ ] [
@@ -71,8 +90,7 @@ let view (model: Model) (dispatch : Msg -> unit) =
             h1 [] [
                 str "Search Wikipedia"
             ]
-
-            AutoComplete.view model.AutoComplete (AutoCompleteMsg >> dispatch)
+            AutoComplete.autocomplete searchWikipedia (Select >> dispatch) ()
         ]
 
         Footer.footer [ ] [
@@ -82,11 +100,7 @@ let view (model: Model) (dispatch : Msg -> unit) =
         ]
     ]
 
-let stream model msgs =
-    msgs
-    |> Stream.subStream AutoComplete.stream model.AutoComplete asAutoCompleteMsg AutoCompleteMsg "auto-complete"
+let initialModel = init ()
+let app = Reaction.mvu initialModel view update
 
-Program.mkSimple init update view
-|> Program.withStream stream "msgs"
-|> Program.withReactBatched "elmish-app"
-|> Program.run
+mountById "app" (ofFunction app () [])

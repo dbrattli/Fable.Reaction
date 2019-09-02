@@ -1,7 +1,5 @@
 module Client
 
-open Elmish
-open Elmish.React
 open Fable.React
 open Fable.React.Props
 open Fetch.Types
@@ -11,7 +9,7 @@ open Thoth.Json
 open Shared
 
 open FSharp.Control
-open Elmish.Streams
+open Fable.Reaction
 
 // The application model holds data that you want to keep track of while the
 // application is running in this case, we are keeping track of a counter.
@@ -29,8 +27,6 @@ type Msg =
 | Increment
 | Decrement
 | InitialCountLoaded of Result<Counter, exn>
-
-
 
 // Fetch a data structure from specified url and using the decoder
 let fetchWithDecoder<'T> (url: string) (decoder: Decoder<'T>) (init: RequestProperties list) =
@@ -57,15 +53,18 @@ let loadCount =
     AsyncRx.ofPromise (initialCounter [])
     |> AsyncRx.map (Ok >> InitialCountLoaded)
     |> AsyncRx.catch (Error >> InitialCountLoaded >> AsyncRx.single)
-    |> AsyncRx.toStream "loading"
 
-let stream model msgs =
+let stream  model msgs =
+    printf "stream"
+
     match model with
-    | Loading -> loadCount
-    | _ -> msgs
+    | Loading -> loadCount |> AsyncRx.tag "loading"
+    | _ -> msgs |> AsyncRx.tag "msgs"
 
 // The update function computes the next state of the application based on the current state and the incoming events/messages
-let update (msg : Msg) (currentModel : Model) : Model =
+let update (currentModel : Model) (msg : Msg) : Model =
+    printf "update: %A" msg
+
     match currentModel, msg with
     | Loading, InitialCountLoaded (Ok initialCount) ->
         App { Counter = initialCount }
@@ -104,42 +103,47 @@ let show = function
 | Loading -> "Loading..."
 
 let button txt onClick =
-    Button.button
-        [ Button.IsFullWidth
-          Button.Color IsPrimary
-          Button.OnClick onClick ]
-        [ str txt ]
+    Button.button [ Button.IsFullWidth
+                    Button.Color IsPrimary
+                    Button.OnClick onClick ] [
+        str txt ]
 
-let view (model : Model) (dispatch : Msg -> unit) =
-    div []
-        [ Navbar.navbar [ Navbar.Color IsPrimary ]
-            [ Navbar.Item.div [ ]
-                [ Heading.h2 [ ]
-                    [ str "SAFE Template" ] ] ]
+let view (model : Model) (dispatch : (Msg -> unit)) =
+    printf "view: %A" model
+    div [] [
+        Navbar.navbar [ Navbar.Color IsPrimary ] [
+            Navbar.Item.div [] [
+                Heading.h2 [] [
+                    str "SAFE Template"
+                ]
+            ]
+        ]
 
-          Container.container []
-              [ Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ]
-                    [ Heading.h3 [] [ str ("Press buttons to manipulate counter: " + show model) ] ]
-                Columns.columns []
-                    [ Column.column [] [ button "-" (fun _ -> dispatch Decrement) ]
-                      Column.column [] [ button "+" (fun _ -> dispatch Increment) ] ] ]
+        Container.container [] [
+            Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ]] [
+                Heading.h3 [] [
+                    str ("Press buttons to manipulate counter: " + show model)
+                ]
+            ]
+            Columns.columns [] [
+                Column.column [] [
+                    button "-" (fun _ -> dispatch Decrement)
+                ]
+                Column.column [] [
+                    button "+" (fun _ -> dispatch Increment)
+                ]
+            ]
+        ]
 
-          Footer.footer [ ]
-                [ Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ]
-                    [ safeComponents ] ] ]
+        Footer.footer [] [
+            Content.content [ Content.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ]] [
+                safeComponents
+            ]
+        ]
+    ]
 
-#if DEBUG
-open Elmish.Debug
-open Elmish.HMR
-#endif
+printf "Starting program"
+let initialModel = init ()
+let app = Reaction.mvuStream initialModel view update stream
 
-Program.mkSimple init update view
-|> Program.withStream stream "msgs"
-#if DEBUG
-|> Program.withConsoleTrace
-#endif
-|> Program.withReactBatched "elmish-app"
-#if DEBUG
-|> Program.withDebugger
-#endif
-|> Program.run
+mountById "app" (ofFunction app () [])
