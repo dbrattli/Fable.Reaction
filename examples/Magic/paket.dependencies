@@ -16,6 +16,7 @@ group Server
 
 group Client
     source https://api.nuget.org/v3/index.json
+    source /Users/dbrattli/Developer/packages
     framework: netstandard2.0
     storage: none
 
@@ -26,6 +27,7 @@ group Client
     nuget Fable.Elmish.HMR ~> 4
     nuget Fable.Elmish.Browser  ~> 3
     nuget Fable.React ~> 5
+    nuget Fable.Reaction ~> 3
     nuget Fable.FontAwesome.Free ~> 2
     nuget Fable.Elmish.Streams ~> 3
     nuget Fable.Fetch

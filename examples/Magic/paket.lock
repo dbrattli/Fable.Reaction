@@ -845,7 +845,7 @@ NUGET
     Fable.Promise (2.0)
       Fable.Core (>= 3.0)
       FSharp.Core (>= 4.5.2)
-    Fable.React (5.2.3)
+    Fable.React (5.2.7)
       Fable.Browser.Dom (>= 1.0)
       Fable.Core (>= 3.0)
       FSharp.Core (>= 4.6.2)
@@ -865,6 +865,15 @@ NUGET
     Thoth.Json (3.0)
       Fable.Core (>= 3.0)
       FSharp.Core (>= 4.6.2)
+  remote: /Users/dbrattli/Developer/packages
+    Fable.Reaction (3.0.7)
+      Fable.Browser.Event (>= 1.0)
+      Fable.Browser.WebSocket (>= 1.0)
+      Fable.Core (>= 3.0)
+      Fable.Fetch (>= 2.1)
+      Fable.React (>= 5.2.7)
+      FSharp.Control.AsyncRx (>= 1.0)
+      FSharp.Core (>= 4.7)
 
 GROUP Server
 STORAGE: NONE

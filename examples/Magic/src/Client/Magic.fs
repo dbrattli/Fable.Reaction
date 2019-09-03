@@ -11,6 +11,7 @@ open Fulma.Extensions.Wikiki
 
 open FSharp.Control
 open Elmish.Streams
+open Fable.Reaction
 open Utils
 
 type LetterSource =
@@ -90,7 +91,8 @@ let withEditedLetterString letterString model =
 let withShowLetterString letterString model =
     { model with LetterString = Show letterString }
 
-let update (msg : Msg) (model : Model) : Model =
+let update (model : Model) (msg : Msg)  : Model =
+    //printfn "Update: %A" msg
     match msg with
     | EditLetterStringRequested ->
         model |> withEditLetterString
@@ -229,8 +231,8 @@ let viewLetterString letterString dispatch =
 
 
 let view model dispatch =
-    div [] [
-        Heading.h3 [] [ str "Subcomponent 1" ]
+    div [ Style [ Border "1px dashed"; Margin "20px"; Padding "20px" ]] [
+        Heading.h3 [] [ str "Magic Component" ]
         Heading.h4 [ Heading.IsSubtitle ] [ str "Magic String over websockets (when activated)" ]
         Columns.columns [] [
             Column.column [] [
@@ -253,6 +255,7 @@ let view model dispatch =
         ]
     ]
 
+// Create timefiles stream of letter string
 let letterStream letterString =
     letterString
     |> Seq.toList // Split into list of characters
@@ -280,11 +283,10 @@ let stream model msgs =
             letterString
             |> letterStream
             |> AsyncRx.map Letter
-            |> AsyncRx.toStream (letterString + "_local")
-        Stream.batch [
-            letters
-            msgs
-        ]
+
+        letters
+        |> AsyncRx.merge msgs
+        |> AsyncRx.tag (letterString + "_local")
 
     | Remote _ ->
         let stringQuery =
@@ -303,12 +305,28 @@ let stream model msgs =
             |> AsyncRx.merge letterStringQuery
             |> server
             |> AsyncRx.map RemoteMsg
-            |> AsyncRx.toStream "_remote"
 
-        Stream.batch [
-            remote
-            msgs
-        ]
 
+        remote
+        |> AsyncRx.merge msgs
+        |> AsyncRx.tag "_remote"
     | _ ->
         msgs
+        |> AsyncRx.tag "msgs"
+
+let magic initialString =
+    let initialModel = init initialString
+
+    FunctionComponent.Of(fun () ->
+        let model = Hooks.useReducer(update, initialModel)
+        let dispatch, msgs = Reaction.useStatefulStream(model.current, model.update, stream)
+
+        (*
+        let select =
+            msgs
+            |> AsyncRx.map (fun x -> x.ToString ())
+        //select.Run (OnNext >> obv)
+*)
+        view model.current dispatch
+    )
+

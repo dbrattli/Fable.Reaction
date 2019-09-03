@@ -14,7 +14,7 @@ open FSharp.Control
 open Thoth.Json
 
 type AppModel = {
-    Magic : Magic.Model
+    InitialString: string
     Info : Info.Model
 }
 
@@ -36,33 +36,21 @@ let update (msg : Msg) model =
     match model, msg with
     | Loading, InitialLetterStringLoaded (Ok letterString) ->
         App {
-            Magic = Magic.init letterString
+            InitialString = letterString
             Info = Info.init letterString
         }
-
     | Loading, InitialLetterStringLoaded (Result.Error exn) ->
         Error exn.Message
-
-    | App model, MagicMsg msg ->
-        { model with Magic = Magic.update msg model.Magic }
-        |> App
-
-    | App model, InfoMsg msg ->
-        { model with Info = Info.update msg model.Info }
-        |> App
-
     | _ -> model
 
 let safeComponents =
     let components =
         span [] [
-            a [ Href "https://github.com/dbrattli/Reaction" ] [ str "Reaction" ]
+            a [ Href "https://github.com/dbrattli/Fable.Reaction" ] [ str "Reaction" ]
             str ", "
             a [ Href "https://github.com/giraffe-fsharp/Giraffe" ] [ str "Giraffe" ]
             str ", "
             a [ Href "http://fable.io" ] [ str "Fable" ]
-            str ", "
-            a [ Href "https://elmish.github.io/elmish/" ] [ str "Elmish" ]
             str ", "
             a [ Href "https://mangelmaxime.github.io/Fulma" ] [ str "Fulma" ]
         ]
@@ -84,8 +72,8 @@ let viewApp model dispatch =
 
     | App model ->
         div [] [
-            Magic.view model.Magic (MagicMsg >> dispatch)
-            Info.view model.Info (InfoMsg >> dispatch)
+            Magic.magic model.InitialString ()
+            Info.info model.InitialString ()
         ]
 
 let view (model : Model) (dispatch : Msg -> unit) =
@@ -93,7 +81,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
         Navbar.navbar [ Navbar.Color IsPrimary ] [
             Navbar.Item.div [] [
                 Heading.h2 [] [
-                    str "Elmish.Streams Playground"
+                    str "Fable Reaction Playground"
                 ]
             ]
         ]
@@ -108,14 +96,6 @@ let view (model : Model) (dispatch : Msg -> unit) =
             ]
         ]
     ]
-
-let asMagicMsg = function
-    | MagicMsg msg -> Some msg
-    | _ -> None
-
-let asInfoMsg = function
-    | InfoMsg msg -> Some msg
-    | _ -> None
 
 // Fetch a data structure from specified url and using the decoder
 let fetchWithDecoder<'T> (url: string) (decoder: Decoder<'T>) (init: RequestProperties list) =
@@ -140,13 +120,8 @@ let stream model msgs =
         |> AsyncRx.catch (Result.Error >> InitialLetterStringLoaded >> AsyncRx.single)
         |> AsyncRx.toStream "loading"
 
-    | Error exn ->
-        msgs
-
-    | App model ->
-        msgs
-        |> Stream.subStream Magic.stream model.Magic asMagicMsg MagicMsg "magic"
-        |> Stream.subStream Info.stream model.Info asInfoMsg InfoMsg "info"
+    | Error exn -> msgs
+    | App model -> msgs
 
 #if DEBUG
 open Elmish.Debug
