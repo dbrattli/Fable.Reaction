@@ -5,7 +5,6 @@ open Fable.React.Props
 
 open Fulma
 open Fulma.Extensions.Wikiki
-open Elmish.Streams
 open Fable.Reaction
 open FSharp.Control
 

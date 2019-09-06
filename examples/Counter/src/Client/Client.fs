@@ -46,7 +46,7 @@ let inline fetchAs<'T> (url: string) (init: RequestProperties list) =
 let initialCounter = fetchAs<Counter> "/api/init"
 
 // defines the initial state
-let init () : Model =
+let initialModel : Model =
     Loading
 
 let loadCount =
@@ -54,17 +54,8 @@ let loadCount =
     |> AsyncRx.map (Ok >> InitialCountLoaded)
     |> AsyncRx.catch (Error >> InitialCountLoaded >> AsyncRx.single)
 
-let stream  model msgs =
-    printf "stream"
-
-    match model with
-    | Loading -> loadCount |> AsyncRx.tag "loading"
-    | _ -> msgs |> AsyncRx.tag "msgs"
-
 // The update function computes the next state of the application based on the current state and the incoming events/messages
 let update (currentModel : Model) (msg : Msg) : Model =
-    printf "update: %A" msg
-
     match currentModel, msg with
     | Loading, InitialCountLoaded (Ok initialCount) ->
         App { Counter = initialCount }
@@ -86,12 +77,10 @@ let safeComponents =
              str ", "
              a [ Href "http://fable.io" ] [ str "Fable" ]
              str ", "
-             a [ Href "https://elmish.github.io/elmish/" ] [ str "Elmish" ]
-             str ", "
              a [ Href "https://fulma.github.io/Fulma" ] [ str "Fulma" ]
              str ", "
-             a [ Href "http://elmish-streams.rtfd.io/" ] [ str "Elmish.Streams" ]
-           ]
+             a [ Href "https://github.com/dbrattli/Fable.Reaction" ] [ str "Reaction" ]
+        ]
 
     span [ ]
         [ strong [] [ str "SAFE Template" ]
@@ -109,7 +98,6 @@ let button txt onClick =
         str txt ]
 
 let view (model : Model) (dispatch : (Msg -> unit)) =
-    printf "view: %A" model
     div [] [
         Navbar.navbar [ Navbar.Color IsPrimary ] [
             Navbar.Item.div [] [
@@ -142,8 +130,12 @@ let view (model : Model) (dispatch : (Msg -> unit)) =
         ]
     ]
 
-printf "Starting program"
-let initialModel = init ()
-let app = Reaction.mvuStream initialModel view update stream
+let stream model msgs =
+    match model with
+    | Loading -> loadCount |> AsyncRx.tag "loading"
+    | _ -> msgs |> AsyncRx.tag "msgs"
 
-mountById "app" (ofFunction app () [])
+
+printf "Starting program"
+let app = Reaction.StreamComponent initialModel view update stream
+mountById "reaction-app" (ofFunction app () [])

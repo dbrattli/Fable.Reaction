@@ -90,13 +90,3 @@ module AsyncRx =
 
     /// Tags an async observable with an identifier.
     let tag<'msg, 'tag> (tag : 'tag) (obs: IAsyncObservable<'msg>) : TaggedObservable<'msg, 'tag> = obs, tag
-
-    let internal streams : Dictionary<string, IAsyncObserver<obj>*IAsyncObservable<obj>> = Dictionary ()
-
-    let ofStream<'msg> name : IAsyncObserver<'msg>*IAsyncObservable<'msg> =
-        if streams.ContainsKey name
-        then streams.[name] :?> _
-        else AsyncRx.empty () :?> _
-
-    let registerStream (name: string) (dispatch: IAsyncObserver<'msg>) (msgs: IAsyncObservable<'msg>) =
-        streams.[name] <- (, AsyncRx.map (fun x -> x :> obj) msgs)

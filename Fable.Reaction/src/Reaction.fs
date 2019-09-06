@@ -15,20 +15,6 @@ module Reaction =
     let debug (text: string, o: #obj) = ()
     #endif
 
-    let renderReact placeholderId =
-        let scanner (lastRequest : float option) view =
-            match lastRequest with
-            | Some r -> window.cancelAnimationFrame r
-            | _ -> ()
-
-            Some (window.requestAnimationFrame (fun _ ->
-                ReactDom.render(
-                    view,
-                    document.getElementById(placeholderId)
-                )))
-
-        scanner
-
     /// Stream hook.
     let useStream (update: 'msg -> unit, stream: IAsyncObservable<'msg> -> TaggedObservable<'msg, 'tag>) =
         let obv, obs = AsyncRx.mbStream<'msg> ()
@@ -41,6 +27,7 @@ module Reaction =
             let mutable subscription : IAsyncDisposable = AsyncDisposable.Empty
             async {
                 let! disposable =
+                    debug ("[Fable.Reaction] Stream subscribed: ", tag)
                     msgs'.SubscribeAsync (fun x -> async {
                         match x with
                         | OnNext msg -> update msg
@@ -55,6 +42,7 @@ module Reaction =
 
             { new IDisposable with
                 member __.Dispose () =
+                    debug ("[Fable.Reaction] Stream disposed: ", tag)
                     subscription.DisposeAsync () |> Async.StartImmediate
             }
         , [| tag |])
@@ -66,27 +54,24 @@ module Reaction =
         useStream (update, stream state)
 
     /// Simple MVU app component.
-    let mvuApp<'model, 'msg>
-            (init: unit -> 'model)
-            (view: 'model -> ('msg -> unit) -> ReactElement)
-            (update: 'model -> 'msg -> 'model) =
+    let Component<'model, 'msg> (initialModel: 'model)
+              (view: 'model -> ('msg -> unit) -> ReactElement)
+              (update: 'model -> 'msg -> 'model) =
 
-        let initialModel = init ()
         FunctionComponent.Of(fun () ->
             let model = Hooks.useReducer(update, initialModel)
             view model.current model.update
         )
 
     /// Simple MVU app with stateful stream.
-    let mvuStreamApp<'model, 'msg, 'tag>
-            (init: unit -> 'model)
-            (view: 'model -> ('msg -> unit) -> ReactElement)
-            (update: 'model -> 'msg -> 'model)
-            (stream: 'model -> IAsyncObservable<'msg> -> TaggedObservable<'msg, 'tag>) =
+    let StreamComponent<'model, 'msg, 'tag> (initialModel: 'model)
+              (view: 'model -> ('msg -> unit) -> ReactElement)
+              (update: 'model -> 'msg -> 'model)
+              (stream: 'model -> IAsyncObservable<'msg> -> TaggedObservable<'msg, 'tag>) =
 
-        let initialModel = init ()
         FunctionComponent.Of(fun () ->
             let model = Hooks.useReducer(update, initialModel)
             let dispatch, _ = useStatefulStream(model.current, model.update, stream)
+
             view model.current dispatch
         )

@@ -1,14 +1,11 @@
 module Client
 
-open Elmish
-open Elmish.React
-
 open Fable.React
 open Fable.React.Props
 open Fetch.Types
 
 open Fulma
-open Elmish.Streams
+open Fable.Reaction
 open FSharp.Control
 
 open Thoth.Json
@@ -29,10 +26,10 @@ type Msg =
     | MagicMsg of Magic.Msg
     | InfoMsg of Info.Msg
 
-let init () =
+let initialModel =
     Loading
 
-let update (msg : Msg) model =
+let update model (msg : Msg) =
     match model, msg with
     | Loading, InitialLetterStringLoaded (Ok letterString) ->
         App {
@@ -46,13 +43,13 @@ let update (msg : Msg) model =
 let safeComponents =
     let components =
         span [] [
-            a [ Href "https://github.com/dbrattli/Fable.Reaction" ] [ str "Reaction" ]
-            str ", "
             a [ Href "https://github.com/giraffe-fsharp/Giraffe" ] [ str "Giraffe" ]
             str ", "
             a [ Href "http://fable.io" ] [ str "Fable" ]
             str ", "
             a [ Href "https://mangelmaxime.github.io/Fulma" ] [ str "Fulma" ]
+            str ", "
+            a [ Href "https://github.com/dbrattli/Fable.Reaction" ] [ str "Reaction" ]
         ]
 
     p [] [
@@ -118,23 +115,10 @@ let stream model msgs =
         AsyncRx.ofPromise (fetchAs<string> "/api/init" [])
         |> AsyncRx.map (Ok >> InitialLetterStringLoaded)
         |> AsyncRx.catch (Result.Error >> InitialLetterStringLoaded >> AsyncRx.single)
-        |> AsyncRx.toStream "loading"
+        |> AsyncRx.tag "loading"
 
-    | Error exn -> msgs
-    | App model -> msgs
+    | Error exn -> msgs |> AsyncRx.tag "error"
+    | App model -> msgs |> AsyncRx.tag "msgs"
 
-#if DEBUG
-open Elmish.Debug
-open Elmish.HMR
-#endif
-
-Program.mkSimple init update view
-|> Program.withStream stream "msgs"
-#if DEBUG
-//|> Program.withConsoleTrace
-#endif
-|> Program.withReactBatched "elmish-app"
-#if DEBUG
-//|> Program.withDebugger
-#endif
-|> Program.run
+let app = Reaction.StreamComponent initialModel view update stream
+mountById "reaction-app" (ofFunction app () [])

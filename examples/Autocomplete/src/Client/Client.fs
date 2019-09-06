@@ -1,6 +1,5 @@
 module Client
 
-open FSharp.Control
 open Fable.React
 open Fable.React.Props
 open Fable.Reaction
@@ -23,7 +22,7 @@ type Model = {
 type Msg =
     | Select of string
 
-let init () : Model = {
+let initialModel : Model = {
     Selection = None
 }
 
@@ -45,9 +44,9 @@ let safeComponents =
              str ", "
              a [ Href "http://fable.io" ] [ str "Fable" ]
              str ", "
-             a [ Href "https://elmish.github.io/elmish/" ] [ str "Elmish" ]
-             str ", "
              a [ Href "https://mangelmaxime.github.io/Fulma" ] [ str "Fulma" ]
+             str ", "
+             a [ Href "https://github.com/dbrattli/Fable.Reaction" ] [ str "Reaction" ]
            ]
 
     p [ ]
@@ -80,17 +79,26 @@ let searchWikipedia (term: string) =
 let view (model: Model) (dispatch : Dispatch<Msg>) =
     div [] [
         Navbar.navbar [ Navbar.Color IsPrimary ] [
-            Navbar.Item.div [ ] [
-                Heading.h2 [ ] [
-                    str "Autocomplete" ]
+            Navbar.Item.div [] [
+                Heading.h2 [] [
+                    str "Autocomplete"
+                ]
             ]
         ]
 
-        Container.container [ Container.Props [Style [ CSSProp.PaddingTop 40; CSSProp.PaddingBottom 150 ]]] [
+        Container.container [ Container.Props [Style [ PaddingTop 40; PaddingBottom 150 ]]] [
             h1 [] [
                 str "Search Wikipedia"
             ]
-            AutoComplete.autocomplete searchWikipedia (Select >> dispatch) ()
+            AutoComplete.autocomplete { Search=searchWikipedia; Dispatch = Select >> dispatch; DebounceTimeout=750 }
+
+            div [ Style [ MarginTop "30px" ]] [
+                match model.Selection with
+                | Some selection ->
+                    yield str "Selection: "
+                    yield str selection
+                | None -> ()
+            ]
         ]
 
         Footer.footer [ ] [
@@ -100,7 +108,5 @@ let view (model: Model) (dispatch : Dispatch<Msg>) =
         ]
     ]
 
-let initialModel = init ()
-let app = Reaction.mvu initialModel view update
-
-mountById "app" (ofFunction app () [])
+let app = Reaction.Component initialModel view update
+mountById "reaction-app" (ofFunction app () [])

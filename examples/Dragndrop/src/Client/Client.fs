@@ -1,12 +1,10 @@
 module Client
 
-open Elmish
-open Elmish.React
 open Fable.React
 open Fable.React.Props
+open Fable.Reaction
 open FSharp.Control
 open Fulma
-open Elmish.Streams
 open Browser.Types
 open Fable.Core.JsInterop
 
@@ -38,7 +36,7 @@ type Msg =
 // defines the initial state and initial command (= side-effect) of the application
 let init () : Model =
     [
-        { Name = "Elmish"; Logo= "url(Images/logo-elmish.png)" }, { Top = 150.0; Left = 100.0 }
+        { Name = "Reaction"; Logo= "url(Images/logo-reaction.png)" }, { Top = 150.0; Left = 100.0 }
         { Name = "ReactiveX"; Logo = "url(Images/logo.png)" } , { Top = 200.0; Left = 700.0 }
         { Name = "Fable"; Logo = "url(Images/logo-fable.png)" } , { Top = 300.0; Left = 400.0 }
     ]
@@ -47,7 +45,7 @@ let init () : Model =
 // The update function computes the next state of the application based on the current state and the incoming events/messages
 // It can also run side-effects (encoded as commands) like calling the server via Http.
 // these commands in turn, can dispatch messages to which the update function will react.
-let update (msg : Msg) (currentModel : Model) : Model  =
+let update (currentModel : Model) (msg : Msg) : Model  =
     match msg with
     | MouseDragEvent (left, top, logo) ->
         currentModel.Add (logo, { Top=top; Left=left })
@@ -62,7 +60,7 @@ let safeComponents =
              str ", "
              a [ Href "http://fable.io" ] [ str "Fable" ]
              str ", "
-             a [ Href "https://elmish.github.io/elmish/" ] [ str "Elmish" ]
+             a [ Href "https://github.com/dbrattli/Fable.Reaction" ] [ str "Reaction" ]
              str ", "
              a [ Href "https://mangelmaxime.github.io/Fulma" ] [ str "Fulma" ]
            ]
@@ -91,7 +89,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
         Navbar.navbar [ Navbar.Color IsPrimary ] [
             Navbar.Item.div [] [
                 Heading.h2 [] [
-                    str "Elmish Streams Drag'n Drop"
+                    str "Fable Reaction Drag'n Drop"
                 ]
             ]
         ]
@@ -135,20 +133,9 @@ let stream model msgs =
             |> AsyncRx.map (fun ev ->
                 MouseDragEvent (ev.clientX - startX, ev.clientY - startY, project))
             |> AsyncRx.takeUntil mouseUp
-    } |> AsyncRx.toStream "dnd"
+    } |> AsyncRx.tag "dnd"
 
-#if DEBUG
-open Elmish.Debug
-open Elmish.HMR
-#endif
 
-Program.mkSimple init update view
-|> Program.withStream stream "msgs"
-#if DEBUG
-|> Program.withConsoleTrace
-#endif
-|> Program.withReactBatched "elmish-app"
-#if DEBUG
-|> Program.withDebugger
-#endif
-|> Program.run
+let initialModel = init ()
+let app = Reaction.StreamComponent initialModel view update stream
+mountById "reaction-app" (ofFunction app () [])

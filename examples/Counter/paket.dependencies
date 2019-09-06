@@ -9,7 +9,6 @@ group Server
 
 group Client
     source https://api.nuget.org/v3/index.json
-    source /Users/dbrattli/Developer/packages
     framework: netstandard2.0
     storage: none
 

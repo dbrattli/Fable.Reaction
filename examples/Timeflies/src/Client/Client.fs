@@ -1,11 +1,10 @@
 module Client
 
+open Browser.Dom
 open Fable.React
 open Fable.React.Props
-open Fable.Core
-open FSharp.Control
 open Fable.Reaction
-open Browser.Dom
+open FSharp.Control
 
 // The model holds data that you want to keep track of while the
 // application is running
@@ -38,7 +37,7 @@ let view (model : Model) (dispatch : Msg -> unit)=
             ] |> ofList
         ]
 
-let init () : Model =
+let initialModel : Model =
     { Letters = Map.empty }
 
 let getOffset (element: Browser.Types.Element) =
@@ -51,7 +50,7 @@ let getOffset (element: Browser.Types.Element) =
 
     int (scrollTop - clientTop), int (scrollLeft - clientLeft)
 
-let container = document.querySelector "#app"
+let container = document.querySelector "#reaction-app"
 let top, left = getOffset container
 
 // Message stream transformation (expression style)
@@ -69,7 +68,5 @@ let stream (model : Model) (msgs: IAsyncObservable<Msg>) =
 
 printf "Starting program"
 
-let initialModel = init ()
-let app = Reaction.mvuStream initialModel view update stream
-
-mountById "app" (ofFunction app () [])
+let app = Reaction.StreamComponent initialModel view update stream
+mountById "reaction-app" (ofFunction app () [])
