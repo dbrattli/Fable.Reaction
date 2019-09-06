@@ -1,4 +1,4 @@
-namespace Elmish.Streams.AspNetCore
+namespace Reaction.AspNetCore
 
 open System
 open System.Collections.Generic
@@ -32,7 +32,7 @@ module Middleware =
 
     type GetOptions<'msg> = StreamsConfig<'msg> -> StreamsConfig<'msg>
 
-    type ElmishStreamsMiddleware<'msg> (next: RequestDelegate, getOptions: GetOptions<'msg>)  =
+    type ReactionMiddleware<'msg> (next: RequestDelegate, getOptions: GetOptions<'msg>)  =
         let sockets = List<WebSocket> ()
         let obv, stream = AsyncRx.subject<'msg*ConnectionId> ()
 
@@ -148,4 +148,4 @@ module Middleware =
 
     type IApplicationBuilder with
         member this.UseStream<'msg> (getOptions: GetOptions<'msg>) =
-            this.UseMiddleware<ElmishStreamsMiddleware<'msg>> getOptions
+            this.UseMiddleware<ReactionMiddleware<'msg>> getOptions
