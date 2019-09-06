@@ -16,11 +16,11 @@ module Reaction =
     #endif
 
     /// Stream hook.
-    let useStream (update: 'msg -> unit, stream: IAsyncObservable<'msg> -> TaggedObservable<'msg, 'tag>) =
+    let useStream (dispatch: 'msg -> unit, stream: IAsyncObservable<'msg> -> TaggedObservable<'msg, 'tag>) =
         let obv, obs = AsyncRx.mbStream<'msg> ()
         let subject = Hooks.useState((OnNext >> obv.Post,  obs))
 
-        let dispatch, msgs = subject.current
+        let dispatch', msgs = subject.current
         let msgs', tag = stream msgs
 
         Hooks.useEffectDisposable (fun () ->
@@ -30,7 +30,7 @@ module Reaction =
                     debug ("[Fable.Reaction] Stream subscribed: ", tag)
                     msgs'.SubscribeAsync (fun x -> async {
                         match x with
-                        | OnNext msg -> update msg
+                        | OnNext msg -> dispatch msg
                         | OnCompleted ->
                             debug ("[Fable.Reaction] Stream completed:", tag)
                         | OnError err ->
@@ -47,7 +47,7 @@ module Reaction =
             }
         , [| tag |])
 
-        dispatch, msgs'
+        dispatch', msgs'
 
     /// Stateful stream hook.
     let useStatefulStream (state: 'state, update: 'msg -> unit, stream: 'state -> IAsyncObservable<'msg> -> TaggedObservable<'msg, 'tag>) =
