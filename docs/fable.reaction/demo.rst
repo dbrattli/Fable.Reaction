@@ -115,9 +115,4 @@ in the stream.
             yield! AsyncRx.ofMouseMove ()
                 |> AsyncRx.delay (100 * i)
                 |> AsyncRx.map (fun m -> Letter (i, string c, int m.clientX + i * 10 + 15 - left, int m.clientY - top))
-        } |> AsyncRx.toStream "msgs"
-
-    Program.mkSimple init update view
-    |> Program.withStream stream "msgs"
-    |> Program.withReactBatched "elmish-app"
-    |> Program.run
+        } |> AsyncRx.tag "msgs"

@@ -108,5 +108,5 @@ let view (model: Model) (dispatch : Dispatch<Msg>) =
         ]
     ]
 
-let app = Reaction.Component initialModel view update
+let app = Reaction.View initialModel view update
 mountById "reaction-app" (ofFunction app () [])

@@ -9,9 +9,8 @@ open Fable.Core.JsInterop
 open Fetch
 
 open FSharp.Control
-open System.Collections.Generic
 
-type TaggedObservable<'msg, 'tag> = IAsyncObservable<'msg> * 'tag
+type TaggedStream<'msg, 'tag> = IAsyncObservable<'msg> * 'tag
 
 /// AsyncRx Extensions
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
@@ -42,7 +41,7 @@ module AsyncRx =
     let ofEvent<'ev> event : IAsyncObservable<'ev> =
         let cts = new CancellationTokenSource ()
 
-        let subscribe (obv: IAsyncObserver<'ev'>) : Async<IAsyncDisposable> =
+        let subscribe (obv: IAsyncObserver<'ev>) : Async<IAsyncDisposable> =
             async {
                 let mb = MailboxProcessor.Start(fun inbox ->
                     let rec messageLoop _ = async {
@@ -68,6 +67,31 @@ module AsyncRx =
     let ofMouseMove () : IAsyncObservable<MouseEvent> =
         ofEvent "mousemove"
 
+    /// Debounces an async observable sequence to the animation frame rate.
+    let requestAnimationFrame<'msg> (source: IAsyncObservable<'msg>) : IAsyncObservable<'msg> =
+        let subscribeAsync (aobv : IAsyncObserver<'msg>) : Async<IAsyncDisposable> =
+                async {
+                    let mutable lastRequest = None
+
+                    let _obv =
+                        { new IAsyncObserver<'msg> with
+                            member __.OnNextAsync x = async {
+                                match lastRequest with
+                                | Some r -> window.cancelAnimationFrame r
+                                | _ -> ()
+
+                                lastRequest <-
+                                    window.requestAnimationFrame (fun _ ->
+                                        aobv.OnNextAsync x |> Async.StartImmediate
+                                    ) |> Some
+                            }
+                            member __.OnErrorAsync err = aobv.OnErrorAsync err
+                            member __.OnCompletedAsync () = aobv.OnCompletedAsync ()
+                        }
+                    return! source.SubscribeAsync _obv
+                }
+        { new IAsyncObservable<'msg> with member __.SubscribeAsync o = subscribeAsync o }
+
     /// Websocket channel operator. Passes string items as ws messages to
     /// the server. Received ws messages will be forwarded down stream.
     /// JSON encode/decode of application messages is left to the client.
@@ -89,4 +113,4 @@ module AsyncRx =
         Fable.Reaction.WebSocket.msgResultChannel uri encode decode source
 
     /// Tags an async observable with an identifier.
-    let tag<'msg, 'tag> (tag : 'tag) (obs: IAsyncObservable<'msg>) : TaggedObservable<'msg, 'tag> = obs, tag
+    let tag<'msg, 'tag> (tag : 'tag) (obs: IAsyncObservable<'msg>) : TaggedStream<'msg, 'tag> = obs, tag

@@ -108,17 +108,5 @@ let stream model msgs =
 
 let info initialString =
     let initialModel = init initialString
-
-    FunctionComponent.Of(fun () ->
-        let model = Hooks.useReducer(update, initialModel)
-        let dispatch, msgs = Reaction.useStatefulStream(model.current, model.update, stream)
-
-        (*
-        let select =
-            msgs
-            |> AsyncRx.map (fun x -> x.ToString ())
-        //select.Run (OnNext >> obv)
-*)
-        view model.current dispatch
-    )
+    Reaction.StreamView initialModel view update stream
 

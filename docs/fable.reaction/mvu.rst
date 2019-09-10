@@ -2,10 +2,10 @@
 Reactive MVU Architecture
 =========================
 
-Elmish Streams is very similar to `Elm <http://elm-lang.org/>`_ and
+Fable.Reaction is very similar to `Elm <http://elm-lang.org/>`_ and
 `Elmish <https://elmish.github.io/>`_ in regards to the `MVU
 architecture <https://guide.elm-lang.org/architecture/>`_. But when using
-Elmish.Streams, we do not need any commands (``Cmd``) or subscriptions
+Fable.Reaction, we do not need any commands (``Cmd``) or subscriptions
 with Elmish. Instead we use a `ReactiveX <http://reactivex.io/>`_
 (AsyncRx) style query that transforms the stream of messages (``Msg``).
 
@@ -24,7 +24,7 @@ with Elmish. Instead we use a `ReactiveX <http://reactivex.io/>`_
 * **Update**, a pure function that produces a new model based on a
   received message and the previous model
 
-In addition to the normal MVU architecture, Elmish Streams also have a
+In addition to the normal MVU architecture, Fable.Reaction also have a
 stream that transforms the "stream" of messages going from the view to
 the update function.
 

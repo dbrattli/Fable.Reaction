@@ -110,7 +110,6 @@ module AutoComplete =
         |> AsyncRx.merge loading
         |> AsyncRx.tag "msgs"
 
-
     let autocomplete =
         let initialModel = init ()
 

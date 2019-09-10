@@ -63,10 +63,11 @@ let stream (model : Model) (msgs: IAsyncObservable<Msg>) =
         let! i, c = AsyncRx.ofSeq chars
         yield! AsyncRx.ofMouseMove ()
             |> AsyncRx.delay (100 * i)
+            |> AsyncRx.requestAnimationFrame
             |> AsyncRx.map (fun m -> Letter (i, string c, int m.clientX + i * 10 + 15 - left, int m.clientY - top))
     } |> AsyncRx.tag "time"
 
 printf "Starting program"
 
-let app = Reaction.StreamComponent initialModel view update stream
+let app = Reaction.StreamView initialModel view update stream
 mountById "reaction-app" (ofFunction app () [])

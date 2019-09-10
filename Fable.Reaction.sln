@@ -11,9 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fable.Reaction", "Fable.Rea
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Fable.Reaction", "Fable.Reaction\src\Fable.Reaction.fsproj", "{8CA23D4B-1E19-4CF2-A647-4DA7C0EF0E78}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reaction", "Reaction", "{ECF1822E-B9CB-419E-A7CE-8B4896A89D83}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Reaction", "Reaction\src\Elmish.Streams.fsproj", "{5C6B887A-5A79-458B-98E6-AE53AAE1BBE9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

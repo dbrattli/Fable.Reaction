@@ -34,13 +34,9 @@ module internal Combine =
                 MailboxProcessor.Start(fun inbox ->
                     let obv key = {
                         new IAsyncObserver<'a> with
-                            member this.OnNextAsync x = async {
-                                do! safeObv.OnNextAsync x
-                            }
-                            member this.OnErrorAsync err = async {
-                                do! safeObv.OnErrorAsync err
-                            }
-                            member this.OnCompletedAsync () = async {
+                            member __.OnNextAsync x = safeObv.OnNextAsync x
+                            member __.OnErrorAsync err = safeObv.OnErrorAsync err
+                            member __.OnCompletedAsync () = async {
                                 Msg.InnerCompleted key |> inbox.Post
                             }
                         }

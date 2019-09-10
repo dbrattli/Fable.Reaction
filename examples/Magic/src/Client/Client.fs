@@ -120,5 +120,5 @@ let stream model msgs =
     | Error exn -> msgs |> AsyncRx.tag "error"
     | App model -> msgs |> AsyncRx.tag "msgs"
 
-let app = Reaction.StreamComponent initialModel view update stream
+let app = Reaction.StreamView initialModel view update stream
 mountById "reaction-app" (ofFunction app () [])

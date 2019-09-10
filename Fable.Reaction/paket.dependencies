@@ -6,7 +6,7 @@ nuget Fable.React ~> 5
 nuget Fable.Browser.WebSocket
 nuget Fable.Browser.Event
 nuget Fable.Fetch
-nuget FSharp.Control.AsyncRx ~> 1.1
+nuget FSharp.Control.AsyncRx ~> 1.2
 
 nuget Microsoft.NET.Test.Sdk ~> 15
 nuget Expecto ~> 8

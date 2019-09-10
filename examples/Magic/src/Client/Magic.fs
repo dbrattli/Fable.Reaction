@@ -269,8 +269,8 @@ let letterStream letterString =
     |> AsyncRx.ofSeq // Make this an observable
     |> AsyncRx.flatMap (fun (i, letter) ->
         AsyncRx.ofMouseMove ()
-//        |> AsyncRx.debounce 10
         |> AsyncRx.delay (100 * i)
+        |> AsyncRx.requestAnimationFrame
         |> AsyncRx.map (fun ev -> (i, { Letter = string letter; X = ev.clientX; Y = ev.clientY }))
     )
 
@@ -321,4 +321,4 @@ let stream model msgs =
 let magic initialString =
     let initialModel = init initialString
 
-    Reaction.StreamComponent initialModel view update stream
+    Reaction.StreamView initialModel view update stream

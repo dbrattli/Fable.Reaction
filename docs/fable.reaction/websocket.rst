@@ -2,7 +2,7 @@
 WebSocket
 =========
 
-Elmish Streams enables you to route stream of messages to the server and
+Fable.Reaction enables you to route stream of messages to the server and
 back again using "message channels".
 
 Note that server side support for WebSocket message handling must also
@@ -38,8 +38,3 @@ resorting to imperative programming.
             |> AsyncRx.msgChannel "ws://localhost:8085/ws" Msg.Encode Msg.Decode
             |> AsyncRx.toStream "msgs"
 
-        Program.mkProgram init update view
-        |> Program.withStream stream
-        |> Program.withReact "elmish-app"
-        |> Program.withDebugger
-        |> Program.run

@@ -21,12 +21,10 @@ module internal Filter =
                                 do! obvAsync.OnNextAsync b
                             | None -> ()
                         }
-                        member this.OnErrorAsync err = async {
-                            do! obvAsync.OnErrorAsync err
-                        }
-                        member this.OnCompletedAsync () = async {
-                            do! obvAsync.OnCompletedAsync ()
-                        }
+                        member __.OnErrorAsync err = obvAsync.OnErrorAsync err
+
+                        member __.OnCompletedAsync () = obvAsync.OnCompletedAsync ()
+
                     }
                 return! source.SubscribeAsync _obv
             }
