@@ -105,7 +105,7 @@ in the stream.
 
 .. code:: fsharp
 
-    let stream (model : Model) (msgs:  Stream<Msg, string>) =
+    let stream (model : Model) (msgs:  IAsyncObservable<Msg>) =
         asyncRx {
             let chars =
                 Seq.toList "TIME FLIES LIKE AN ARROW"

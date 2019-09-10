@@ -3,10 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Elmish Streams
+Fable Reaction
 ==============
 
-Elmish Streams is a collection of projects that combines the power of
+Fable Reaction is a collection of projects that combines the power of
 asynchronous reactive (AsyncRx) functional programming (RFP) with F#,
 `Fable <http://fable.io/>`_ and `Elmish <https://elmish.github.io/>`_
 applications.
@@ -14,7 +14,7 @@ applications.
 .. toctree::
    :maxdepth: 2
 
-   fable.elmish/index
+   fable.reaction/index
    asyncrx/index
 
 Indices and tables

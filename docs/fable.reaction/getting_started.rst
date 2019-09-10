@@ -2,7 +2,7 @@
 Getting Started
 ===============
 
-To use Elmish Streams with Elmish you need to call the
+To use Fable Reaction with Elmish you need to call the
 ``Program.withStream`` with your reactive query. The query function takes
 an ``IAsyncObservable<'msg>`` and returns a possibibly transformed
 ``IAsyncObservable<'msg>``.
@@ -10,20 +10,21 @@ an ``IAsyncObservable<'msg>`` and returns a possibibly transformed
 .. code:: fsharp
 
     open FSharp.Control.AsyncRx // 1. Enable AsyncRx
-    open Elmish.Streams // 2. Enable Elmish Streams
+    open Fable.Reaction // 2. Enable Fable Reaction
 
-    // (your Elmish program here)
+    let update (currentModel : Model) (msg : Msg) : Model =
+        ...
+
+    let view (model : Model) (dispatch : (Msg -> unit)) =
+        ...
 
     let stream model msgs = // 3. Add the reactive stream
         msgs
         |> AsyncRx.delay 1000
         |> AsyncRx.toStream "msgs"
 
-
-    Program.mkSimple init update view
-    |> Program.withStream stream       // 4. Enable the stream in Elmish
-    |> Program.withReact "elmish-app"
-    |> Program.run
+    let app = Reaction.StreamComponent initialModel view update stream
+    mountById "reaction-app" (ofFunction app () [])
 
 Loading initial State
 =====================
@@ -36,7 +37,7 @@ will start with the initialCountLoaded message.
 .. code:: fsharp
 
     // Add open statements to top of file
-    open Elmish.Streams
+    open Fable.Reaction
 
     let loadCount =
         ofPromise (fetchAs<int> "/api/init" [])
@@ -64,7 +65,7 @@ operation if a new query is made before the previous result is ready.
 .. code:: fsharp
 
     // Add open statements to top of file
-    open Elmish.Streams
+    open Fable.Reaction
 
     let stream model msgs =
         msgs

@@ -6,7 +6,7 @@
 Fable Reaction
 ==============
 
-Elimsh Streams is a library combining reactive programming with
+Fable Reaction is a library combining reactive programming with
 the model view update (MVU) style architecture.
 
 .. toctree::
@@ -15,8 +15,6 @@ the model view update (MVU) style architecture.
    getting_started
    install
    mvu
-   streams
-   scaling
    examples
    websocket
    demo.rst
