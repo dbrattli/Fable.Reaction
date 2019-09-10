@@ -6,7 +6,7 @@ open Elmish
 open Elmish.React
 open Fulma
 
-open Components
+open AutoComplete
 open Thoth.Json
 open Fetch
 
@@ -91,7 +91,7 @@ let view (model: Model) (dispatch : Dispatch<Msg>) =
             h1 [] [
                 str "Search Wikipedia"
             ]
-            AutoComplete.autocomplete { Search=searchWikipedia; Dispatch = Select >> dispatch; DebounceTimeout=750 }
+            autocomplete { Search=searchWikipedia; Dispatch = Select >> dispatch; DebounceTimeout=750 }
 
             div [ Style [ MarginTop "30px" ]] [
                 match model.Selection with

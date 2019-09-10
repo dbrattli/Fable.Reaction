@@ -1,4 +1,4 @@
-namespace Components
+namespace AutoComplete
 
 open Fable.Core.JsInterop
 open Fable.React
@@ -8,7 +8,8 @@ open Fable.Reaction
 open Fulma
 open Fable.Core.JS
 
-module AutoComplete =
+[<AutoOpen>]
+module Component =
     type Props = {
         DebounceTimeout: int
         Search: string -> Promise<Result<string list, string>>
