@@ -2,7 +2,8 @@ module Client
 
 open Fable.React
 open Fable.React.Props
-open Fable.Reaction
+open Elmish
+open Elmish.React
 open Fulma
 
 open Components
@@ -15,21 +16,21 @@ open Fetch
 // the initial value will be requested from server
 type Model = {
     Selection: string option
- }
+}
 
 // The Msg type defines what events/actions can occur while the application is running
 // the state of the application changes *only* in reaction to these events
 type Msg =
     | Select of string
 
-let initialModel : Model = {
+let init () : Model = {
     Selection = None
 }
 
 // The update function computes the next state of the application based on the current state and the incoming events/messages
 // It can also run side-effects (encoded as commands) like calling the server via Http.
 // these commands in turn, can dispatch messages to which the update function will react.
-let update (currentModel: Model) (msg: Msg) : Model =
+let update (msg: Msg) (currentModel: Model)  : Model =
     let model =
         match msg with
         | Select entry ->
@@ -108,5 +109,6 @@ let view (model: Model) (dispatch : Dispatch<Msg>) =
         ]
     ]
 
-let app = Reaction.View initialModel view update
-mountById "reaction-app" (ofFunction app () [])
+Program.mkSimple init update view
+|> Program.withReactBatched "elmish-app"
+|> Program.run

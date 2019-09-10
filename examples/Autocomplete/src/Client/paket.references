@@ -1,5 +1,8 @@
 group Client
     FSharp.Core
+    Fable.Elmish
+    Fable.Elmish.Debugger
+    Fable.Elmish.React
     Fable.Core
     Fable.Reaction
     Fable.Fetch

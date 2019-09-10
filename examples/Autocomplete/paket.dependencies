@@ -18,6 +18,9 @@ group Client
     storage: none
 
     nuget Fable.Core ~> 3
+    nuget Fable.Elmish
+    nuget Fable.Elmish.Debugger
+    nuget Fable.Elmish.React
     nuget Fable.Reaction ~> 3
     nuget Fable.Fetch ~> 2
     nuget Fable.React ~> 5
