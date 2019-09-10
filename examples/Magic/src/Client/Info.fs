@@ -1,10 +1,11 @@
 module Info
 
 open Fable.React
+open Fable.React.Props
 
 open Fulma
 open Fulma.Extensions.Wikiki
-open Elmish.Streams
+open Fable.Reaction
 open FSharp.Control
 
 open Utils
@@ -27,7 +28,7 @@ let init letterString = {
     Remote = false
 }
 
-let update msg model =
+let update model msg =
     match msg with
     | MsgAdded ->
         { model with Msgs = model.Msgs + 1 }
@@ -71,8 +72,8 @@ let viewStatus dispatch model =
     ]
 
 let view model dispatch =
-    Container.container [] [
-        Heading.h3 [] [ str "Subcomponent 2" ]
+    Container.container [ Container.Option.Props [ Style [ Border "1px dashed"; Margin "20px"; Padding "20px" ]]] [
+        Heading.h3 [] [ str "Info Component" ]
         Heading.h4 [ Heading.IsSubtitle ] [ str "Different Websocket subscription" ]
         Columns.columns [] [
             Column.column [] [
@@ -96,12 +97,16 @@ let stream model msgs =
             websocket
             |> AsyncRx.map (fun _ -> MsgAdded)
             |> AsyncRx.merge letterStringQuery
-            |> AsyncRx.toStream "remote"
 
-        Stream.batch [
-            remote
-            msgs
-        ]
+        remote
+        |> AsyncRx.merge msgs
+        |> AsyncRx.tag "remote"
 
     else
         msgs
+        |> AsyncRx.tag "msgs"
+
+let info initialString =
+    let initialModel = init initialString
+    Reaction.StreamView initialModel view update stream
+

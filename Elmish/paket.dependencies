@@ -1,7 +1,0 @@
-source https://www.nuget.org/api/v2
-source /Users/dbrattli/Developer/packages
-
-storage: none
-
-nuget Elmish ~> 3
-nuget FSharp.Control.AsyncRx ~> 1

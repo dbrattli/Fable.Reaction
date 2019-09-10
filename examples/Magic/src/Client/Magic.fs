@@ -10,7 +10,7 @@ open Fulma
 open Fulma.Extensions.Wikiki
 
 open FSharp.Control
-open Elmish.Streams
+open Fable.Reaction
 open Utils
 
 type LetterSource =
@@ -76,8 +76,10 @@ let withEditLetterString model =
     | Show letterString ->
         { model with LetterString = Edit letterString }
 
-    | Edit letterString ->
-        model
+    | Edit _ ->
+        { model with
+            Letters = None
+        }
 
 let withEditedLetterString letterString model =
     match model.LetterString with
@@ -90,7 +92,10 @@ let withEditedLetterString letterString model =
 let withShowLetterString letterString model =
     { model with LetterString = Show letterString }
 
-let update (msg : Msg) (model : Model) : Model =
+let update (model : Model) (msg : Msg) : Model =
+    //printfn "Model %A" model
+    //printfn "Msg %A" msg
+
     match msg with
     | EditLetterStringRequested ->
         model |> withEditLetterString
@@ -129,24 +134,27 @@ let offsetX x i =
     (int x) + i * 10 + 15
 
 let drawLetters letters = [
-    [ for KeyValue(i, pos) in letters do
-       yield span [ Key (string i); Style [Top pos.Y; Left (offsetX pos.X i); Position PositionOptions.Fixed] ]
-          [ str pos.Letter ]] |> ofList
-  ]
+    [
+        for KeyValue(i, pos) in letters do
+            yield span [ Key (string i)
+                         Style [Top pos.Y
+                                Left (offsetX pos.X i)
+                                Position PositionOptions.Fixed ]] [
+                    str pos.Letter
+                ]
+    ] |> ofList
+]
 
 let viewLetters model =
-    match model.Letters with
-    | None ->
-        str ""
-
-    | Local letters ->
-        letters |> drawLetters |> div []
-
-    | Remote letters ->
-        letters |> drawLetters |> div []
-
-    |> List.singleton
-    |> div [ Style [ FontFamily "Consolas, monospace"; FontWeight "Bold"; Height "100%"] ]
+    div [ Style [ FontFamily "Consolas, monospace"; FontWeight "Bold"; Height "100%"] ] [
+        match model.Letters with
+        | None ->
+            yield str ""
+        | Local letters ->
+            yield!  drawLetters letters
+        | Remote letters ->
+            yield! drawLetters letters
+    ]
 
 
 let letterSubscription model =
@@ -197,7 +205,7 @@ let viewLetterString letterString dispatch =
     match letterString with
     | Show letterString ->
         div [] [
-            str <| letterString
+            str letterString
             str " "
 
             Button.button [
@@ -213,7 +221,7 @@ let viewLetterString letterString dispatch =
                     Input.text [
                         Input.Placeholder "Magic String"
                         Input.DefaultValue letterString
-                        Input.Props [ OnChange (fun event -> LetterStringEdited (!!event.target?value) |> dispatch) ]
+                        Input.Props [ OnChange (fun event ->  !!event.target?value |> LetterStringEdited |> dispatch) ]
                     ]
                 ]
 
@@ -229,8 +237,8 @@ let viewLetterString letterString dispatch =
 
 
 let view model dispatch =
-    div [] [
-        Heading.h3 [] [ str "Subcomponent 1" ]
+    div [ Style [ Border "1px dashed"; Margin "20px"; Padding "20px" ]] [
+        Heading.h3 [] [ str "Magic Component" ]
         Heading.h4 [ Heading.IsSubtitle ] [ str "Magic String over websockets (when activated)" ]
         Columns.columns [] [
             Column.column [] [
@@ -253,6 +261,7 @@ let view model dispatch =
         ]
     ]
 
+// Create timefiles stream of letter string
 let letterStream letterString =
     letterString
     |> Seq.toList // Split into list of characters
@@ -261,13 +270,14 @@ let letterStream letterString =
     |> AsyncRx.flatMap (fun (i, letter) ->
         AsyncRx.ofMouseMove ()
         |> AsyncRx.delay (100 * i)
+        |> AsyncRx.requestAnimationFrame
         |> AsyncRx.map (fun ev -> (i, { Letter = string letter; X = ev.clientX; Y = ev.clientY }))
     )
 
 let extractedLetterString letterString =
     match letterString with
-    | Show letterString | Edit letterString ->
-        letterString
+    | Show letterString -> letterString
+    | Edit _ -> ""
 
 
 let stream model msgs =
@@ -276,15 +286,11 @@ let stream model msgs =
         let letterString =
             model.LetterString |> extractedLetterString
 
-        let letters =
-            letterString
-            |> letterStream
-            |> AsyncRx.map Letter
-            |> AsyncRx.toStream (letterString + "_local")
-        Stream.batch [
-            letters
-            msgs
-        ]
+        letterString
+        |> letterStream
+        |> AsyncRx.map Letter
+        |> AsyncRx.merge msgs
+        |> AsyncRx.tag (letterString + "_local")
 
     | Remote _ ->
         let stringQuery =
@@ -293,7 +299,7 @@ let stream model msgs =
 
         let letterStringQuery =
             stringQuery
-            |> AsyncRx.map Shared.Msg.LetterStringChanged
+            |> AsyncRx.map LetterStringChanged
 
         let remote =
             stringQuery
@@ -302,13 +308,17 @@ let stream model msgs =
             |> AsyncRx.map Shared.Msg.Letter
             |> AsyncRx.merge letterStringQuery
             |> server
+//            |> AsyncRx.retry 10
             |> AsyncRx.map RemoteMsg
-            |> AsyncRx.toStream "_remote"
 
-        Stream.batch [
-            remote
-            msgs
-        ]
-
+        remote
+        |> AsyncRx.merge msgs
+        |> AsyncRx.tag "_remote"
     | _ ->
         msgs
+        |> AsyncRx.tag "msgs"
+
+let magic initialString =
+    let initialModel = init initialString
+
+    Reaction.StreamView initialModel view update stream

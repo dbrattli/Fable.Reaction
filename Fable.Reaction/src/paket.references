@@ -1,0 +1,7 @@
+FSharp.Core
+Fable.Core
+Fable.React
+Fable.Browser.WebSocket
+Fable.Browser.Event
+Fable.Fetch
+FSharp.Control.AsyncRx

@@ -1,6 +1,8 @@
 namespace FSharp.Control
 
+open System
 open System.Threading
+open Core
 
 #if !FABLE_COMPILER
 open FSharp.Control
@@ -24,16 +26,38 @@ module AsyncObservable =
             do! this.SubscribeAsync (AsyncObserver obv) |> Async.Ignore
         }
 
+        member this.Run (obv: IAsyncObserver<'a>) =
+            this.RunAsync obv |> Async.Start'
+
         /// Subscribes the async observer function (`Notification{'a} -> Async{unit}`)
         /// to the AsyncObservable
-        member this.SubscribeAsync<'a> (obv: Notification<'a> -> Async<unit>) = async {
-            let! disposable = this.SubscribeAsync (AsyncObserver obv)
-            return disposable
-        }
+        member this.SubscribeAsync<'a> (obv: Notification<'a> -> Async<unit>) : Async<IAsyncDisposable> =
+            async {
+                let! disposable = this.SubscribeAsync (AsyncObserver obv)
+                return disposable
+            }
 
     /// Returns an observable sequence that contains the elements of
     /// the given sequences concatenated together.
     let (++) source other = Combine.concatSeq [source; other]
+
+[<AutoOpen>]
+module Observable =
+    type IObservable<'a> with
+        /// Subscribes a dispatch function taking notifications.
+        member this.Subscribe<'a> (dispatch: Notification<'a> -> unit) : IDisposable =
+            this.Subscribe (Observer dispatch)
+
+        /// Convert observable (IObservable) to async observable (IAsyncObservable).
+        member this.ToAsyncObservable<'a> () : IAsyncObservable<'a> =
+             { new IAsyncObservable<'a> with
+                member __.SubscribeAsync aobv =
+                    async {
+                        let obv = aobv.ToObserver ()
+                        let disposable = this.Subscribe obv
+                        return disposable.ToAsyncDisposable ()
+                    }
+            }
 
 /// A single module that contains all the operators. Nicer and shorter way than writing
 /// AsyncObservable. We want to prefix our operators so we don't mix e.g. `map` with other modules.
@@ -260,6 +284,10 @@ module AsyncRx =
     let catch (handler: exn -> IAsyncObservable<'a>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
         Transformation.catch handler source
 
+    /// Retries the given Observable retryCount number of times.
+    let retry (retryCount: int) (source: IAsyncObservable<'a>) : IAsyncObservable<'a>=
+        Transformation.retry retryCount source
+
     /// Projects each element of an observable sequence into an
     /// observable sequence and merges the resulting observable
     /// sequences back into one observable sequence.
@@ -298,6 +326,9 @@ module AsyncRx =
     let flatMapLatestAsync (mapperAsync: 'a -> Async<IAsyncObservable<'b>>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
         Transformation.flatMapLatestAsync mapperAsync source
 
+    let concatMap (mapper:'a -> IAsyncObservable<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
+        Transformation.concatMap mapper source
+
     /// Returns an observable sequence whose elements are the result of
     /// invoking the mapper function on each element of the source.
     let map (mapper:'a -> 'b) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
@@ -335,6 +366,10 @@ module AsyncRx =
     let share (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
         Transformation.share source
 
+    /// Convert an async observable to an observable.
+    let toObservable (source: IAsyncObservable<'a>) : IObservable<'a> =
+        Transformation.toObservable source
+
   // Subjects Region
 
     /// A stream is both an observable sequence as well as an observer.
@@ -342,9 +377,9 @@ module AsyncRx =
     let subject<'a> () : IAsyncObserver<'a> * IAsyncObservable<'a> =
         Subjects.subject<'a> ()
 
-    /// A mailbox stream is a subscribable mailbox. Each message is
+    /// A mailbox subject is a subscribable mailbox. Each message is
     /// broadcasted to all subscribed observers.
-    let mbStream<'a> () : MailboxProcessor<Notification<'a>>*IAsyncObservable<'a> =
+    let mbSubject<'a> () : MailboxProcessor<Notification<'a>>*IAsyncObservable<'a> =
         Subjects.mbSubject<'a> ()
 
     /// A cold stream that only supports a single subscriber. Will await the

@@ -1,5 +1,6 @@
 namespace FSharp.Control
 
+open System
 open Core
 
 [<RequireQualifiedAccess>]
@@ -11,16 +12,12 @@ module internal Transformation =
             async {
                 let _obv =
                     { new IAsyncObserver<'a> with
-                        member this.OnNextAsync x = async {
+                        member __.OnNextAsync x = async {
                             let! b = mapperAsync x
                             do! aobv.OnNextAsync b
                         }
-                        member this.OnErrorAsync err = async {
-                            do! aobv.OnErrorAsync err
-                        }
-                        member this.OnCompletedAsync () = async {
-                            do! aobv.OnCompletedAsync ()
-                        }
+                        member __.OnErrorAsync err = aobv.OnErrorAsync err
+                        member __.OnCompletedAsync () = aobv.OnCompletedAsync ()
                     }
                 return! source.SubscribeAsync _obv
             }
@@ -100,13 +97,9 @@ module internal Transformation =
             let innerAgent =
                 let obv (mb: MailboxProcessor<InnerSubscriptionCmd<'a>>) (id: int) = {
                     new IAsyncObserver<'a> with
-                        member this.OnNextAsync x = async {
-                            do! safeObserver.OnNextAsync x
-                        }
-                        member this.OnErrorAsync err = async {
-                            do! safeObserver.OnErrorAsync err
-                        }
-                        member this.OnCompletedAsync () = async {
+                        member __.OnNextAsync x = safeObserver.OnNextAsync x
+                        member __.OnErrorAsync err = safeObserver.OnErrorAsync err
+                        member __.OnCompletedAsync () = async {
                             mb.Post (InnerCompleted id)
                         }
                     }
@@ -191,16 +184,13 @@ module internal Transformation =
                 let rec action (source: IAsyncObservable<_>) = async {
                     let _obv = {
                         new IAsyncObserver<'a> with
-                        member this.OnNextAsync x = async {
-                            do! aobv.OnNextAsync x
-                        }
-                        member this.OnErrorAsync err = async {
+                        member __.OnNextAsync x = aobv.OnNextAsync x
+                        member __.OnErrorAsync err =
                             let nextSource = handler err
-                            do! action nextSource
-                        }
-                        member this.OnCompletedAsync () = async {
-                            do! aobv.OnCompletedAsync ()
-                        }
+                            action nextSource
+
+                        member __.OnCompletedAsync () = aobv.OnCompletedAsync ()
+
                     }
                     do! disposable.DisposeAsync ()
                     let! subscription = source.SubscribeAsync _obv
@@ -208,13 +198,23 @@ module internal Transformation =
                 }
                 do! action source
 
-                let cancel () =
-                    async {
-                        do! disposable.DisposeAsync ()
-                    }
+                let cancel () = disposable.DisposeAsync ()
+
                 return AsyncDisposable.Create cancel
             }
         { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
+
+    let retry (retryCount: int) (source: IAsyncObservable<'a>) =
+        let mutable count = retryCount
+
+        let factory exn =
+            match count with
+            | 0 ->  Create.fail exn
+            | _ ->
+                count <- count - 1
+                source
+
+        catch factory source
 
     type Cmd =
         | Connect
@@ -259,11 +259,24 @@ module internal Transformation =
 
                 let! disposable = stream.SubscribeAsync aobv
                 let cancel () =
-                    async {
-                        mb.Post Dispose
-                        do! disposable.DisposeAsync ()
-                    }
+                    mb.Post Dispose
+                    disposable.DisposeAsync ()
+
                 return AsyncDisposable.Create cancel
             }
 
         { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
+
+    let toObservable (source: IAsyncObservable<'a>) : IObservable<'a> =
+        let mutable subscription : IAsyncDisposable = AsyncDisposable.Empty
+
+        { new IObservable<'a> with
+            member __.Subscribe obv =
+                async {
+                    let aobv = obv.ToAsyncObserver ()
+                    let! disposable = source.SubscribeAsync aobv
+                    subscription <- disposable
+                } |> Async.Start'
+
+                subscription.ToDisposable ()
+        }

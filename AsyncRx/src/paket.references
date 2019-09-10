@@ -1,2 +1,3 @@
-FSharp.Core
-FSharp.Control.AsyncSeq
+group AsyncRx
+    FSharp.Core
+    FSharp.Control.AsyncSeq

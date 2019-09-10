@@ -1,13 +1,10 @@
 module Client
 
+open Browser.Dom
 open Fable.React
 open Fable.React.Props
-open Fable.Core
+open Fable.Reaction
 open FSharp.Control
-open Elmish
-open Elmish.React
-open Elmish.Streams
-open Browser.Dom
 
 // The model holds data that you want to keep track of while the
 // application is running
@@ -23,22 +20,24 @@ type Msg =
 
 // The update function computes the next state of the application based
 // on the current state and the incoming messages
-let update (msg : Msg) (currentModel : Model) : Model =
+let update (currentModel : Model) (msg : Msg) : Model =
     match currentModel.Letters, msg with
     | _, Letter (i, c, x, y) ->
         { currentModel with Letters = currentModel.Letters.Add (i, (c, x, y)) }
 
-let view (model : Model) (dispatch : Dispatch<Msg>) =
+let view (model : Model) (dispatch : Msg -> unit)=
     let letters = model.Letters
 
-    div [ Style [ FontFamily "Consolas, monospace"; Height "100%"] ]
-        [
-            [ for KeyValue(i, (c, x, y)) in letters do
-                yield span [ Key (c + string i); Style [Top y; Left x; Position (PositionOptions.Fixed)] ]
-                    [ str c ] ] |> ofList
+    div [ Style [ FontFamily "Consolas, monospace"; Height "100%"] ] [
+            [
+                for KeyValue(i, (c, x, y)) in letters do
+                    yield span [ Key (c + string i); Style [Top y; Left x; Position (PositionOptions.Fixed)] ] [
+                        str c
+                    ]
+            ] |> ofList
         ]
 
-let init () : Model =
+let initialModel : Model =
     { Letters = Map.empty }
 
 let getOffset (element: Browser.Types.Element) =
@@ -51,11 +50,11 @@ let getOffset (element: Browser.Types.Element) =
 
     int (scrollTop - clientTop), int (scrollLeft - clientLeft)
 
-let container = document.querySelector "#elmish-app"
+let container = document.querySelector "#reaction-app"
 let top, left = getOffset container
 
 // Message stream transformation (expression style)
-let stream (model : Model) (msgs:  Stream<Msg, string>) =
+let stream (model : Model) (msgs: IAsyncObservable<Msg>) =
     asyncRx {
         let chars =
             Seq.toList "TIME FLIES LIKE AN ARROW"
@@ -64,10 +63,11 @@ let stream (model : Model) (msgs:  Stream<Msg, string>) =
         let! i, c = AsyncRx.ofSeq chars
         yield! AsyncRx.ofMouseMove ()
             |> AsyncRx.delay (100 * i)
+            |> AsyncRx.requestAnimationFrame
             |> AsyncRx.map (fun m -> Letter (i, string c, int m.clientX + i * 10 + 15 - left, int m.clientY - top))
-    } |> AsyncRx.toStream "msgs"
+    } |> AsyncRx.tag "time"
 
-Program.mkSimple init update view
-|> Program.withStream stream "msgs"
-|> Program.withReactBatched "elmish-app"
-|> Program.run
+printf "Starting program"
+
+let app = Reaction.StreamView initialModel view update stream
+mountById "reaction-app" (ofFunction app () [])

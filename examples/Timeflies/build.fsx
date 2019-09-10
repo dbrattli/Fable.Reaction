@@ -1,6 +1,5 @@
 #r "paket: groupref build //"
 #load "./.fake/build.fsx/intellisense.fsx"
-#load "./src/Server/Version.fs"
 
 #if !FAKE
 #r "netstandard"
@@ -12,13 +11,15 @@ open System
 open Fake.Core
 open Fake.DotNet
 open Fake.IO
-open Fake.Runtime
-open ServerCode.Version
+
+Target.initEnvironment ()
 
 let serverPath = Path.getFullName "./src/Server"
 let clientPath = Path.getFullName "./src/Client"
 let clientDeployPath = Path.combine clientPath "deploy"
 let deployDir = Path.getFullName "./deploy"
+
+let release = ReleaseNotes.load "RELEASE_NOTES.md"
 
 let platformTool tool winTool =
     let tool = if Environment.isUnix then tool else winTool
@@ -69,12 +70,16 @@ Target.create "InstallClient" (fun _ ->
     printfn "Yarn version:"
     runTool yarnTool "--version" __SOURCE_DIRECTORY__
     runTool yarnTool "install --frozen-lockfile" __SOURCE_DIRECTORY__
-    runDotNet "restore" clientPath
 )
 
 Target.create "Build" (fun _ ->
     runDotNet "build" serverPath
-    runTool yarnTool (sprintf "webpack-cli -p --env.VERSION=%s" Version) __SOURCE_DIRECTORY__
+    Shell.regexReplaceInFileWithEncoding
+        "let app = \".+\""
+       ("let app = \"" + release.NugetVersion + "\"")
+        System.Text.Encoding.UTF8
+        (Path.combine clientPath "Version.fs")
+    runTool yarnTool "webpack-cli -p" __SOURCE_DIRECTORY__
 )
 
 Target.create "Run" (fun _ ->
@@ -82,11 +87,11 @@ Target.create "Run" (fun _ ->
         runDotNet "watch run" serverPath
     }
     let client = async {
-        runTool yarnTool (sprintf "webpack-dev-server --env.VERSION=%s" Version) __SOURCE_DIRECTORY__
+        runTool yarnTool "webpack-dev-server" __SOURCE_DIRECTORY__
     }
     let browser = async {
         do! Async.Sleep 5000
-        openBrowser "http://localhost:8085"
+        openBrowser "http://localhost:8080"
     }
 
     let vsCodeSession = Environment.hasEnvironVar "vsCodeSession"
@@ -103,28 +108,9 @@ Target.create "Run" (fun _ ->
     |> ignore
 )
 
-let buildDocker tag =
-    let args = sprintf "build -t %s ." tag
-    runTool "docker" args "."
 
-Target.create "Bundle" (fun _ ->
-    let serverDir = Path.combine deployDir "Server"
-    let clientDir = Path.combine deployDir "Client"
-    let publicDir = Path.combine clientDir "public"
 
-    let publishArgs = sprintf "publish -c Release -o \"%s\"" serverDir
-    runDotNet publishArgs serverPath
 
-    Shell.copyDir publicDir clientDeployPath FileFilter.allFiles
-)
-
-let dockerUser = "dbrattli"
-let dockerImageName = "camp-brattli"
-let dockerFullName = sprintf "%s/%s" dockerUser dockerImageName
-
-Target.create "Docker" (fun _ ->
-    buildDocker dockerFullName
-)
 
 
 open Fake.Core.TargetOperators
@@ -132,8 +118,6 @@ open Fake.Core.TargetOperators
 "Clean"
     ==> "InstallClient"
     ==> "Build"
-    ==> "Bundle"
-    ==> "Docker"
 
 
 "Clean"

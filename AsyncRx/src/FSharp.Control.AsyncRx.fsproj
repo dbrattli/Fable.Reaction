@@ -3,18 +3,19 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>FSharp.Control.AsyncRx</PackageId>
-    <Version>1.0.0</Version>
-    <PackageVersion>1.0.0</PackageVersion>
+    <Version>1.2.1</Version>
+    <PackageVersion>1.2.1</PackageVersion>
     <Authors>Dag Brattli</Authors>
     <Company>Brattli Labs</Company>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="Types.fs" />
+    <Compile Include="Core.fs" />
     <Compile Include="AsyncDisposable.fs" />
     <Compile Include="AsyncObserver.fs" />
-    <Compile Include="Core.fs" />
     <Compile Include="Subject.fs" />
     <Compile Include="Create.fs" />
     <Compile Include="Leave.fs" />
@@ -26,6 +27,9 @@
     <Compile Include="Tap.fs" />
     <Compile Include="AsyncObservable.fs" />
     <Compile Include="Query.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\LICENSE" Pack="true" Visible="false" PackagePath=""/>
   </ItemGroup>
   <ItemGroup>
     <Content Include="*.fsproj; *.fs" PackagePath="fable\" />

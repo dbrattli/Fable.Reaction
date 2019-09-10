@@ -1,12 +1,8 @@
 namespace FSharp.Control
 
 open System.Threading
-open System.Runtime.CompilerServices
 
-[<assembly:InternalsVisibleTo("Tests")>]
-do()
-
-module internal Core =
+module Core =
     let infinite = Seq.initInfinite id
 
     let noopAsync = fun _ -> async { () }

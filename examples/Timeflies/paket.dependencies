@@ -17,25 +17,19 @@ group Client
     source https://api.nuget.org/v3/index.json
 
     nuget Fable.Core ~> 3
-    nuget Fable.Elmish ~> 3
-    nuget Fable.Elmish.React ~> 3
-    nuget Fable.Elmish.Streams ~> 3
+    nuget Fable.Reaction ~> 3
     nuget Fable.Import.Browser ~> 1
-    nuget Fable.PowerPack ~> 2
     nuget Fable.Browser.Dom
-    #   nuget Fulma
-
-    clitool dotnet-fable ~> 2
 
 group Build
     source https://api.nuget.org/v3/index.json
     framework: netstandard2.0
     storage: none
 
-    nuget FSharp.Core 4.3.4 // https://github.com/fsharp/FAKE/issues/2001
+    nuget FSharp.Core
+    nuget Fake.Core.ReleaseNotes
     nuget Fake.Core.Target
     nuget Fake.DotNet.Cli
     nuget Fake.IO.FileSystem
-    nuget Fake.Runtime
 
 

@@ -461,3 +461,7 @@ gh-pages/_book
 .mypy_cache
 .vscode
 .metals
+AsyncRx/.ionide
+AsyncRx/.paket/.store
+.ionide
+examples/Timeflies/.paket/.store
