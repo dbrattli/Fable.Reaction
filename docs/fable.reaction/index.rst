@@ -12,6 +12,7 @@ the model view update (MVU) style architecture.
 .. toctree::
    :maxdepth: 1
 
+   introduction
    getting_started
    install
    mvu

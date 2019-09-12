@@ -42,7 +42,7 @@ module Reaction =
                 )
 
             { new IDisposable with
-                member this.Dispose () =
+                member __.Dispose () =
                         debug ("[Fable.Reaction] Stream disposed: ", tag)
                         disposable.Dispose () }
         , [| tag |])
@@ -82,4 +82,4 @@ module Reaction =
             let dispatch, _ = useStatefulStream(model.current, model.update, stream props)
 
             view props model.current dispatch
-        , "Reaction.StreamView")
+        , "Reaction.StreamViewWithProps")

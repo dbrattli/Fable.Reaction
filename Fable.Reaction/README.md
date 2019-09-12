@@ -14,7 +14,7 @@ Fable.Reaction is is built on the Async Reactive ([Rx](http://reactivex.io/)) li
 
 ## Documentation
 
-Please check out the [documentation](https://dbrattli.github.io/Elmish.Streams/)
+Please check out the [documentation](http://fablereaction.rtfd.io/)
 
 ## Install
 

@@ -2,10 +2,11 @@
 Getting Started
 ===============
 
-To use Fable Reaction with Elmish you need to call the
-``Program.withStream`` with your reactive query. The query function takes
-an ``IAsyncObservable<'msg>`` and returns a possibibly transformed
-``IAsyncObservable<'msg>``.
+To use Fable.Reaction you need to create an instance of a `StreamView`.
+The `StreamView` works almost the same way as an Elmish application
+taking an initial model, a view and and update function. In addition it
+takes a stream function that transforms the stream of dispatched
+messages before they reach the update function.
 
 .. code:: fsharp
 
@@ -23,7 +24,7 @@ an ``IAsyncObservable<'msg>`` and returns a possibibly transformed
         |> AsyncRx.delay 1000
         |> AsyncRx.toStream "msgs"
 
-    let app = Reaction.StreamComponent initialModel view update stream
+    let app = Reaction.StreamView initialModel view update stream
     mountById "reaction-app" (ofFunction app () [])
 
 Loading initial State
@@ -51,6 +52,34 @@ will start with the initialCountLoaded message.
             loadCount
         | _ ->
             msgs
+
+Using Fable.Reaction with Elmish
+================================
+
+Fable.Reaction can be used all by itself without Elmish. But if you want
+to use Fable Reaction with Elmish you just add the Fable.Reaction component
+to the Elmish view like any other element such as e.g `div` and `str`. A
+Fable.Reaction component produces a `ReactElement` that can be used
+anywhere in your view such as with the `autocomplete` component below.
+
+.. code:: fsharp
+
+    let view (model: Model) (dispatch : Dispatch<Msg>) =
+        Container.container [] [
+            h1 [] [
+                str "Search Wikipedia"
+            ]
+            autocomplete { Search=searchWikipedia; Dispatch = Select >> dispatch; DebounceTimeout=750 }
+
+            div [ Style [ MarginTop "30px" ]] [
+                match model.Selection with
+                | Some selection ->
+                    yield str "Selection: "
+                    yield str selection
+                | None -> ()
+            ]
+        ]
+
 
 
 Doing side effects per message

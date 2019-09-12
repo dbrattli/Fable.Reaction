@@ -6,7 +6,7 @@ Fable.Reaction enables you to route stream of messages to the server and
 back again using "message channels".
 
 Note that server side support for WebSocket message handling must also
-be in place using ``Elmish.Streams.AspNetCoreMiddleWare``.
+be in place using ``Reaction.AspNetCoreMiddleWare``.
 
 Message Channel
 ===============
