@@ -117,7 +117,7 @@ module Middleware =
                             elif result.EndOfMessage then
                                 logger.LogDebug ("Received message end with {bytes} bytes", result.Count)
                                 return
-                                    buffer.[0..result.Count] :: messages
+                                    buffer.[0..result.Count - 1] :: messages
                                     |> List.rev
                                     |> Array.concat
                                     |> System.Text.Encoding.UTF8.GetString
