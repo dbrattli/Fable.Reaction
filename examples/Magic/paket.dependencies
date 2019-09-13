@@ -10,7 +10,7 @@ group Server
     nuget Microsoft.AspNetCore.StaticFiles
     nuget Fable.JsonConverter
     nuget FSharp.Control.AsyncRx
-    nuget Elmish.Streams.AspNetCore.Middleware
+    nuget Reaction.AspNetCore.Middleware
     nuget Microsoft.AspNetCore.WebSockets
     nuget Thoth.Json.Net ~> 2
 
