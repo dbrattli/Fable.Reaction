@@ -93,9 +93,6 @@ let withShowLetterString letterString model =
     { model with LetterString = Show letterString }
 
 let update (model : Model) (msg : Msg) : Model =
-    //printfn "Model %A" model
-    //printfn "Msg %A" msg
-
     match msg with
     | EditLetterStringRequested ->
         model |> withEditLetterString
@@ -279,8 +276,9 @@ let extractedLetterString letterString =
     | Show letterString -> letterString
     | Edit _ -> ""
 
-
+open System.Threading.Tasks
 let stream model msgs =
+
     match model.Letters with
     | Local _ ->
         let letterString =

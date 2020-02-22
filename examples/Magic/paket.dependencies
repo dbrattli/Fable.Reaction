@@ -3,6 +3,7 @@ source https://www.nuget.org/api/v2
 group Server
     storage: none
     source https://api.nuget.org/v3/index.json
+    framework: netcoreapp3.1
 
     nuget FSharp.Core
     nuget Giraffe
