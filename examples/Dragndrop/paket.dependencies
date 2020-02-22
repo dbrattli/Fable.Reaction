@@ -1,10 +1,11 @@
 group Server
     source https://api.nuget.org/v3/index.json
-    framework: netcoreapp2.2
+    framework: netcoreapp3.1
     storage: none
 
     nuget FSharp.Core
-    nuget Saturn
+    nuget Microsoft.AspNetCore
+    nuget Microsoft.AspNetCore.StaticFiles
     nuget Thoth.Json.Giraffe
 
 group Client
