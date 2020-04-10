@@ -9,8 +9,8 @@ open FSharp.Control.Core
     /// sequence and returns each intermediate result. The seed value is
     /// used as the initial accumulator value. Returns an observable
     /// sequence containing the accumulated values.
-    let scanInitAsync (initial: 's) (accumulator: 's -> 'a -> Async<'s>) (source: IAsyncObservable<'a>) : IAsyncObservable<'s> =
-        let subscribeAsync (aobv : IAsyncObserver<'s>) =
+    let scanInitAsync (initial: 'TState) (accumulator: 'TState -> 'TSource -> Async<'TState>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TState> =
+        let subscribeAsync (aobv : IAsyncObserver<'TState>) =
             let safeObserver = safeObserver aobv
             let mutable state = initial
 
@@ -30,14 +30,14 @@ open FSharp.Control.Core
                     }
                 return! AsyncObserver obv |> source.SubscribeAsync
             }
-        { new IAsyncObservable<'s> with member __.SubscribeAsync o = subscribeAsync o }
+        { new IAsyncObservable<'TState> with member __.SubscribeAsync o = subscribeAsync o }
 
     /// Applies an async accumulator function over an observable
     /// sequence and returns each intermediate result. The first value
     /// is used as the initial accumulator value. Returns an observable
     /// sequence containing the accumulated values.
-    let scanAsync (accumulator: 'a -> 'a -> Async<'a>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
-        let subscribeAsync (aobv : IAsyncObserver<'a>) =
+    let scanAsync (accumulator: 'TSource -> 'TSource -> Async<'TSource>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
+        let subscribeAsync (aobv : IAsyncObserver<'TSource>) =
             let safeObserver = safeObserver aobv
             let mutable states = None
 
@@ -61,17 +61,17 @@ open FSharp.Control.Core
                     }
                 return! AsyncObserver obv |> source.SubscribeAsync
             }
-        { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
+        { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 
 
     /// Groups the elements of an observable sequence according to a
     /// specified key mapper function. Returns a sequence of observable
     /// groups, each of which corresponds to a given key.
-    let groupBy (keyMapper: 'a -> 'g) (source: IAsyncObservable<'a>) : IAsyncObservable<IAsyncObservable<'a>> =
-        let subscribeAsync (aobv: IAsyncObserver<IAsyncObservable<'a>>) =
+    let groupBy (keyMapper: 'TSource -> 'TKey) (source: IAsyncObservable<'TSource>) : IAsyncObservable<IAsyncObservable<'TSource>> =
+        let subscribeAsync (aobv: IAsyncObserver<IAsyncObservable<'TSource>>) =
             let cts = new CancellationTokenSource()
             let agent = MailboxProcessor.Start((fun inbox ->
-                let rec messageLoop ((groups, disposed) : Map<'g, IAsyncObserver<'a>>*bool) = async {
+                let rec messageLoop ((groups, disposed) : Map<'TKey, IAsyncObserver<'TSource>>*bool) = async {
                     let! n = inbox.Receive ()
 
                     if disposed then
@@ -112,7 +112,7 @@ open FSharp.Control.Core
                 messageLoop (Map.empty, false)), cts.Token)
 
             async {
-                let obv (n : Notification<'a>) =
+                let obv (n : Notification<'TSource>) =
                     async {
                         agent.Post n
                     }
@@ -123,4 +123,4 @@ open FSharp.Control.Core
                 }
                 return AsyncDisposable.Create cancel
             }
-        { new IAsyncObservable<IAsyncObservable<'a>> with member __.SubscribeAsync o = subscribeAsync o }
+        { new IAsyncObservable<IAsyncObservable<'TSource>> with member __.SubscribeAsync o = subscribeAsync o }

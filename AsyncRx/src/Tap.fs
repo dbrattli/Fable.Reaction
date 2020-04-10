@@ -5,12 +5,12 @@ open Core
 [<RequireQualifiedAccess>]
 module internal Tap =
     /// Tap asynchronously into the stream performing side effects by the given async actions.
-    let tapAsync (onNextAsync: 'a -> Async<unit>) (onErrorAsync: exn -> Async<unit>) (onCompletedAsync: unit -> Async<unit>)
-        (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
-        let subscribeAsync (obvAsync : IAsyncObserver<'a>) =
+    let tapAsync (onNextAsync: 'TSource -> Async<unit>) (onErrorAsync: exn -> Async<unit>) (onCompletedAsync: unit -> Async<unit>)
+        (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
+        let subscribeAsync (obvAsync : IAsyncObserver<'TSource>) =
             async {
                 let _obv =
-                    { new IAsyncObserver<'a> with
+                    { new IAsyncObserver<'TSource> with
                         member this.OnNextAsync x = async {
                             // Let exceptions bubble to the top
                             do! onNextAsync x
@@ -27,14 +27,14 @@ module internal Tap =
                     }
                 return! source.SubscribeAsync _obv
             }
-        { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
+        { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 
     /// Tap asynchronously into the stream performing side effects by the given `onNextAsync` action.
-    let tapOnNextAsync (onNextAsync: 'a -> Async<unit>) : IAsyncObservable<'a> -> IAsyncObservable<'a> =
+    let tapOnNextAsync (onNextAsync: 'TSource -> Async<unit>) : IAsyncObservable<'TSource> -> IAsyncObservable<'TSource> =
         tapAsync onNextAsync noopAsync noopAsync
 
     /// Tap synchronously into the stream performing side effects by the given `onNext` action.
-    let tapOnNext (onNext: 'a -> unit) : IAsyncObservable<'a> -> IAsyncObservable<'a> =
+    let tapOnNext (onNext: 'TSource -> unit) : IAsyncObservable<'TSource> -> IAsyncObservable<'TSource> =
         let onNextAsync x = async {
             onNext x
         }

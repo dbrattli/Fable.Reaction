@@ -18,7 +18,7 @@ module Core =
     /// Safe observer that wraps the given observer. Makes sure that
     /// invocations are serialized and that the Rx grammar (OnNext*
     /// (OnError|OnCompleted)?) is not violated.
-    let safeObserver (obv: IAsyncObserver<'a>) : IAsyncObserver<'a> =
+    let safeObserver (obv: IAsyncObserver<'TSource>) : IAsyncObserver<'TSource> =
         let agent = MailboxProcessor.Start (fun inbox ->
             let rec messageLoop stopped = async {
                 let! n = inbox.Receive ()
@@ -47,7 +47,7 @@ module Core =
                 return! messageLoop stop
             }
             messageLoop false)
-        { new IAsyncObserver<'a> with
+        { new IAsyncObserver<'TSource> with
             member this.OnNextAsync x = async {
                 OnNext x |> agent.Post
             }

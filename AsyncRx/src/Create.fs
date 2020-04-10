@@ -12,7 +12,7 @@ open Core
 open System.Runtime.CompilerServices
 
 [<assembly:InternalsVisibleTo("Tests")>]
-do()
+do ()
 
 
 [<RequireQualifiedAccess>]
@@ -30,7 +30,7 @@ module internal Create =
             let safeObv = safeObserver aobv
 
             async {
-                Async.Start' ((worker safeObv token), token)
+                Async.Start' (worker safeObv token, token)
                 return disposable
             }
         { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }

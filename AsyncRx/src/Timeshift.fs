@@ -11,10 +11,10 @@ module internal Timeshift =
 
     /// Time shifts the observable sequence by the given timeout. The
     /// relative time intervals between the values are preserved.
-    let delay (msecs: int) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
+    let delay (msecs: int) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
         let cts = new CancellationTokenSource()
 
-        let subscribeAsync (aobv : IAsyncObserver<'a>) =
+        let subscribeAsync (aobv : IAsyncObserver<'TSource>) =
             let agent = MailboxProcessor.Start((fun inbox ->
                 let rec messageLoop state = async {
                     let! n, dueTime = inbox.Receive()
@@ -46,14 +46,14 @@ module internal Timeshift =
                 }
                 return AsyncDisposable.Create cancel
             }
-        { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
+        { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 
     /// Ignores values from an observable sequence which are followed by
     /// another value before the given timeout.
-    let debounce msecs (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
-        let subscribeAsync (aobv: IAsyncObserver<'a>) =
+    let debounce msecs (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
+        let subscribeAsync (aobv: IAsyncObserver<'TSource>) =
             let safeObserver = safeObserver aobv
-            let infinite = Seq.initInfinite (fun index -> index)
+            let infinite = Seq.initInfinite id
 
             let agent = MailboxProcessor.Start(fun inbox ->
                 let rec messageLoop currentIndex = async {
@@ -86,7 +86,7 @@ module internal Timeshift =
             async {
                 let indexer = infinite.GetEnumerator ()
 
-                let obv (n: Notification<'a>) =
+                let obv (n: Notification<'TSource>) =
                     async {
                         indexer.MoveNext () |> ignore
                         let index = indexer.Current
@@ -108,10 +108,10 @@ module internal Timeshift =
                     }
                 return AsyncDisposable.Create cancel
             }
-        { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
+        { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 
     /// Samples the observable sequence at each interval.
-    let sample msecs (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
+    let sample msecs (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
         let timer = Create.interval msecs msecs
 
         if msecs > 0 then

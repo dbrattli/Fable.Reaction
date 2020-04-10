@@ -7,11 +7,11 @@ open Core
 module internal Transformation =
     /// Returns an observable sequence whose elements are the result of
     /// invoking the async mapper function on each element of the source.
-    let mapAsync (mapperAsync: 'a -> Async<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
-        let subscribeAsync (aobv : IAsyncObserver<'b>) : Async<IAsyncDisposable> =
+    let mapAsync (mapperAsync: 'TSource -> Async<'TResult>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
+        let subscribeAsync (aobv : IAsyncObserver<'TResult>) : Async<IAsyncDisposable> =
             async {
                 let _obv =
-                    { new IAsyncObserver<'a> with
+                    { new IAsyncObserver<'TSource> with
                         member __.OnNextAsync x = async {
                             let! b = mapperAsync x
                             do! aobv.OnNextAsync b
@@ -21,17 +21,17 @@ module internal Transformation =
                     }
                 return! source.SubscribeAsync _obv
             }
-        { new IAsyncObservable<'b> with member __.SubscribeAsync o = subscribeAsync o }
+        { new IAsyncObservable<'TResult> with member __.SubscribeAsync o = subscribeAsync o }
 
     /// Returns an observable sequence whose elements are the result of
     /// invoking the mapper function on each element of the source.
-    let map (mapper:'a -> 'b) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
+    let map (mapper:'TSource -> 'TResult) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
         mapAsync (fun x -> async { return mapper x }) source
 
     /// Returns an observable sequence whose elements are the result of
     /// invoking the async mapper function by incorporating the element's
     /// index on each element of the source.
-    let mapiAsync (mapper:'a*int -> Async<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
+    let mapiAsync (mapper:'TSource*int -> Async<'TResult>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
         source
         |> Combine.zipSeq Core.infinite
         |> mapAsync mapper
@@ -39,13 +39,13 @@ module internal Transformation =
     /// Returns an observable sequence whose elements are the result of
     /// invoking the mapper function and incorporating the element's
     /// index on each element of the source.
-    let mapi (mapper:'a*int -> 'b) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
+    let mapi (mapper:'TSource*int -> 'TResult) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
         mapiAsync (fun (x, i) -> async { return mapper (x, i) }) source
 
     /// Projects each element of an observable sequence into an
     /// observable sequence and merges the resulting observable
     /// sequences back into one observable sequence.
-    let flatMap (mapper:'a -> IAsyncObservable<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
+    let flatMap (mapper:'TSource -> IAsyncObservable<'TResult>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
         source
         |> map mapper
         |> Combine.mergeInner 0
@@ -54,7 +54,7 @@ module internal Transformation =
     /// observable sequence by incorporating the element's
     /// index on each element of the source. Merges the resulting
     /// observable sequences back into one observable sequence.
-    let flatMapi (mapper:'a*int -> IAsyncObservable<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
+    let flatMapi (mapper:'TSource*int -> IAsyncObservable<'TResult>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
         source
         |> mapi mapper
         |> Combine.mergeInner 0
@@ -62,7 +62,7 @@ module internal Transformation =
     /// Asynchronously projects each element of an observable sequence
     /// into an observable sequence and merges the resulting observable
     /// sequences back into one observable sequence.
-    let flatMapAsync (mapper:'a -> Async<IAsyncObservable<'b>>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
+    let flatMapAsync (mapper:'TSource -> Async<IAsyncObservable<'TResult>>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
         source
         |> mapAsync mapper
         |> Combine.mergeInner 0
@@ -71,19 +71,19 @@ module internal Transformation =
     /// into an observable sequence by incorporating the element's
     /// index on each element of the source. Merges the resulting
     /// observable sequences back into one observable sequence.
-    let flatMapiAsync (mapperAsync:'a*int -> Async<IAsyncObservable<'b>>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
+    let flatMapiAsync (mapperAsync:'TSource*int -> Async<IAsyncObservable<'TResult>>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
         source
         |> mapiAsync mapperAsync
         |> Combine.mergeInner 0
 
-    let concatMap (mapper:'a -> IAsyncObservable<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
+    let concatMap (mapper:'TSource -> IAsyncObservable<'TResult>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
         source
         |> map mapper
         |> Combine.mergeInner 1
 
 
-    type InnerSubscriptionCmd<'a> =
-        | InnerObservable of IAsyncObservable<'a>
+    type InnerSubscriptionCmd<'T> =
+        | InnerObservable of IAsyncObservable<'T>
         | InnerCompleted of int
         | Completed
         | Dispose
@@ -91,12 +91,12 @@ module internal Transformation =
     /// Transforms an observable sequence of observable sequences into
     /// an observable sequence producing values only from the most
     /// recent observable sequence.
-    let switchLatest (source: IAsyncObservable<IAsyncObservable<'a>>) : IAsyncObservable<'a> =
-        let subscribeAsync (aobv : IAsyncObserver<'a>) =
+    let switchLatest (source: IAsyncObservable<IAsyncObservable<'TSource>>) : IAsyncObservable<'TSource> =
+        let subscribeAsync (aobv : IAsyncObserver<'TSource>) =
             let safeObserver = safeObserver aobv
             let innerAgent =
-                let obv (mb: MailboxProcessor<InnerSubscriptionCmd<'a>>) (id: int) = {
-                    new IAsyncObserver<'a> with
+                let obv (mb: MailboxProcessor<InnerSubscriptionCmd<'TSource>>) (id: int) = {
+                    new IAsyncObserver<'TSource> with
                         member __.OnNextAsync x = safeObserver.OnNextAsync x
                         member __.OnErrorAsync err = safeObserver.OnErrorAsync err
                         member __.OnCompletedAsync () = async {
@@ -139,7 +139,7 @@ module internal Transformation =
                 )
 
             async {
-                let obv (ns: Notification<IAsyncObservable<'a>>) =
+                let obv (ns: Notification<IAsyncObservable<'TSource>>) =
                     async {
                         match ns with
                         | OnNext xs -> InnerObservable xs |> innerAgent.Post
@@ -155,12 +155,12 @@ module internal Transformation =
                     }
                 return AsyncDisposable.Create cancel
             }
-        { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
+        { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 
     /// Asynchronosly transforms the items emitted by an source sequence
     /// into observable streams, and mirror those items emitted by the
     /// most-recently transformed observable sequence.
-    let flatMapLatestAsync (mapperAsync: 'a -> Async<IAsyncObservable<'b>>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
+    let flatMapLatestAsync (mapperAsync: 'TSource -> Async<IAsyncObservable<'TResult>>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
         source
         |> mapAsync mapperAsync
         |> switchLatest
@@ -168,7 +168,7 @@ module internal Transformation =
     /// Transforms the items emitted by an source sequence into
     /// observable streams, and mirror those items emitted by the
     /// most-recently transformed observable sequence.
-    let flatMapLatest (mapper: 'a -> IAsyncObservable<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
+    let flatMapLatest (mapper: 'TSource -> IAsyncObservable<'TResult>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
         source
         |> map mapper
         |> switchLatest
@@ -176,14 +176,14 @@ module internal Transformation =
     /// Returns an observable sequence containing the first sequence's
     /// elements, followed by the elements of the handler sequence in
     /// case an exception occurred.
-    let catch (handler: exn -> IAsyncObservable<'a>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
-        let subscribeAsync (aobv: IAsyncObserver<'a>) =
+    let catch (handler: exn -> IAsyncObservable<'TSource>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
+        let subscribeAsync (aobv: IAsyncObserver<'TSource>) =
             async {
                 let mutable disposable = AsyncDisposable.Empty
 
                 let rec action (source: IAsyncObservable<_>) = async {
                     let _obv = {
-                        new IAsyncObserver<'a> with
+                        new IAsyncObserver<'TSource> with
                         member __.OnNextAsync x = aobv.OnNextAsync x
                         member __.OnErrorAsync err =
                             let nextSource = handler err
@@ -202,9 +202,9 @@ module internal Transformation =
 
                 return AsyncDisposable.Create cancel
             }
-        { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
+        { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 
-    let retry (retryCount: int) (source: IAsyncObservable<'a>) =
+    let retry (retryCount: int) (source: IAsyncObservable<'TSource>) =
         let mutable count = retryCount
 
         let factory exn =
@@ -226,8 +226,8 @@ module internal Transformation =
     /// Observable will be subscribed and emitting data. When all
     /// subscribers have unsubscribed it will unsubscribe from the source
     /// Observable.
-    let share (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
-        let dispatch, stream = Subjects.subject<'a> ()
+    let share (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
+        let dispatch, stream = Subjects.subject<'TSource> ()
 
         let mb = MailboxProcessor.Start(fun inbox ->
             let rec messageLoop (count: int) (subscription: IAsyncDisposable) = async {
@@ -253,7 +253,7 @@ module internal Transformation =
             }
             messageLoop 0 AsyncDisposable.Empty)
 
-        let subscribeAsync (aobv: IAsyncObserver<'a>) =
+        let subscribeAsync (aobv: IAsyncObserver<'TSource>) =
             async {
                 mb.Post Connect
 
@@ -265,12 +265,12 @@ module internal Transformation =
                 return AsyncDisposable.Create cancel
             }
 
-        { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
+        { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 
-    let toObservable (source: IAsyncObservable<'a>) : IObservable<'a> =
+    let toObservable (source: IAsyncObservable<'TSource>) : IObservable<'TSource> =
         let mutable subscription : IAsyncDisposable = AsyncDisposable.Empty
 
-        { new IObservable<'a> with
+        { new IObservable<'TSource> with
             member __.Subscribe obv =
                 async {
                     let aobv = obv.ToAsyncObserver ()
