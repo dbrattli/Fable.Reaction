@@ -133,24 +133,28 @@ let offsetX x i =
 let drawLetters letters = [
     [
         for KeyValue(i, pos) in letters do
-            yield span [ Key (string i)
-                         Style [Top pos.Y
-                                Left (offsetX pos.X i)
-                                Position PositionOptions.Fixed ]] [
-                    str pos.Letter
-                ]
+            Html.span [
+                prop.key (string i)
+                prop.style [ style.top (int pos.Y)
+                             style.left (offsetX pos.X i)
+                             style.position.fixedRelativeToWindow ]
+                prop.text pos.Letter
+            ]
     ] |> ofList
 ]
 
 let viewLetters model =
-    div [ Style [ FontFamily "Consolas, monospace"; FontWeight "Bold"; Height "100%"] ] [
-        match model.Letters with
-        | None ->
-            yield str ""
-        | Local letters ->
-            yield!  drawLetters letters
-        | Remote letters ->
-            yield! drawLetters letters
+    Html.div [
+        prop.style [ style.fontFamily "Consolas, monospace"; style.fontWeight 700; style.height 100 ]
+        prop.children [
+            match model.Letters with
+            | None ->
+                Html.none
+            | Local letters ->
+                yield!  drawLetters letters
+            | Remote letters ->
+                yield! drawLetters letters
+        ]
     ]
 
 
@@ -172,14 +176,14 @@ let viewStatus dispatch model =
         prop.children [
             Html.thead [
                 Html.tr [
-                    Html.th [ str "Feature" ]
-                    Html.th [ str "Active" ]
+                    Html.th "Feature"
+                    Html.th "Active"
                 ]
             ]
 
             Html.tbody [
                 Html.tr [
-                    Html.td [ str "Letters" ]
+                    Html.td "Letters"
                     Html.td [
                         Bulma.checkboxLabel [
                             Bulma.checkboxInput [
@@ -192,7 +196,7 @@ let viewStatus dispatch model =
                 ]
 
                 Html.tr [
-                    Html.td [ str "Letters (string and position) over Websockets" ]
+                    Html.td "Letters (string and position) over Websockets"
                     Html.td [
                         Bulma.checkboxLabel [
                             Bulma.checkboxInput [
@@ -211,8 +215,8 @@ let viewLetterString letterString dispatch =
     match letterString with
     | Show letterString ->
         Html.div [
-            str letterString
-            str " "
+            Html.text letterString
+            Html.text " "
 
             Bulma.button [
                 button.isPrimary
@@ -293,7 +297,6 @@ let extractedLetterString letterString =
     | Show letterString -> letterString
     | Edit _ -> ""
 
-open System.Threading.Tasks
 let stream model msgs =
 
     match model.Letters with

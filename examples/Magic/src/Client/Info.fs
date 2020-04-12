@@ -45,7 +45,7 @@ let viewStatus dispatch model =
         prop.children [
             Html.thead [
                 Html.tr [
-                    Html.th [ str "Remote (string and number of messages over websockets)" ]
+                    Html.th "Remote (string and number of messages over websockets)"
                     Html.th [
                         Bulma.checkboxLabel [
                             Bulma.checkboxInput [
@@ -61,7 +61,7 @@ let viewStatus dispatch model =
             Html.tbody [
                 Html.tr [
                     Html.td "Number of remote msgs"
-                    Html.td (string model.Msgs)
+                    Html.td model.Msgs
                 ]
 
                 Html.tr [
@@ -77,7 +77,6 @@ let view model dispatch =
         prop.style [ style.border(1, borderStyle.dashed, color.black); style.margin 20; style.padding 20 ]
         prop.children [
             Bulma.title1 "Info Component"
-
             Bulma.subtitle4 "Different Websocket subscription"
 
             Bulma.columns [
