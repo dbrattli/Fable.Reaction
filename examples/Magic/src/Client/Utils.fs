@@ -1,6 +1,6 @@
 module Utils
 
-open Elmish.Streams
+open Fable.Reaction
 
 let server source =
   AsyncRx.msgChannel<Shared.Msg>

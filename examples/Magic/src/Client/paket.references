@@ -1,12 +1,9 @@
 group Client
 
 FSharp.Core
-Fable.Elmish.Debugger
-Fable.Elmish.React
-Fable.Elmish.HMR
 Fable.Fetch
 Fable.Core
-Fulma
-Fulma.Extensions.Wikiki.Switch
-Fable.Elmish.Streams
 Fable.Reaction
+Feliz
+Feliz.Bulma
+Thoth.Json

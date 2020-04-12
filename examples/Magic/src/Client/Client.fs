@@ -1,12 +1,14 @@
 module Client
 
-open Fable.React
-open Fable.React.Props
+//open Fable.React
+//open Fable.React.Props
 open Fetch.Types
 
-open Fulma
+open Fable.React
 open Fable.Reaction
 open FSharp.Control
+open Feliz
+open Feliz.Bulma
 
 open Thoth.Json
 
@@ -42,19 +44,19 @@ let update model (msg : Msg) =
 
 let safeComponents =
     let components =
-        span [] [
-            a [ Href "https://github.com/giraffe-fsharp/Giraffe" ] [ str "Giraffe" ]
-            str ", "
-            a [ Href "http://fable.io" ] [ str "Fable" ]
-            str ", "
-            a [ Href "https://mangelmaxime.github.io/Fulma" ] [ str "Fulma" ]
-            str ", "
-            a [ Href "https://github.com/dbrattli/Fable.Reaction" ] [ str "Reaction" ]
+        Html.span [
+            Html.a [ prop.href "https://github.com/giraffe-fsharp/Giraffe"; prop.text "Giraffe" ]
+            Html.text ", "
+            Html.a [ prop.href "http://fable.io"; prop.text "Fable" ]
+            Html.text ", "
+            Html.a [ prop.href "https://mangelmaxime.github.io/Fulma"; prop.text "Fulma" ]
+            Html.text ", "
+            Html.a [ prop.href "https://github.com/dbrattli/Fable.Reaction"; prop.text "Reaction" ]
         ]
 
-    p [] [
-        strong [] [ str "SAFE Template" ]
-        str " powered by: "
+    Html.p [
+        Html.strong "SAFE Template"
+        Html.text " powered by: "
         components
     ]
 
@@ -62,34 +64,36 @@ let safeComponents =
 let viewApp model dispatch =
     match model with
     | Loading ->
-        div [] [ str "Initial Values not loaded" ]
+        Html.div "Initial Values not loaded"
 
     | Error error ->
-        div [] [ str <| "Something went wrong: " + error ]
+        Html.div ("Something went wrong: " + error)
 
     | App model ->
-        div [] [
+        Html.div [
             Magic.magic model.InitialString ()
             Info.info model.InitialString ()
         ]
 
 let view (model : Model) (dispatch : Msg -> unit) =
-    div [] [
-        Navbar.navbar [ Navbar.Color IsPrimary ] [
-            Navbar.Item.div [] [
-                Heading.h2 [] [
-                    str "Fable Reaction Playground"
+    Html.div [
+        Bulma.navbar [
+            navbar.isPrimary
+            prop.children [
+                Bulma.navbarItemDiv [
+                    Bulma.title2 "Fable Reaction Playground"
                 ]
             ]
         ]
 
-        Container.container []  [ viewApp model dispatch ]
+        Bulma.container [ viewApp model dispatch ]
 
-        Footer.footer [] [
-            Content.content [ Content.Modifiers [
-                                Modifier.TextAlignment (Screen.All, TextAlignment.Centered)
-                            ] ] [
-                safeComponents
+        Bulma.footer [
+            Bulma.content [
+                prop.style [ style.textAlign.center ]
+                prop.children [
+                    safeComponents
+                ]
             ]
         ]
     ]

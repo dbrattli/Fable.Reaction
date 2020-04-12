@@ -1,12 +1,11 @@
 module Info
 
 open Fable.React
-open Fable.React.Props
 
-open Fulma
-open Fulma.Extensions.Wikiki
 open Fable.Reaction
 open FSharp.Control
+open Feliz
+open Feliz.Bulma
 
 open Utils
 
@@ -40,44 +39,51 @@ let update model msg =
         { model with LetterString = str }
 
 let viewStatus dispatch model =
-    Table.table [ Table.IsHoverable ; Table.IsStriped ] [
-        thead [] [
-            tr [] [
-                th [] [ str "Remote (string and number of messages over websockets)" ]
-                th [] [
-                    Switch.switch [
-                        Switch.Checked model.Remote
-                        Switch.OnChange (fun _ -> dispatch RemoteToggled)
-                        Switch.Id "remoteInfo"
-                    ] []
-                ]
-            ]
-        ]
-
-        tbody [] [
-            tr [] [
-                td [] [ str "Number of remote msgs" ]
-                td [] [
-                    str <| string model.Msgs
+    Bulma.table [
+        table.isHoverable
+        table.isStriped
+        prop.children [
+            Html.thead [
+                Html.tr [
+                    Html.th [ str "Remote (string and number of messages over websockets)" ]
+                    Html.th [
+                        Bulma.checkboxLabel [
+                            Bulma.checkboxInput [
+                                prop.isChecked model.Remote
+                                prop.id "remoteInfo"
+                                prop.onChange (fun (_: bool) -> dispatch RemoteToggled)
+                            ]
+                        ]
+                    ]
                 ]
             ]
 
-            tr [] [
-                td [] [ str "Current string (updated when websocket is active)" ]
-                td [] [
-                    str model.LetterString
+            Html.tbody [
+                Html.tr [
+                    Html.td "Number of remote msgs"
+                    Html.td (string model.Msgs)
+                ]
+
+                Html.tr [
+                    Html.td "Current string (updated when websocket is active)"
+                    Html.td model.LetterString
                 ]
             ]
         ]
     ]
 
 let view model dispatch =
-    Container.container [ Container.Option.Props [ Style [ Border "1px dashed"; Margin "20px"; Padding "20px" ]]] [
-        Heading.h3 [] [ str "Info Component" ]
-        Heading.h4 [ Heading.IsSubtitle ] [ str "Different Websocket subscription" ]
-        Columns.columns [] [
-            Column.column [] [
-                viewStatus dispatch model
+    Bulma.container [
+        prop.style [ style.border(1, borderStyle.dashed, color.black); style.margin 20; style.padding 20 ]
+        prop.children [
+            Bulma.title1 "Info Component"
+
+            Bulma.subtitle4 "Different Websocket subscription"
+
+            Bulma.columns [
+                Bulma.column [
+                    viewStatus dispatch model
+                ]
             ]
         ]
     ]
@@ -109,4 +115,3 @@ let stream model msgs =
 let info initialString =
     let initialModel = init initialString
     Reaction.StreamView initialModel view update stream
-

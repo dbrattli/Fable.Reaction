@@ -21,18 +21,14 @@ group Client
     storage: none
 
     nuget Fable.Core ~> 3
-    nuget Fable.Elmish ~> 3
-    nuget Fable.Elmish.Debugger ~> 3
-    nuget Fable.Elmish.React ~> 3
-    nuget Fable.Elmish.HMR ~> 4
-    nuget Fable.Elmish.Browser  ~> 3
     nuget Fable.React ~> 5
     nuget Fable.Reaction ~> 3
     nuget Fable.FontAwesome.Free ~> 2
-    nuget Fable.Elmish.Streams ~> 3
     nuget Fable.Fetch
-    nuget Fulma ~> 2
     nuget Fulma.Extensions.Wikiki.Switch
+    nuget Feliz
+    nuget Feliz.Bulma
+    nuget Thoth.Json
 
 group Build
     source https://api.nuget.org/v3/index.json

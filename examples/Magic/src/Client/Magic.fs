@@ -6,8 +6,8 @@ open Fable.React.Props
 
 open Shared
 
-open Fulma
-open Fulma.Extensions.Wikiki
+open Feliz
+open Feliz.Bulma
 
 open FSharp.Control
 open Fable.Reaction
@@ -165,34 +165,43 @@ let letterSubscriptionOverWebsockets model =
   | _ -> false
 
 let viewStatus dispatch model =
-    Table.table [ Table.IsHoverable ; Table.IsStriped ] [
-        thead [] [
-            tr [] [
-                th [] [ str "Feature" ]
-                th [] [ str "Active" ]
-            ]
-        ]
+    Bulma.table [
+        table.isHoverable
+        table.isStriped
 
-        tbody [ ] [
-            tr [] [
-                td [] [ str "Letters" ]
-                td [] [
-                    Switch.switch [
-                        Switch.Checked <| letterSubscription model
-                        Switch.OnChange (fun _ -> dispatch ToggleLetters)
-                        Switch.Id "letters"
-                    ] []
+        prop.children [
+            Html.thead [
+                Html.tr [
+                    Html.th [ str "Feature" ]
+                    Html.th [ str "Active" ]
                 ]
             ]
 
-            tr [] [
-                td [] [ str "Letters (string and position) over Websockets" ]
-                td [] [
-                    Switch.switch [
-                        Switch.Checked <| letterSubscriptionOverWebsockets model
-                        Switch.OnChange (fun _ -> dispatch ToggleRemoteLetters)
-                        Switch.Id "remoteLetters"
-                    ] []
+            Html.tbody [
+                Html.tr [
+                    Html.td [ str "Letters" ]
+                    Html.td [
+                        Bulma.checkboxLabel [
+                            Bulma.checkboxInput [
+                                prop.isChecked (letterSubscription model)
+                                prop.id "letters"
+                                prop.onChange (fun (_: bool) -> dispatch ToggleLetters)
+                            ]
+                        ]
+                    ]
+                ]
+
+                Html.tr [
+                    Html.td [ str "Letters (string and position) over Websockets" ]
+                    Html.td [
+                        Bulma.checkboxLabel [
+                            Bulma.checkboxInput [
+                                prop.isChecked (letterSubscriptionOverWebsockets model)
+                                prop.id "remoteLetters"
+                                prop.onChange (fun (_: bool) -> dispatch ToggleRemoteLetters)
+                            ]
+                        ]
+                    ]
                 ]
             ]
         ]
@@ -201,59 +210,67 @@ let viewStatus dispatch model =
 let viewLetterString letterString dispatch =
     match letterString with
     | Show letterString ->
-        div [] [
+        Html.div [
             str letterString
             str " "
 
-            Button.button [
-                Button.Color IsPrimary
-                Button.OnClick (fun _ -> dispatch EditLetterStringRequested)
-            ] [ str "Edit" ]
+            Bulma.button [
+                button.isPrimary
+                prop.onClick (fun _ -> dispatch EditLetterStringRequested)
+                prop.text "Edit"
+            ]
         ]
 
     | Edit letterString ->
-        div [] [
-            Field.div [ Field.IsGrouped] [
-                Control.div [] [
-                    Input.text [
-                        Input.Placeholder "Magic String"
-                        Input.DefaultValue letterString
-                        Input.Props [ OnChange (fun event ->  !!event.target?value |> LetterStringEdited |> dispatch) ]
+        Html.div [
+            Bulma.field [
+                field.isGrouped
+                prop.children [
+                    Bulma.control [
+                        Bulma.textInput [
+                            prop.placeholder "Magic String"
+                            prop.defaultValue letterString
+                            prop.onChange (fun (event: Browser.Types.Event) ->  !!event.target?value |> LetterStringEdited |> dispatch)
+                        ]
                     ]
-                ]
 
-                Control.div [] [
-                  Button.button
-                    [
-                      Button.Color IsPrimary
-                      Button.OnClick (fun _ -> dispatch <| EditLetterStringDone letterString)
-                    ] [ str "Submit" ]
+                    Bulma.control [
+                        Bulma.button [
+                            button.isPrimary
+                            prop.onClick (fun _ -> dispatch <| EditLetterStringDone letterString)
+                            prop.text "Submit"
+                        ]
+                    ]
                 ]
             ]
         ]
 
 
 let view model dispatch =
-    div [ Style [ Border "1px dashed"; Margin "20px"; Padding "20px" ]] [
-        Heading.h3 [] [ str "Magic Component" ]
-        Heading.h4 [ Heading.IsSubtitle ] [ str "Magic String over websockets (when activated)" ]
-        Columns.columns [] [
-            Column.column [] [
-                viewLetterString model.LetterString dispatch
+    Html.div [
+        prop.style [ style.border(1, borderStyle.dashed, color.black); style.margin 20; style.padding 20 ]
+        prop.children [
+
+            Bulma.title3 "Magic Component"
+            Bulma.subtitle4 "Magic String over websockets (when activated)"
+            Bulma.columns [
+                Bulma.column [
+                    viewLetterString model.LetterString dispatch
+                ]
+
+                Bulma.column []
             ]
 
-            Column.column [] []
-        ]
-
-        Columns.columns [] [
-            Column.column [] [
-                viewStatus dispatch model
+            Bulma.columns [
+                Bulma.column [
+                    viewStatus dispatch model
+                ]
             ]
-        ]
 
-        Columns.columns [] [
-            Column.column [] [
-                viewLetters model
+            Bulma.columns [
+                Bulma.column [
+                    viewLetters model
+                ]
             ]
         ]
     ]
