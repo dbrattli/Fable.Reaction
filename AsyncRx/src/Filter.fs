@@ -8,49 +8,43 @@ module internal Filter =
     /// Applies the given async function to each element of the stream and
     /// returns the stream comprised of the results for each element
     /// where the function returns Some with some value.
-    let chooseAsync (chooser: 'TSource -> Async<'TResult option>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
-        let subscribeAsync (obvAsync : IAsyncObserver<'TResult>) =
-            let _obv =
-                { new IAsyncObserver<'TSource> with
-                    member this.OnNextAsync x = async {
-                        // Let exceptions bubble to the top
-                        let! result = chooser x
-                        match result with
-                        | Some b ->
-                            do! obvAsync.OnNextAsync b
-                        | None -> ()
-                    }
-                    member __.OnErrorAsync err = obvAsync.OnErrorAsync err
-                    member __.OnCompletedAsync () = obvAsync.OnCompletedAsync ()
-
-                }
-            source.SubscribeAsync _obv
-
-        { new IAsyncObservable<'TResult> with member __.SubscribeAsync o = subscribeAsync o }
+    let chooseAsync (chooser: 'TSource -> Async<'TResult option>) : Stream<'TSource, 'TResult> =
+        Transform.transformAsync (fun next a -> async {
+            match! chooser a with
+            | Some b -> return! next b
+            | None -> return ()
+        })
 
     /// Applies the given function to each element of the stream and
     /// returns the stream comprised of the results for each element
     /// where the function returns Some with some value.
     let choose (chooser: 'TSource -> 'TResult option) : Stream<'TSource, 'TResult> =
-        chooseAsync  (fun x -> async { return chooser x })
+        Transform.transformAsync (fun next a ->
+            match chooser a with
+            | Some b -> next b
+            | None -> Async.empty
+        )
 
     /// Filters the elements of an observable sequence based on an async
     /// predicate. Returns an observable sequence that contains elements
     /// from the input sequence that satisfy the condition.
     let filterAsync (predicate: 'TSource -> Async<bool>) : Stream<'TSource> =
-        let predicate' a = async {
-            let! result = predicate a
-            match result with
-            | true -> return Some a
-            | _ -> return None
-        }
-        chooseAsync predicate'
+        Transform.transformAsync (fun next a -> async {
+            match! predicate a with
+            | true -> return! next a
+            | _ -> return ()
+        })
+
 
     /// Filters the elements of an observable sequence based on a
     /// predicate. Returns an observable sequence that contains elements
     /// from the input sequence that satisfy the condition.
     let filter (predicate: 'TSource -> bool) : Stream<'TSource> =
-        filterAsync (fun x -> async { return predicate x })
+        Transform.transformAsync (fun next a ->
+            match predicate a with
+            | true -> next a
+            | _ -> Async.empty
+        )
 
     /// Return an observable sequence only containing the distinct
     /// contiguous elementsfrom the source sequence.

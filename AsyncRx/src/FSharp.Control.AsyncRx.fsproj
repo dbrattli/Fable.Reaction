@@ -17,11 +17,11 @@
     <Compile Include="Subject.fs" />
     <Compile Include="Create.fs" />
     <Compile Include="Leave.fs" />
-    <Compile Include="Filter.fs" />
     <Compile Include="Aggregate.fs" />
     <Compile Include="Combine.fs" />
     <Compile Include="Transform.fs" />
     <Compile Include="Timeshift.fs" />
+    <Compile Include="Filter.fs" />
     <Compile Include="Tap.fs" />
     <Compile Include="AsyncObservable.fs" />
     <Compile Include="Query.fs" />

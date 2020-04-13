@@ -115,6 +115,6 @@ module internal Timeshift =
         let timer = Create.interval msecs msecs
 
         if msecs > 0 then
-            Combine.withLatestFrom source timer |> Transformation.map (fun (_, source) -> source)
+            Combine.withLatestFrom source timer |> Transform.map (fun (_, source) -> source)
         else
             source

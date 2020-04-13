@@ -4,14 +4,14 @@ open System
 open Core
 
 [<RequireQualifiedAccess>]
-module internal Transformation =
+module internal Transform =
     /// Returns an observable sequence whose elements are the result of invoking the async mapper function on each
     /// element of the source.
-    let mapContAsync<'TSource, 'TResult> (mapperContAsync: ('TResult -> Async<unit>) -> 'TSource -> Async<unit>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
+    let transformAsync<'TSource, 'TResult> (mapNextAsync: ('TResult -> Async<unit>) -> 'TSource -> Async<unit>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
         let subscribeAsync (aobv : IAsyncObserver<'TResult>) : Async<IAsyncDisposable> =
             let _obv =
                 { new IAsyncObserver<'TSource> with
-                    member __.OnNextAsync x = mapperContAsync aobv.OnNextAsync x
+                    member __.OnNextAsync x = mapNextAsync aobv.OnNextAsync x
                     member __.OnErrorAsync err = aobv.OnErrorAsync err
                     member __.OnCompletedAsync () = aobv.OnCompletedAsync ()
                 }
@@ -21,26 +21,27 @@ module internal Transformation =
     /// Returns an observable sequence whose elements are the result of invoking the async mapper function on each
     /// element of the source.
     let mapAsync (mapperAsync: 'TSource -> Async<'TResult>) : Stream<'TSource, 'TResult> =
-        mapContAsync (fun cont x -> async {
+        transformAsync (fun next x -> async {
             let! b = mapperAsync x
-            return! cont b
+            return! next b
         })
 
     /// Returns an observable sequence whose elements are the result of invoking the mapper function on each element of
     /// the source.
     let map (mapper:'TSource -> 'TResult) : Stream<'TSource, 'TResult> =
-        mapContAsync (fun cont x -> cont (mapper x) )
+        transformAsync (fun next x -> next (mapper x) )
 
     /// Returns an observable sequence whose elements are the result of invoking the async mapper function by
     /// incorporating the element's index on each element of the source.
     let mapiAsync (mapper:'TSource*int -> Async<'TResult>) : Stream<'TSource, 'TResult> =
-        Combine.zipSeq Core.infinite
+        Combine.zipSeq infinite
         >=> mapAsync mapper
 
     /// Returns an observable sequence whose elements are the result of invoking the mapper function and incorporating
     /// the element's index on each element of the source.
     let mapi (mapper:'TSource*int -> 'TResult) : Stream<'TSource, 'TResult> =
-        mapiAsync (fun (x, i) -> async { return mapper (x, i) })
+        Combine.zipSeq infinite
+        >=> map mapper
 
     /// Projects each element of an observable sequence into an observable sequence and merges the resulting observable
     /// sequences back into one observable sequence.

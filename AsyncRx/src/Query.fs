@@ -8,20 +8,20 @@ type QueryBuilder () =
         Combine.concatSeq [xs; ys]
     member this.Delay (fn) = fn ()
     member this.Bind(source: IAsyncObservable<'a>, fn: 'a -> IAsyncObservable<'b>) : IAsyncObservable<'b> =
-        Transformation.flatMap fn source
+        Transform.flatMap fn source
     member x.For(source: IAsyncObservable<_>, func: 'a -> IAsyncObservable<'b>) : IAsyncObservable<'b> =
-        Transformation.concatMap func source
+        Transform.concatMap func source
 
     // Async to AsyncObservable conversion
     member this.Bind (source: Async<'a>, fn: 'a -> IAsyncObservable<'b>) =
         Create.ofAsync source
-        |> Transformation.flatMap fn
+        |> Transform.flatMap fn
     member this.YieldFrom (xs: Async<'x>) = Create.ofAsync xs
 
     // Sequence to AsyncObservable conversion
     member x.For(source: seq<'a>, func: 'a -> IAsyncObservable<'b>) : IAsyncObservable<'b> =
         Create.ofSeq source
-        |> Transformation.concatMap func
+        |> Transform.concatMap func
 
 [<AutoOpen>]
 module QueryBuilder =

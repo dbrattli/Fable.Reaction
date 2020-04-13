@@ -81,9 +81,7 @@ module internal Create =
     /// Returns the observable sequence that terminates exceptionally
     /// with the specified exception.
     let inline fail<'a> (error: exn) : IAsyncObservable<'a> =
-        ofAsyncWorker (fun obv _ -> async {
-            do! obv.OnErrorAsync error
-        })
+        ofAsyncWorker (fun obv _ -> obv.OnErrorAsync error)
 
     /// Returns the async observable sequence whose elements are pulled
     /// from the given enumerable sequence.

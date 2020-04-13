@@ -5,8 +5,6 @@ open System.Threading
 module Core =
     let infinite = Seq.initInfinite id
 
-    let noopAsync = fun _ -> async { () }
-
     let canceller () =
         let cts = new CancellationTokenSource()
         let cancel () = async {
@@ -69,3 +67,10 @@ module Core =
             #else
                 Async.Start (computation, ?cancellationToken=cancellationToken)
             #endif
+
+    [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+
+    module Async =
+        let empty = async { return () }
+
+        let noop = fun _ -> async { () }

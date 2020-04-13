@@ -31,11 +31,11 @@ module internal Tap =
 
     /// Tap asynchronously into the stream performing side effects by the given `onNextAsync` action.
     let tapOnNextAsync (onNextAsync: 'TSource -> Async<unit>) : Stream<'TSource> =
-        tapAsync onNextAsync noopAsync noopAsync
+        tapAsync onNextAsync Async.noop Async.noop
 
     /// Tap synchronously into the stream performing side effects by the given `onNext` action.
     let tapOnNext (onNext: 'TSource -> unit) : Stream<'TSource> =
         let onNextAsync x = async {
             onNext x
         }
-        tapAsync onNextAsync noopAsync noopAsync
+        tapAsync onNextAsync Async.noop Async.noop

@@ -283,80 +283,80 @@ module AsyncRx =
     /// elements, followed by the elements of the handler sequence in
     /// case an exception occurred.
     let catch (handler: exn -> IAsyncObservable<'a>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
-        Transformation.catch handler source
+        Transform.catch handler source
 
     /// Retries the given Observable retryCount number of times.
     let retry (retryCount: int) (source: IAsyncObservable<'a>) : IAsyncObservable<'a>=
-        Transformation.retry retryCount source
+        Transform.retry retryCount source
 
     /// Projects each element of an observable sequence into an
     /// observable sequence and merges the resulting observable
     /// sequences back into one observable sequence.
     let flatMap (mapper:'a -> IAsyncObservable<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
-        Transformation.flatMap mapper source
+        Transform.flatMap mapper source
 
     /// Asynchronously projects each element of an observable sequence
     /// into an observable sequence and merges the resulting observable
     /// sequences back into one observable sequence.
     let flatMapAsync (mapperAsync:'a -> Async<IAsyncObservable<'b>>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
-        Transformation.flatMapAsync mapperAsync source
+        Transform.flatMapAsync mapperAsync source
 
     /// Projects each element of an observable sequence into an
     /// observable sequence by incorporating the element's
     /// index on each element of the source. Merges the resulting
     /// observable sequences back into one observable sequence.
     let flatMapi (mapper:'a*int -> IAsyncObservable<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
-        Transformation.flatMapi mapper source
+        Transform.flatMapi mapper source
 
     /// Asynchronously projects each element of an observable sequence
     /// into an observable sequence by incorporating the element's
     /// index on each element of the source. Merges the resulting
     /// observable sequences back into one observable sequence.
     let flatMapiAsync  (mapperAsync:'a*int -> Async<IAsyncObservable<'b>>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
-        Transformation.flatMapiAsync mapperAsync source
+        Transform.flatMapiAsync mapperAsync source
 
     /// Transforms the items emitted by an source sequence into
     /// observable streams, and mirror those items emitted by the
     /// most-recently transformed observable sequence.
     let flatMapLatest (mapper: 'a -> IAsyncObservable<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
-        Transformation.flatMapLatest mapper source
+        Transform.flatMapLatest mapper source
 
     /// Asynchronosly transforms the items emitted by an source sequence
     /// into observable streams, and mirror those items emitted by the
     /// most-recently transformed observable sequence.
     let flatMapLatestAsync (mapperAsync: 'a -> Async<IAsyncObservable<'b>>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
-        Transformation.flatMapLatestAsync mapperAsync source
+        Transform.flatMapLatestAsync mapperAsync source
 
     let concatMap (mapper:'a -> IAsyncObservable<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
-        Transformation.concatMap mapper source
+        Transform.concatMap mapper source
 
     /// Returns an observable sequence whose elements are the result of
     /// invoking the mapper function on each element of the source.
     let map (mapper:'a -> 'b) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
-        Transformation.map mapper source
+        Transform.map mapper source
 
     /// Returns an observable sequence whose elements are the result of
     /// invoking the async mapper function on each element of the source.
     let mapAsync (mapperAsync: 'a -> Async<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
-        Transformation.mapAsync mapperAsync source
+        Transform.mapAsync mapperAsync source
 
     /// Returns an observable sequence whose elements are the result of
     /// invoking the mapper function and incorporating the element's
     /// index on each element of the source.
     let mapi (mapper:'a*int -> 'b) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
-        Transformation.mapi mapper source
+        Transform.mapi mapper source
 
     /// Returns an observable sequence whose elements are the result of
     /// invoking the async mapper function by incorporating the element's
     /// index on each element of the source.
     let mapiAsync (mapper:'a*int -> Async<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'b> =
-        Transformation.mapiAsync mapper source
+        Transform.mapiAsync mapper source
 
     /// Transforms an observable sequence of observable sequences into
     /// an observable sequence producing values only from the most
     /// recent observable sequence.
     let switchLatest (source: IAsyncObservable<IAsyncObservable<'a>>) : IAsyncObservable<'a> =
-        Transformation.switchLatest source
+        Transform.switchLatest source
 
     /// Share a single subscription among multple observers.
     /// Returns a new Observable that multicasts (shares) the original
@@ -365,11 +365,11 @@ module AsyncRx =
     /// subscribers have unsubscribed it will unsubscribe from the source
     /// Observable.
     let share (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
-        Transformation.share source
+        Transform.share source
 
     /// Convert an async observable to an observable.
     let toObservable (source: IAsyncObservable<'a>) : IObservable<'a> =
-        Transformation.toObservable source
+        Transform.toObservable source
 
   // Subjects Region
 
