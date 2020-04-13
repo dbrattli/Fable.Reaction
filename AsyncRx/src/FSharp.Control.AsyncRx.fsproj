@@ -1,16 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>FSharp.Control.AsyncRx</PackageId>
-    <Version>1.2.1</Version>
-    <PackageVersion>1.2.1</PackageVersion>
+    <Version>1.2.2</Version>
+    <PackageVersion>1.2.2</PackageVersion>
     <Authors>Dag Brattli</Authors>
     <Company>Brattli Labs</Company>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="Types.fs" />
     <Compile Include="Core.fs" />
