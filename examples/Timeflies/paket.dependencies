@@ -21,6 +21,7 @@ group Client
     nuget Fable.Reaction ~> 3
     nuget Fable.Import.Browser ~> 1
     nuget Fable.Browser.Dom
+    nuget Feliz
 
 group Build
     source https://api.nuget.org/v3/index.json

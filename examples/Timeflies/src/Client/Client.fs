@@ -2,9 +2,9 @@ module Client
 
 open Browser.Dom
 open Fable.React
-open Fable.React.Props
 open Fable.Reaction
 open FSharp.Control
+open Feliz
 
 // The model holds data that you want to keep track of while the
 // application is running
@@ -28,14 +28,24 @@ let update (currentModel : Model) (msg : Msg) : Model =
 let view (model : Model) (dispatch : Msg -> unit)=
     let letters = model.Letters
 
-    div [ Style [ FontFamily "Consolas, monospace"; Height "100%"] ] [
-            [
-                for KeyValue(i, (c, x, y)) in letters do
-                    yield span [ Key (c + string i); Style [Top y; Left x; Position (PositionOptions.Fixed)] ] [
-                        str c
-                    ]
-            ] |> ofList
+    Html.div [
+        prop.style [
+            style.fontFamily "Consolas, monospace"
+            style.height 100
         ]
+        prop.children [
+            for KeyValue(i, (c, x, y)) in letters do
+                Html.span [
+                    prop.key (c + string i)
+                    prop.style [
+                        style.top y
+                        style.left x
+                        style.position.fixedRelativeToWindow
+                    ]
+                    prop.text c
+                ]
+        ]
+    ]
 
 let initialModel : Model =
     { Letters = Map.empty }

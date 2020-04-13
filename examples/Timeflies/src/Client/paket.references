@@ -2,3 +2,4 @@ group Client
     FSharp.Core
     Fable.Core
     Fable.Reaction
+    Feliz
