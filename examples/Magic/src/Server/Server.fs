@@ -10,8 +10,8 @@ open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.DependencyInjection
 
 open FSharp.Control.Tasks.V2
-open Giraffe
 open FSharp.Control
+open Giraffe
 open Reaction.AspNetCore.Middleware
 open Shared
 
