@@ -9,78 +9,69 @@ module internal Transformation =
     /// invoking the async mapper function on each element of the source.
     let mapAsync (mapperAsync: 'TSource -> Async<'TResult>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
         let subscribeAsync (aobv : IAsyncObserver<'TResult>) : Async<IAsyncDisposable> =
-            async {
-                let _obv =
-                    { new IAsyncObserver<'TSource> with
-                        member __.OnNextAsync x = async {
-                            let! b = mapperAsync x
-                            do! aobv.OnNextAsync b
-                        }
-                        member __.OnErrorAsync err = aobv.OnErrorAsync err
-                        member __.OnCompletedAsync () = aobv.OnCompletedAsync ()
+            let _obv =
+                { new IAsyncObserver<'TSource> with
+                    member __.OnNextAsync x = async {
+                        let! b = mapperAsync x
+                        do! aobv.OnNextAsync b
                     }
-                return! source.SubscribeAsync _obv
-            }
+                    member __.OnErrorAsync err = aobv.OnErrorAsync err
+                    member __.OnCompletedAsync () = aobv.OnCompletedAsync ()
+                }
+            source.SubscribeAsync _obv
         { new IAsyncObservable<'TResult> with member __.SubscribeAsync o = subscribeAsync o }
 
     /// Returns an observable sequence whose elements are the result of
     /// invoking the mapper function on each element of the source.
-    let map (mapper:'TSource -> 'TResult) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
-        mapAsync (fun x -> async { return mapper x }) source
+    let map (mapper:'TSource -> 'TResult) : Stream<'TSource, 'TResult> =
+        mapAsync (fun x -> async { return mapper x })
 
     /// Returns an observable sequence whose elements are the result of
     /// invoking the async mapper function by incorporating the element's
     /// index on each element of the source.
-    let mapiAsync (mapper:'TSource*int -> Async<'TResult>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
-        source
-        |> Combine.zipSeq Core.infinite
-        |> mapAsync mapper
+    let mapiAsync (mapper:'TSource*int -> Async<'TResult>) : Stream<'TSource, 'TResult> =
+        Combine.zipSeq Core.infinite
+        >=> mapAsync mapper
 
     /// Returns an observable sequence whose elements are the result of
     /// invoking the mapper function and incorporating the element's
     /// index on each element of the source.
-    let mapi (mapper:'TSource*int -> 'TResult) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
-        mapiAsync (fun (x, i) -> async { return mapper (x, i) }) source
+    let mapi (mapper:'TSource*int -> 'TResult) : Stream<'TSource, 'TResult> =
+        mapiAsync (fun (x, i) -> async { return mapper (x, i) })
 
     /// Projects each element of an observable sequence into an
     /// observable sequence and merges the resulting observable
     /// sequences back into one observable sequence.
-    let flatMap (mapper:'TSource -> IAsyncObservable<'TResult>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
-        source
-        |> map mapper
-        |> Combine.mergeInner 0
+    let flatMap (mapper:'TSource -> IAsyncObservable<'TResult>) : Stream<'TSource, 'TResult> =
+        map mapper
+        >=> Combine.mergeInner 0
 
     /// Projects each element of an observable sequence into an
     /// observable sequence by incorporating the element's
     /// index on each element of the source. Merges the resulting
     /// observable sequences back into one observable sequence.
-    let flatMapi (mapper:'TSource*int -> IAsyncObservable<'TResult>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
-        source
-        |> mapi mapper
-        |> Combine.mergeInner 0
+    let flatMapi (mapper:'TSource*int -> IAsyncObservable<'TResult>) : Stream<'TSource, 'TResult> =
+        mapi mapper
+        >=> Combine.mergeInner 0
 
     /// Asynchronously projects each element of an observable sequence
     /// into an observable sequence and merges the resulting observable
     /// sequences back into one observable sequence.
-    let flatMapAsync (mapper:'TSource -> Async<IAsyncObservable<'TResult>>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
-        source
-        |> mapAsync mapper
-        |> Combine.mergeInner 0
+    let flatMapAsync (mapper:'TSource -> Async<IAsyncObservable<'TResult>>) : Stream<'TSource, 'TResult> =
+        mapAsync mapper
+        >=> Combine.mergeInner 0
 
     /// Asynchronously projects each element of an observable sequence
     /// into an observable sequence by incorporating the element's
     /// index on each element of the source. Merges the resulting
     /// observable sequences back into one observable sequence.
-    let flatMapiAsync (mapperAsync:'TSource*int -> Async<IAsyncObservable<'TResult>>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
-        source
-        |> mapiAsync mapperAsync
-        |> Combine.mergeInner 0
+    let flatMapiAsync (mapperAsync:'TSource*int -> Async<IAsyncObservable<'TResult>>) : Stream<'TSource, 'TResult> =
+        mapiAsync mapperAsync
+        >=> Combine.mergeInner 0
 
-    let concatMap (mapper:'TSource -> IAsyncObservable<'TResult>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
-        source
-        |> map mapper
-        |> Combine.mergeInner 1
-
+    let concatMap (mapper:'TSource -> IAsyncObservable<'TResult>) : Stream<'TSource, 'TResult> =
+        map mapper
+        >=> Combine.mergeInner 1
 
     type InnerSubscriptionCmd<'T> =
         | InnerObservable of IAsyncObservable<'T>
@@ -160,18 +151,16 @@ module internal Transformation =
     /// Asynchronosly transforms the items emitted by an source sequence
     /// into observable streams, and mirror those items emitted by the
     /// most-recently transformed observable sequence.
-    let flatMapLatestAsync (mapperAsync: 'TSource -> Async<IAsyncObservable<'TResult>>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
-        source
-        |> mapAsync mapperAsync
-        |> switchLatest
+    let flatMapLatestAsync (mapperAsync: 'TSource -> Async<IAsyncObservable<'TResult>>) : Stream<'TSource, 'TResult> =
+        mapAsync mapperAsync
+        >=> switchLatest
 
     /// Transforms the items emitted by an source sequence into
     /// observable streams, and mirror those items emitted by the
     /// most-recently transformed observable sequence.
-    let flatMapLatest (mapper: 'TSource -> IAsyncObservable<'TResult>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
-        source
-        |> map mapper
-        |> switchLatest
+    let flatMapLatest (mapper: 'TSource -> IAsyncObservable<'TResult>) : Stream<'TSource, 'TResult> =
+        map mapper
+        >=> switchLatest
 
     /// Returns an observable sequence containing the first sequence's
     /// elements, followed by the elements of the handler sequence in

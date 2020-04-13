@@ -7,9 +7,7 @@ open Core
 type AsyncDisposable (cancel) =
     interface IAsyncDisposable with
         member this.DisposeAsync () =
-            async {
-                do! cancel ()
-            }
+            cancel ()
 
     static member Create (cancel) : IAsyncDisposable =
         AsyncDisposable cancel :> IAsyncDisposable
@@ -25,7 +23,7 @@ type AsyncDisposable (cancel) =
             for d in disposables do
                 do! d.DisposeAsync ()
         }
-        AsyncDisposable (cancel) :> IAsyncDisposable
+        AsyncDisposable cancel :> IAsyncDisposable
 
 type Disposable (cancel) =
     interface IDisposable with

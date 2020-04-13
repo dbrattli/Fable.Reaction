@@ -10,50 +10,47 @@ module internal Filter =
     /// where the function returns Some with some value.
     let chooseAsync (chooser: 'TSource -> Async<'TResult option>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
         let subscribeAsync (obvAsync : IAsyncObserver<'TResult>) =
-            async {
-                let _obv =
-                    { new IAsyncObserver<'TSource> with
-                        member this.OnNextAsync x = async {
-                            // Let exceptions bubble to the top
-                            let! result = chooser x
-                            match result with
-                            | Some b ->
-                                do! obvAsync.OnNextAsync b
-                            | None -> ()
-                        }
-                        member __.OnErrorAsync err = obvAsync.OnErrorAsync err
-
-                        member __.OnCompletedAsync () = obvAsync.OnCompletedAsync ()
-
+            let _obv =
+                { new IAsyncObserver<'TSource> with
+                    member this.OnNextAsync x = async {
+                        // Let exceptions bubble to the top
+                        let! result = chooser x
+                        match result with
+                        | Some b ->
+                            do! obvAsync.OnNextAsync b
+                        | None -> ()
                     }
-                return! source.SubscribeAsync _obv
-            }
+                    member __.OnErrorAsync err = obvAsync.OnErrorAsync err
+                    member __.OnCompletedAsync () = obvAsync.OnCompletedAsync ()
+
+                }
+            source.SubscribeAsync _obv
 
         { new IAsyncObservable<'TResult> with member __.SubscribeAsync o = subscribeAsync o }
 
     /// Applies the given function to each element of the stream and
     /// returns the stream comprised of the results for each element
     /// where the function returns Some with some value.
-    let choose (chooser: 'TSource -> 'TResult option) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
-        chooseAsync  (fun x -> async { return chooser x }) source
+    let choose (chooser: 'TSource -> 'TResult option) : Stream<'TSource, 'TResult> =
+        chooseAsync  (fun x -> async { return chooser x })
 
     /// Filters the elements of an observable sequence based on an async
     /// predicate. Returns an observable sequence that contains elements
     /// from the input sequence that satisfy the condition.
-    let filterAsync (predicate: 'TSource -> Async<bool>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
+    let filterAsync (predicate: 'TSource -> Async<bool>) : Stream<'TSource> =
         let predicate' a = async {
             let! result = predicate a
             match result with
             | true -> return Some a
             | _ -> return None
         }
-        chooseAsync predicate' source
+        chooseAsync predicate'
 
     /// Filters the elements of an observable sequence based on a
     /// predicate. Returns an observable sequence that contains elements
     /// from the input sequence that satisfy the condition.
-    let filter (predicate: 'TSource -> bool) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
-        filterAsync (fun x -> async { return predicate x }) source
+    let filter (predicate: 'TSource -> bool) : Stream<'TSource> =
+        filterAsync (fun x -> async { return predicate x })
 
     /// Return an observable sequence only containing the distinct
     /// contiguous elementsfrom the source sequence.
