@@ -71,6 +71,6 @@ module Core =
     [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 
     module Async =
-        let empty = async { return () }
+        let empty = async { () }
 
-        let noop = fun _ -> async { () }
+        let noop = fun _ -> empty

@@ -181,9 +181,7 @@ module internal Transform =
                 }
                 do! action source
 
-                let cancel () = disposable.DisposeAsync ()
-
-                return AsyncDisposable.Create cancel
+                return AsyncDisposable.Create disposable.DisposeAsync
             }
         { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 

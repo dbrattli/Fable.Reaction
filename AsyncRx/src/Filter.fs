@@ -52,8 +52,8 @@ module internal Filter =
         let subscribeAsync (aobv : IAsyncObserver<'TSource>) =
             let safeObserver = safeObserver aobv
             let agent = MailboxProcessor.Start(fun inbox ->
-                let rec messageLoop (latest : Notification<'TSource>) = async {
-                    let! n = inbox.Receive()
+                let rec messageLoop (latest: Notification<'TSource>) = async {
+                    let! n = inbox.Receive ()
 
                     let! latest' = async {
                         match n with

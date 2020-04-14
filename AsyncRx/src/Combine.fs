@@ -125,7 +125,7 @@ module internal Combine =
 
             let agent = MailboxProcessor.Start(fun inbox ->
                 let rec messageLoop (source: option<'TSource>) (other: option<'TOther>) = async {
-                    let! cn = inbox.Receive()
+                    let! cn = inbox.Receive ()
 
                     let onNextOption n =
                         async {
