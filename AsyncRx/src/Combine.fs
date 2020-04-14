@@ -45,23 +45,18 @@ module internal Combine =
                         async {
                             match msg with
                             | Msg.InnerObservable xs ->
-                                //printfn "InnerObservable: maxConcurrent=%A" maxConcurrent
                                 if maxConcurrent = 0 || model.Subscriptions.Count < maxConcurrent then
-                                    //printfn "InnerObservable: Subscribe: %A" model.Key
                                     let! inner = xs.SubscribeAsync (obv model.Key)
                                     return { model with Subscriptions = model.Subscriptions.Add (model.Key, inner); Key = model.Key + 1 }
                                 else
-                                    //printfn "InnerObservable: Queue"
                                     model.Queue.Add xs
                                     return model
                             | Msg.InnerCompleted key ->
-                                //printfn "InnerComplete: %A" key
                                 let subscriptions = model.Subscriptions.Remove key
 
                                 if model.Queue.Count > 0 then
                                     let xs = model.Queue.[0]
                                     model.Queue.RemoveAt 0
-                                    //printfn "InnerComplete: Subscribing: %A" model.Key
                                     let! inner = xs.SubscribeAsync (obv model.Key)
 
                                     return { model with Subscriptions = subscriptions.Add (model.Key, inner); Key = model.Key + 1 }
@@ -69,13 +64,10 @@ module internal Combine =
                                     return { model with Subscriptions = subscriptions }
                                 else
                                     if model.IsStopped then
-                                        //printfn "InnerComplete: completing"
                                         do! safeObv.OnCompletedAsync ()
                                     return { model with Subscriptions = Map.empty }
                             | Msg.OuterCompleted ->
-                                //printfn "OuterComplete"
                                 if model.Subscriptions.Count = 0 then
-                                    //printfn "OuterComplete: completing"
                                     do! safeObv.OnCompletedAsync ()
                                 return { model with IsStopped = true }
                             | Msg.Dispose ->
@@ -116,25 +108,23 @@ module internal Combine =
             }
         { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 
-    /// Returns an observable sequence that contains the elements of
-    /// each given sequences, in sequential order.
+    /// Returns an observable sequence that contains the elements of each given sequences, in sequential order.
     let concatSeq (sources: seq<IAsyncObservable<'TSource>>) : IAsyncObservable<'TSource> =
         Create.ofSeq(sources)
         |> mergeInner 1
 
-    type Notifications<'T1, 'T2> =
-    | Source of Notification<'T1>
-    | Other of Notification<'T2>
+    type Notifications<'TSource, 'TOther> =
+    | Source of Notification<'TSource>
+    | Other of Notification<'TOther>
 
-    /// Merges the specified observable sequences into one observable
-    /// sequence by combining elements of the sources into tuples.
-    /// Returns an observable sequence containing the combined results.
-    let combineLatest (other: IAsyncObservable<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a*'b> =
-        let subscribeAsync (aobv: IAsyncObserver<'a*'b>) =
+    /// Merges the specified observable sequences into one observable sequence by combining elements of the sources into
+    /// tuples. Returns an observable sequence containing the combined results.
+    let combineLatest (other: IAsyncObservable<'TOther>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource*'TOther> =
+        let subscribeAsync (aobv: IAsyncObserver<'TSource*'TOther>) =
             let safeObserver = Core.safeObserver aobv
 
             let agent = MailboxProcessor.Start(fun inbox ->
-                let rec messageLoop (source: option<'a>) (other: option<'b>) = async {
+                let rec messageLoop (source: option<'TSource>) (other: option<'TOther>) = async {
                     let! cn = inbox.Receive()
 
                     let onNextOption n =
@@ -171,19 +161,17 @@ module internal Combine =
             )
 
             async {
-                let obvA = AsyncObserver (fun (n : Notification<'a>) -> async { Source n |> agent.Post })
+                let obvA = AsyncObserver (fun (n : Notification<'TSource>) -> async { Source n |> agent.Post })
                 let! dispose1 = source.SubscribeAsync obvA
-                let obvB = AsyncObserver  (fun (n : Notification<'b>) -> async { Other n |> agent.Post })
+                let obvB = AsyncObserver  (fun (n : Notification<'TOther>) -> async { Other n |> agent.Post })
                 let! dispose2 = other.SubscribeAsync obvB
 
                 return AsyncDisposable.Composite [ dispose1; dispose2 ]
             }
-        { new IAsyncObservable<'a*'b> with member __.SubscribeAsync o = subscribeAsync o }
+        { new IAsyncObservable<'TSource*'TOther> with member __.SubscribeAsync o = subscribeAsync o }
 
-    /// Merges the specified observable sequences into one observable
-    /// sequence by combining the values into tuples only when the first
-    /// observable sequence produces an element. Returns the combined
-    /// observable sequence.
+    /// Merges the specified observable sequences into one observable sequence by combining the values into tuples only
+    /// when the first observable sequence produces an element. Returns the combined observable sequence.
     let withLatestFrom (other: IAsyncObservable<'TOther>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource*'TOther> =
         let subscribeAsync (aobv: IAsyncObserver<'TSource*'TOther>) =
             let safeObserver = Core.safeObserver aobv
@@ -236,8 +224,8 @@ module internal Combine =
             }
         { new IAsyncObservable<'TSource*'TOther> with member __.SubscribeAsync o = subscribeAsync o }
 
-    let zipSeq (sequence: seq<'b>) (source: IAsyncObservable<'a>) : IAsyncObservable<'a*'b> =
-        let subscribeAsync (aobv: IAsyncObserver<'a*'b>) =
+    let zipSeq (sequence: seq<'TOther>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource*'TOther> =
+        let subscribeAsync (aobv: IAsyncObserver<'TSource*'TOther>) =
             async {
                 let enumerator = sequence.GetEnumerator ()
                 let _obv n =
@@ -258,4 +246,4 @@ module internal Combine =
                     }
                 return! AsyncObserver _obv |> Core.safeObserver |> source.SubscribeAsync
             }
-        { new IAsyncObservable<'a*'b> with member __.SubscribeAsync o = subscribeAsync o }
+        { new IAsyncObservable<'TSource*'TOther> with member __.SubscribeAsync o = subscribeAsync o }

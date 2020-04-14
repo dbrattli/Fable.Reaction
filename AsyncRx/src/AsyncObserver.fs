@@ -6,7 +6,7 @@ open FSharp.Control.Core
 type AsyncObserver<'T> (fn: Notification<'T> -> Async<unit>) =
 
     interface IAsyncObserver<'T> with
-        member this.OnNextAsync (x: 'T) =  OnNext x |> fn
+        member this.OnNextAsync (x: 'T) = OnNext x |> fn
         member this.OnErrorAsync err = OnError err |> fn
         member this.OnCompletedAsync () = OnCompleted |> fn
 
@@ -15,7 +15,7 @@ type AsyncObserver<'T> (fn: Notification<'T> -> Async<unit>) =
 
 type Observer<'T> (fn: Notification<'T> -> unit) =
     interface IObserver<'T> with
-        member this.OnNext (x: 'T) =  OnNext x |> fn
+        member this.OnNext (x: 'T) = OnNext x |> fn
         member this.OnError err = OnError err |> fn
         member this.OnCompleted () = OnCompleted |> fn
 
