@@ -7,11 +7,11 @@ open Core
 
 module Subjects =
     /// A cold stream that only supports a single subscriber
-    let singleSubject<'a> () : IAsyncObserver<'a> * IAsyncObservable<'a> =
-        let mutable oobv: IAsyncObserver<'a> option = None
+    let singleSubject<'TSource> () : IAsyncObserver<'TSource> * IAsyncObservable<'TSource> =
+        let mutable oobv: IAsyncObserver<'TSource> option = None
         let cts = new CancellationTokenSource ()
 
-        let subscribeAsync (aobv : IAsyncObserver<'a>) : Async<IAsyncDisposable> =
+        let subscribeAsync (aobv : IAsyncObserver<'TSource>) : Async<IAsyncDisposable> =
             let sobv = safeObserver aobv
             if Option.isSome oobv then
                 failwith "singleStream: Already subscribed"
@@ -26,7 +26,7 @@ module Subjects =
                 return AsyncDisposable.Create cancel
             }
 
-        let obv (n: Notification<'a>) =
+        let obv (n: Notification<'TSource>) =
             async {
                 while oobv.IsNone do
                     // Wait for subscriber
@@ -46,13 +46,12 @@ module Subjects =
                     printfn "No observer for %A" n
                     ()
             }
-        let obs = { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
-        AsyncObserver obv :> IAsyncObserver<'a>, obs
+        let obs = { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
+        AsyncObserver obv :> IAsyncObserver<'TSource>, obs
 
-    /// A mailbox subject is a subscribable mailbox. Each message is
-    /// broadcasted to all subscribed observers.
-    let mbSubject<'a> () : MailboxProcessor<Notification<'a>>*IAsyncObservable<'a> =
-        let obvs = new List<IAsyncObserver<'a>>()
+    /// A mailbox subject is a subscribable mailbox. Each message is broadcasted to all subscribed observers.
+    let mbSubject<'TSource> () : MailboxProcessor<Notification<'TSource>>*IAsyncObservable<'TSource> =
+        let obvs = new List<IAsyncObserver<'TSource>>()
         let cts = new CancellationTokenSource()
 
         let mb = MailboxProcessor.Start(fun inbox ->
@@ -79,7 +78,7 @@ module Subjects =
             messageLoop ()
         , cts.Token)
 
-        let subscribeAsync (aobv: IAsyncObserver<'a>) : Async<IAsyncDisposable> =
+        let subscribeAsync (aobv: IAsyncObserver<'TSource>) : Async<IAsyncDisposable> =
             async {
                 let sobv = safeObserver aobv
                 obvs.Add sobv
@@ -90,14 +89,14 @@ module Subjects =
                 return AsyncDisposable.Create cancel
             }
 
-        mb, { new IAsyncObservable<'a> with member __.SubscribeAsync o = subscribeAsync o }
+        mb, { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 
     /// A stream is both an observable sequence as well as an observer.
     /// Each notification is broadcasted to all subscribed observers.
-    let subject<'a> () : IAsyncObserver<'a> * IAsyncObservable<'a> =
-        let mb, obs = mbSubject<'a> ()
+    let subject<'TSource> () : IAsyncObserver<'TSource> * IAsyncObservable<'TSource> =
+        let mb, obs = mbSubject<'TSource> ()
 
-        let obv = { new IAsyncObserver<'a> with
+        let obv = { new IAsyncObserver<'TSource> with
             member this.OnNextAsync x = async {
                 OnNext x |> mb.Post
             }

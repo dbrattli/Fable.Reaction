@@ -215,7 +215,7 @@ module internal Combine =
 
             async {
                 let obvA = AsyncObserver (fun (n : Notification<'TSource>) -> async { Source n |> agent.Post })
-                let obvB = AsyncObserver  (fun (n : Notification<'TOther>) -> async { Other n |> agent.Post })
+                let obvB = AsyncObserver (fun (n : Notification<'TOther>) -> async { Other n |> agent.Post })
 
                 let! dispose1 = other.SubscribeAsync obvB
                 let! dispose2 = source.SubscribeAsync obvA

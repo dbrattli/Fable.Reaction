@@ -9,13 +9,12 @@ module internal Transform =
     /// element of the source.
     let transformAsync<'TSource, 'TResult> (mapNextAsync: ('TResult -> Async<unit>) -> 'TSource -> Async<unit>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
         let subscribeAsync (aobv : IAsyncObserver<'TResult>) : Async<IAsyncDisposable> =
-            let _obv =
-                { new IAsyncObserver<'TSource> with
-                    member __.OnNextAsync x = mapNextAsync aobv.OnNextAsync x
-                    member __.OnErrorAsync err = aobv.OnErrorAsync err
-                    member __.OnCompletedAsync () = aobv.OnCompletedAsync ()
-                }
-            source.SubscribeAsync _obv
+            { new IAsyncObserver<'TSource> with
+                member __.OnNextAsync x = mapNextAsync aobv.OnNextAsync x
+                member __.OnErrorAsync err = aobv.OnErrorAsync err
+                member __.OnCompletedAsync () = aobv.OnCompletedAsync ()
+            }
+            |> source.SubscribeAsync
         { new IAsyncObservable<'TResult> with member __.SubscribeAsync o = subscribeAsync o }
 
     /// Returns an observable sequence whose elements are the result of invoking the async mapper function on each

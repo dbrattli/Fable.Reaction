@@ -5,10 +5,9 @@ open FSharp.Control.Core
 
 [<RequireQualifiedAccess>]
  module internal Aggregation =
-    /// Applies an async accumulator function over an observable
-    /// sequence and returns each intermediate result. The seed value is
-    /// used as the initial accumulator value. Returns an observable
-    /// sequence containing the accumulated values.
+    /// Applies an async accumulator function over an observable sequence and returns each intermediate result. The seed
+    /// value is used as the initial accumulator value. Returns an observable sequence containing the accumulated
+    /// values.
     let scanInitAsync (initial: 'TState) (accumulator: 'TState -> 'TSource -> Async<'TState>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TState> =
         let subscribeAsync (aobv : IAsyncObserver<'TState>) =
             let safeObserver = safeObserver aobv
@@ -32,10 +31,9 @@ open FSharp.Control.Core
             }
         { new IAsyncObservable<'TState> with member __.SubscribeAsync o = subscribeAsync o }
 
-    /// Applies an async accumulator function over an observable
-    /// sequence and returns each intermediate result. The first value
-    /// is used as the initial accumulator value. Returns an observable
-    /// sequence containing the accumulated values.
+    /// Applies an async accumulator function over an observable sequence and returns each intermediate result. The
+    /// first value is used as the initial accumulator value. Returns an observable sequence containing the accumulated
+    /// values.
     let scanAsync (accumulator: 'TSource -> 'TSource -> Async<'TSource>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
         let subscribeAsync (aobv : IAsyncObserver<'TSource>) =
             let safeObserver = safeObserver aobv
@@ -64,9 +62,8 @@ open FSharp.Control.Core
         { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 
 
-    /// Groups the elements of an observable sequence according to a
-    /// specified key mapper function. Returns a sequence of observable
-    /// groups, each of which corresponds to a given key.
+    /// Groups the elements of an observable sequence according to a specified key mapper function. Returns a sequence
+    /// of observable groups, each of which corresponds to a given key.
     let groupBy (keyMapper: 'TSource -> 'TKey) (source: IAsyncObservable<'TSource>) : IAsyncObservable<IAsyncObservable<'TSource>> =
         let subscribeAsync (aobv: IAsyncObserver<IAsyncObservable<'TSource>>) =
             let cts = new CancellationTokenSource()
