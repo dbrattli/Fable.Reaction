@@ -1,15 +1,14 @@
 namespace FSharp.Control
 
+open System
 open Core
-
-type IObservable<'T> = System.IObservable<'T>
 
 [<RequireQualifiedAccess>]
 module internal Transform =
     /// Returns an observable sequence whose elements are the result of invoking the async mapper function on each
     /// element of the source.
     let transformAsync<'TSource, 'TResult> (mapNextAsync: ('TResult -> Async<unit>) -> 'TSource -> Async<unit>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TResult> =
-        let subscribeAsync (aobv : IAsyncObserver<'TResult>) : Async<IAsyncDisposable> =
+        let subscribeAsync (aobv : IAsyncObserver<'TResult>) : Async<FSharp.Control.IAsyncDisposable> =
             { new IAsyncObserver<'TSource> with
                 member __.OnNextAsync x = mapNextAsync aobv.OnNextAsync x
                 member __.OnErrorAsync err = aobv.OnErrorAsync err
@@ -94,7 +93,7 @@ module internal Transform =
                     }
 
                 MailboxProcessor.Start(fun inbox ->
-                    let rec messageLoop (current: IAsyncDisposable option, isStopped, currentId) = async {
+                    let rec messageLoop (current: FSharp.Control.IAsyncDisposable option, isStopped, currentId) = async {
                         let! cmd = inbox.Receive ()
 
                         let! (current', isStopped', currentId') = async {
@@ -209,7 +208,7 @@ module internal Transform =
         let dispatch, stream = Subjects.subject<'TSource> ()
 
         let mb = MailboxProcessor.Start(fun inbox ->
-            let rec messageLoop (count: int) (subscription: IAsyncDisposable) = async {
+            let rec messageLoop (count: int) (subscription: FSharp.Control.IAsyncDisposable) = async {
                 let! cmd = inbox.Receive ()
 
                 let! count', subscription' =
@@ -247,7 +246,7 @@ module internal Transform =
         { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 
     let toObservable (source: IAsyncObservable<'TSource>) : IObservable<'TSource> =
-        let mutable subscription : IAsyncDisposable = AsyncDisposable.Empty
+        let mutable subscription : FSharp.Control.IAsyncDisposable = AsyncDisposable.Empty
 
         { new IObservable<'TSource> with
             member __.Subscribe obv =
