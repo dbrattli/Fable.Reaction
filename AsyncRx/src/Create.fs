@@ -1,16 +1,10 @@
 namespace FSharp.Control
 
 open System.Threading
-open System
-
-#if !FABLE_COMPILER
-open FSharp.Control
-#endif
 
 open Core
 
 open System.Runtime.CompilerServices
-
 [<assembly:InternalsVisibleTo("Tests")>]
 do ()
 

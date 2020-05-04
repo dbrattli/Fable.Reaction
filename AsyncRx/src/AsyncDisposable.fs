@@ -5,25 +5,25 @@ open Core
 
 /// Overloads and extensions for AsyncDisposable
 type AsyncDisposable (cancel) =
-    interface IAsyncDisposable with
+    interface FSharp.Control.IAsyncDisposable with
         member this.DisposeAsync () =
             cancel ()
 
-    static member Create (cancel) : IAsyncDisposable =
-        AsyncDisposable cancel :> IAsyncDisposable
+    static member Create (cancel) : FSharp.Control.IAsyncDisposable =
+        AsyncDisposable cancel :> FSharp.Control.IAsyncDisposable
 
-    static member Empty : IAsyncDisposable =
+    static member Empty : FSharp.Control.IAsyncDisposable =
         let cancel () = async {
             return ()
         }
-        AsyncDisposable cancel :> IAsyncDisposable
+        AsyncDisposable cancel :> FSharp.Control.IAsyncDisposable
 
-    static member Composite (disposables: IAsyncDisposable seq) : IAsyncDisposable =
+    static member Composite (disposables: FSharp.Control.IAsyncDisposable seq) : FSharp.Control.IAsyncDisposable =
         let cancel () = async {
             for d in disposables do
                 do! d.DisposeAsync ()
         }
-        AsyncDisposable cancel :> IAsyncDisposable
+        AsyncDisposable cancel :> FSharp.Control.IAsyncDisposable
 
 type Disposable (cancel) =
     interface IDisposable with
@@ -48,10 +48,10 @@ type Disposable (cancel) =
 
 [<AutoOpen>]
 module AsyncDisposable =
-    type IAsyncDisposable with
+    type FSharp.Control.IAsyncDisposable with
         member this.ToDisposable () =
             { new IDisposable with member __.Dispose () = this.DisposeAsync () |> Async.Start' }
 
-    type IDisposable with
-        member this.ToAsyncDisposable () : IAsyncDisposable =
-            { new IAsyncDisposable with member __.DisposeAsync () = async { this.Dispose () } }
+    type System.IDisposable with
+        member this.ToAsyncDisposable () : FSharp.Control.IAsyncDisposable =
+            { new FSharp.Control.IAsyncDisposable with member __.DisposeAsync () = async { this.Dispose () } }

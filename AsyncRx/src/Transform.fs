@@ -1,7 +1,8 @@
 namespace FSharp.Control
 
-open System
 open Core
+
+type IObservable<'T> = System.IObservable<'T>
 
 [<RequireQualifiedAccess>]
 module internal Transform =
