@@ -9,12 +9,6 @@ type QueryBuilder () =
     member this.YieldFrom (xs: IAsyncObservable<'a>) : IAsyncObservable<'a> = xs
     member this.Combine (xs: IAsyncObservable<'a>, ys: IAsyncObservable<'a>) =
         Combine.concatSeq [xs; ys]
-    member this.Using(resource:#IAsyncRxDisposable, f: #IAsyncRxDisposable -> Async<'a>) =
-        let disposeFunction _ =
-            let t = resource.DisposeAsync()
-            Async.RunSynchronously t
-        async.TryFinally(f resource, disposeFunction)
-
     member this.Delay (fn) = fn ()
     member this.Bind(source: IAsyncObservable<'a>, fn: 'a -> IAsyncObservable<'b>) : IAsyncObservable<'b> =
         Transform.flatMap fn source
