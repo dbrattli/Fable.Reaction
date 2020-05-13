@@ -4,7 +4,7 @@ open System
 open Fable.React
 open FSharp.Control
 
-type Dispatch<'msg> = 'msg -> unit
+type Dispatch<'Msg> = 'Msg -> unit
 
 [<RequireQualifiedAccess>]
 module Reaction =
@@ -21,7 +21,7 @@ module Reaction =
             Hooks.useMemo((fun () ->
                 let obv, obs = AsyncRx.mbSubject<'msg> ()
                 OnNext >> obv.Post,  obs
-            ), [||])
+            ), Array.empty)
 
         // Only re-run the stream function if the state changes.
         let msgs', tag =
@@ -30,15 +30,14 @@ module Reaction =
                 msgs |> AsyncRx.toObservable, tag
             ), [| state |])
 
-        // Resubstribe the stream if the tag has changed.
+        // Re-subscribe the stream if the tag has changed.
         Hooks.useEffectDisposable(fun () ->
             let disposable =
                 debug ("[Fable.Reaction] Stream subscribed: ", tag)
-                msgs'.Subscribe(fun x ->
-                    match x with
+                msgs'.Subscribe(function
                     | OnNext msg -> dispatch msg
                     | OnCompleted -> debug ("[Fable.Reaction] Stream completed:", tag)
-                    | OnError err -> debug("[Fable.Reaction] Stream error: ", (err.ToString ()))
+                    | OnError err -> debug ("[Fable.Reaction] Stream error: ", (err.ToString ()))
                 )
 
             { new IDisposable with

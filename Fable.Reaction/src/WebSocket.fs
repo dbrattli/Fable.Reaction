@@ -12,7 +12,7 @@ module WebSocket =
     /// the server. Received ws messages will be forwarded down stream.
     /// JSON encode/decode of application messages is left to the client.
     let channel (uri: string) (source: IAsyncObservable<string>) : IAsyncObservable<string> =
-        let subscribe (down: IAsyncObserver<string>) : Async<IAsyncDisposable> =
+        let subscribe (down: IAsyncObserver<string>) : Async<IAsyncRxDisposable> =
             async {
                 let websocket = WebSocket.Create uri
                 let mutable disposable = AsyncDisposable.Empty

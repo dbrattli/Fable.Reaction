@@ -5,11 +5,15 @@ open Fable.React
 open Fable.Reaction
 open FSharp.Control
 open Feliz
+open System
 
 // The model holds data that you want to keep track of while the
 // application is running
 type Model = {
     Letters: Map<int, string * int * int>
+    Fps: int
+    Second: int64
+    Count: int
 }
 
 // The Msg type defines what events/actions can occur while the
@@ -21,9 +25,15 @@ type Msg =
 // The update function computes the next state of the application based
 // on the current state and the incoming messages
 let update (currentModel : Model) (msg : Msg) : Model =
-    match currentModel.Letters, msg with
-    | _, Letter (i, c, x, y) ->
-        { currentModel with Letters = currentModel.Letters.Add (i, (c, x, y)) }
+    let second = DateTimeOffset.Now.ToUnixTimeSeconds ()
+    match msg with
+    | Letter (i, c, x, y) ->
+        { currentModel with
+            Letters = currentModel.Letters.Add (i, (c, x, y))
+            Second = second
+            Fps = if second > currentModel.Second then currentModel.Count else currentModel.Fps
+            Count = if second > currentModel.Second then 0 else currentModel.Count + 1
+        }
 
 let view (model : Model) (dispatch : Msg -> unit)=
     let letters = model.Letters
@@ -44,11 +54,17 @@ let view (model : Model) (dispatch : Msg -> unit)=
                     ]
                     prop.text c
                 ]
+            Html.span ("Fps: " + (string model.Fps))
         ]
     ]
 
 let initialModel : Model =
-    { Letters = Map.empty }
+    {
+        Letters = Map.empty
+        Count = 0
+        Second = 0L
+        Fps = 0
+    }
 
 let getOffset (element: Browser.Types.Element) =
     let doc = element.ownerDocument

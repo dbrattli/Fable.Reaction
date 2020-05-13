@@ -1,6 +1,8 @@
 namespace FSharp.Control
 open System.Threading
 
+open FSharp.Control.Core
+
 type QueryBuilder () =
     member this.Zero () : IAsyncObservable<_> = Create.empty ()
     member this.Yield (x: 'a) : IAsyncObservable<'a> = Create.single x
@@ -43,8 +45,8 @@ module QueryBuilder =
 #if !FABLE_COMPILER
                 if Interlocked.CompareExchange(&x, 1, 0) = 0 then
 #endif
-                    let t = resource.DisposeAsync()
-                    Async.RunSynchronously t
+                    resource.DisposeAsync()
+                    |> Async.Start' // Dispose is best effort.
 
             async.TryFinally(f resource, disposeFunction)
 
