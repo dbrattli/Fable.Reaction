@@ -35,6 +35,7 @@ module QueryBuilder =
     /// Query builder for an async reactive event source
     let asyncRx = QueryBuilder ()
 
+    /// We extend AsyncBuilder to use `use!` for resource managemnt when using async builder.
     type AsyncBuilder with
         member builder.Using(resource:#IAsyncRxDisposable, f: #IAsyncRxDisposable -> Async<'a>) =
             let mutable x = 0
