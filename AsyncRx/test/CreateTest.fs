@@ -76,17 +76,18 @@ let tests = testList "Create Tests" [
         Expect.equal actual expected "Should be equal"
     }
 
-    testAsync "Test ofSeq dispose after subscribe" {
+    testAsync "Test dispose after subscribe" {
         // Arrange
-        let xs = AsyncRx.ofSeq <| seq { 1 .. 5 }
+        let xs = AsyncRx.timer 10
         let obv = TestObserver<int> ()
 
         // Act
         let! subscription = xs.SubscribeAsync obv
         do! subscription.DisposeAsync ()
+        do! Async.Sleep 15
 
         // Assert
-        //let actual = obv.Notifications |> Seq.toList
-        //Assert.That(actual, Is.EquivalentTo([]))
+        let actual = obv.Notifications |> Seq.toList
+        Expect.equal actual [] "Should be equal"
     }
 ]

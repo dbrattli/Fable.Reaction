@@ -24,7 +24,7 @@
     <Compile Include="Filter.fs" />
     <Compile Include="Tap.fs" />
     <Compile Include="AsyncObservable.fs" />
-    <Compile Include="Query.fs" />
+    <Compile Include="Builder.fs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\LICENSE" Pack="true" Visible="false" PackagePath=""/>

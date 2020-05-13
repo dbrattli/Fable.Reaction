@@ -22,7 +22,7 @@ module AsyncObservable =
             this.RunAsync obv |> Async.Start'
 
         /// Subscribes the async observer function (`Notification{'a} -> Async{unit}`) to the AsyncObservable
-        member this.SubscribeAsync<'TSource> (obv: Notification<'TSource> -> Async<unit>) : Async<FSharp.Control.IAsyncDisposable> =
+        member this.SubscribeAsync<'TSource> (obv: Notification<'TSource> -> Async<unit>) : Async<IAsyncRxDisposable> =
             this.SubscribeAsync (AsyncObserver obv)
 
     /// Returns an observable sequence that contains the elements of the given sequences concatenated together.
@@ -126,7 +126,7 @@ module AsyncRx =
 
     /// Creates an async observable (`AsyncObservable{'a}`) from the
     /// given subscribe function.
-    let create (subscribe : IAsyncObserver<'a> -> Async<FSharp.Control.IAsyncDisposable>) : IAsyncObservable<'a> =
+    let create (subscribe : IAsyncObserver<'a> -> Async<IAsyncRxDisposable>) : IAsyncObservable<'a> =
         Create.create subscribe
 
     // Returns an observable sequence that invokes the specified factory

@@ -13,22 +13,20 @@ open FSharp.Control.Core
             let safeObserver = safeObserver aobv
             let mutable state = initial
 
-            async {
-                let obv n =
-                    async {
-                        match n with
-                        | OnNext x ->
-                            try
-                                let! state' = accumulator state x
-                                state <- state'
-                                do! safeObserver.OnNextAsync state
-                            with
-                            | err -> do! safeObserver.OnErrorAsync err
-                        | OnError e -> do! safeObserver.OnErrorAsync e
-                        | OnCompleted -> do! safeObserver.OnCompletedAsync ()
-                    }
-                return! AsyncObserver obv |> source.SubscribeAsync
-            }
+            let obv n =
+                async {
+                    match n with
+                    | OnNext x ->
+                        try
+                            let! state' = accumulator state x
+                            state <- state'
+                            do! safeObserver.OnNextAsync state
+                        with
+                        | err -> do! safeObserver.OnErrorAsync err
+                    | OnError e -> do! safeObserver.OnErrorAsync e
+                    | OnCompleted -> do! safeObserver.OnCompletedAsync ()
+                }
+            AsyncObserver obv |> source.SubscribeAsync
         { new IAsyncObservable<'TState> with member __.SubscribeAsync o = subscribeAsync o }
 
     /// Applies an async accumulator function over an observable sequence and returns each intermediate result. The
@@ -39,26 +37,24 @@ open FSharp.Control.Core
             let safeObserver = safeObserver aobv
             let mutable states = None
 
-            async {
-                let obv n =
-                    async {
-                        match n with
-                        | OnNext x ->
-                            match states with
-                            | Some state ->
-                                try
-                                    let! state' = accumulator state x
-                                    states <- Some state'
-                                    do! safeObserver.OnNextAsync state
-                                with
-                                | err -> do! safeObserver.OnErrorAsync err
-                            | None ->
-                                states <- Some x
-                        | OnError e -> do! safeObserver.OnErrorAsync e
-                        | OnCompleted -> do! safeObserver.OnCompletedAsync ()
-                    }
-                return! AsyncObserver obv |> source.SubscribeAsync
-            }
+            let obv n =
+                async {
+                    match n with
+                    | OnNext x ->
+                        match states with
+                        | Some state ->
+                            try
+                                let! state' = accumulator state x
+                                states <- Some state'
+                                do! safeObserver.OnNextAsync state
+                            with
+                            | err -> do! safeObserver.OnErrorAsync err
+                        | None ->
+                            states <- Some x
+                    | OnError e -> do! safeObserver.OnErrorAsync e
+                    | OnCompleted -> do! safeObserver.OnCompletedAsync ()
+                }
+            AsyncObserver obv |> source.SubscribeAsync
         { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 
 

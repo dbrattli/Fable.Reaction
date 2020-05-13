@@ -6,7 +6,7 @@ open System.Collections.Generic
 module internal Combine =
     type Key = int
     type Model<'a> = {
-        Subscriptions: Map<Key, IAsyncDisposable>
+        Subscriptions: Map<Key, IAsyncRxDisposable>
         Queue: List<IAsyncObservable<'a>>
         IsStopped: bool
         Key: Key
@@ -161,10 +161,12 @@ module internal Combine =
             )
 
             async {
-                let obvA = AsyncObserver (fun (n : Notification<'TSource>) -> async { Source n |> agent.Post })
-                let! dispose1 = source.SubscribeAsync obvA
-                let obvB = AsyncObserver  (fun (n : Notification<'TOther>) -> async { Other n |> agent.Post })
-                let! dispose2 = other.SubscribeAsync obvB
+                let! dispose1 =
+                    AsyncObserver (fun (n : Notification<'TSource>) -> async { Source n |> agent.Post })
+                    |> source.SubscribeAsync
+                let! dispose2 =
+                    AsyncObserver  (fun (n : Notification<'TOther>) -> async { Other n |> agent.Post })
+                    |> other.SubscribeAsync
 
                 return AsyncDisposable.Composite [ dispose1; dispose2 ]
             }
@@ -214,13 +216,17 @@ module internal Combine =
             )
 
             async {
-                let obvA = AsyncObserver (fun (n : Notification<'TSource>) -> async { Source n |> agent.Post })
-                let obvB = AsyncObserver (fun (n : Notification<'TOther>) -> async { Other n |> agent.Post })
+                let! dispose1 =
+                    AsyncObserver (fun (n : Notification<'TOther>) -> async { Other n |> agent.Post })
+                    |> other.SubscribeAsync
+                let! dispose2 =
+                    AsyncObserver (fun (n : Notification<'TSource>) -> async { Source n |> agent.Post })
+                    |> source.SubscribeAsync
 
-                let! dispose1 = other.SubscribeAsync obvB
-                let! dispose2 = source.SubscribeAsync obvA
-
-                return AsyncDisposable.Composite [ dispose1; dispose2 ]
+                return AsyncDisposable.Composite [
+                    dispose1
+                    dispose2
+                ]
             }
         { new IAsyncObservable<'TSource*'TOther> with member __.SubscribeAsync o = subscribeAsync o }
 

@@ -1,6 +1,3 @@
-source https://www.nuget.org/api/v2
-framework: netstandard2.0
-
 group AsyncRx
 
 source https://www.nuget.org/api/v2
@@ -11,7 +8,7 @@ nuget FSharp.Control.AsyncSeq
 
 group Test
 source https://www.nuget.org/api/v2
-framework: netcoreapp2.1
+framework: netcoreapp3.1
 
 nuget coverlet.msbuild
 nuget FSharp.Control.AsyncSeq

@@ -11,7 +11,7 @@ module Subjects =
         let mutable oobv: IAsyncObserver<'TSource> option = None
         let cts = new CancellationTokenSource ()
 
-        let subscribeAsync (aobv : IAsyncObserver<'TSource>) : Async<IAsyncDisposable> =
+        let subscribeAsync (aobv : IAsyncObserver<'TSource>) : Async<IAsyncRxDisposable> =
             let sobv = safeObserver aobv
             if Option.isSome oobv then
                 failwith "singleStream: Already subscribed"
@@ -78,7 +78,7 @@ module Subjects =
             messageLoop ()
         , cts.Token)
 
-        let subscribeAsync (aobv: IAsyncObserver<'TSource>) : Async<IAsyncDisposable> =
+        let subscribeAsync (aobv: IAsyncObserver<'TSource>) : Async<IAsyncRxDisposable> =
             async {
                 let sobv = safeObserver aobv
                 obvs.Add sobv

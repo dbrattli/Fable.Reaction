@@ -1,4 +1,5 @@
 namespace FSharp.Control
+open System.Threading
 
 type QueryBuilder () =
     member this.Zero () : IAsyncObservable<_> = Create.empty ()
@@ -6,6 +7,12 @@ type QueryBuilder () =
     member this.YieldFrom (xs: IAsyncObservable<'a>) : IAsyncObservable<'a> = xs
     member this.Combine (xs: IAsyncObservable<'a>, ys: IAsyncObservable<'a>) =
         Combine.concatSeq [xs; ys]
+    member this.Using(resource:#IAsyncRxDisposable, f: #IAsyncRxDisposable -> Async<'a>) =
+        let disposeFunction _ =
+            let t = resource.DisposeAsync()
+            Async.RunSynchronously t
+        async.TryFinally(f resource, disposeFunction)
+
     member this.Delay (fn) = fn ()
     member this.Bind(source: IAsyncObservable<'a>, fn: 'a -> IAsyncObservable<'b>) : IAsyncObservable<'b> =
         Transform.flatMap fn source
@@ -27,3 +34,16 @@ type QueryBuilder () =
 module QueryBuilder =
     /// Query builder for an async reactive event source
     let asyncRx = QueryBuilder ()
+
+    type AsyncBuilder with
+        member builder.Using(resource:#IAsyncRxDisposable, f: #IAsyncRxDisposable -> Async<'a>) =
+            let mutable x = 0
+            let disposeFunction _ =
+#if !FABLE_COMPILER
+                if Interlocked.CompareExchange(&x, 1, 0) = 0 then
+#endif
+                    let t = resource.DisposeAsync()
+                    Async.RunSynchronously t
+
+            async.TryFinally(f resource, disposeFunction)
+

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
 
@@ -14,7 +14,7 @@
     <Compile Include="MergeTest.fs" />
     <Compile Include="ConcatTest.fs" />
     <Compile Include="FlatMapTest.fs" />
-    <Compile Include="QueryTest.fs" />
+    <Compile Include="BuilderTest.fs" />
     <Compile Include="CatchTest.fs" />
     <Compile Include="ScanTest.fs" />
     <Compile Include="Main.fs" />

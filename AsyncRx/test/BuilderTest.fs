@@ -165,4 +165,22 @@ let tests = testList "Query Tests" [
         let expected : Notification<int> list = [ OnNext 44; OnCompleted ]
         Expect.equal actual expected "Should be equal"
     }
+
+    testAsync "test query async dispose with use!" {
+        // Arrange
+        let xs = AsyncRx.timer 10
+        let obv = TestObserver<int> ()
+
+        // Act
+        let! _ =
+            async {
+                use! _ignore = xs.SubscribeAsync obv
+                ()
+            }
+        do! Async.Sleep 15
+
+        // Assert
+        let actual = obv.Notifications |> Seq.toList
+        Expect.equal actual [] "Should be equal"
+    }
 ]

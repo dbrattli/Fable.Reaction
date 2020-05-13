@@ -10,7 +10,7 @@ module Core =
         let cancel () = async {
             cts.Cancel ()
         }
-        let disposable = { new IAsyncDisposable with member __.DisposeAsync () = cancel () }
+        let disposable = { new IAsyncRxDisposable with member __.DisposeAsync () = cancel () }
         disposable, cts.Token
 
     /// Safe observer that wraps the given observer. Makes sure that
