@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Fable.Reaction</PackageId>
-    <Version>3.3.1</Version>
-    <PackageVersion>3.3.1</PackageVersion>
+    <Version>3.3.2</Version>
+    <PackageVersion>3.3.2</PackageVersion>
     <Authors>Dag Brattli</Authors>
     <Company>Brattli Labs</Company>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <Compile Include="Error.fs" />
-    <Compile Include="Query.fs" />
+    <Compile Include="Builder.fs" />
     <Compile Include="WebSocket.fs" />
     <Compile Include="AsyncRx.fs" />
     <Compile Include="Reaction.fs" />

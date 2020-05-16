@@ -19,7 +19,7 @@ module AsyncRx =
     /// promise resolves. The observable will also complete after
     /// producing an event.
     let ofPromise (pr: Fable.Core.JS.Promise<_>) =
-        QueryExtension.ofPromise pr
+        QueryBuilderExtension.ofPromise pr
 
     let msgRequest (url:string) (encode: 'msg -> string) (decode: string -> 'msg option) (msgs: IAsyncObservable<'msg>) =
         asyncRx {

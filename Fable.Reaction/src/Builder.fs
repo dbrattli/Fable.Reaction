@@ -5,7 +5,7 @@ open FSharp.Control
 
 
 [<AutoOpen>]
-module QueryExtension =
+module QueryBuilderExtension =
     let internal ofPromise (pr: Fable.Core.JS.Promise<_>) =
         AsyncRx.ofAsyncWorker(fun obv _ -> async {
             try

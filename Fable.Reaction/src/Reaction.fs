@@ -21,7 +21,7 @@ module Reaction =
             Hooks.useMemo((fun () ->
                 let obv, obs = AsyncRx.mbSubject<'msg> ()
                 OnNext >> obv.Post,  obs
-            ), Array.empty)
+            ), [||]) // Note to self: cannot be Array.empty
 
         // Only re-run the stream function if the state changes.
         let msgs', tag =
