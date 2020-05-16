@@ -21,7 +21,7 @@ group Client
     storage: none
 
     nuget Fable.Core ~> 3
-    nuget Fable.React ~> 5
+    nuget Fable.React ~> 6
     nuget Fable.Reaction ~> 3
     nuget Fable.FontAwesome.Free ~> 2
     nuget Fable.Fetch
@@ -35,7 +35,7 @@ group Build
     framework: netstandard2.0
     storage: none
 
-    nuget FSharp.Core 4.3.4 // https://github.com/fsharp/FAKE/issues/2001
+    nuget FSharp.Core
     nuget Fake.Core.Target
     nuget Fake.DotNet.Cli
     nuget Fake.IO.FileSystem
