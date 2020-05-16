@@ -23,7 +23,7 @@ group Client
     nuget Fable.Elmish.React
     nuget Fable.Reaction ~> 3
     nuget Fable.Fetch ~> 2
-    nuget Fable.React ~> 5
+    nuget Fable.React ~> 6
     nuget Fulma ~> 2
     nuget Fable.FontAwesome.Free ~> 2
     nuget Thoth.Json

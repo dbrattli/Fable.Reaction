@@ -2,7 +2,7 @@ source https://www.nuget.org/api/v2
 storage: none
 
 nuget Fable.Core ~> 3
-nuget Fable.React ~> 5
+nuget Fable.React ~> 6
 nuget Fable.Browser.WebSocket
 nuget Fable.Browser.Event
 nuget Fable.Fetch
