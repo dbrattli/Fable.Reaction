@@ -9,7 +9,6 @@ open Feliz
 open Feliz.Bulma
 
 open Thoth.Json
-open System
 
 type AppModel = {
     InitialString: string
@@ -123,5 +122,7 @@ let stream model msgs =
     | Error exn -> msgs |> AsyncRx.tag "error"
     | App model -> msgs |> AsyncRx.tag "msgs"
 
-let app props = Reaction.StreamView initialModel view update stream
-mountById "reaction-app" (ofFunction app () [])
+
+open Browser.Dom
+let app = Reaction.StreamView initialModel view update stream
+ReactDOM.render(app, document.getElementById "reaction-app")
