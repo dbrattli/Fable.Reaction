@@ -5,9 +5,8 @@ open System.Collections.Generic
 
 [<RequireQualifiedAccess>]
 module internal Filter =
-    /// Applies the given async function to each element of the stream and
-    /// returns the stream comprised of the results for each element
-    /// where the function returns Some with some value.
+    /// Applies the given async function to each element of the stream and returns the stream comprised of the results
+    /// for each element where the function returns Some with some value.
     let chooseAsync (chooser: 'TSource -> Async<'TResult option>) : Stream<'TSource, 'TResult> =
         Transform.transformAsync (fun next a -> async {
             match! chooser a with
@@ -15,9 +14,8 @@ module internal Filter =
             | None -> return ()
         })
 
-    /// Applies the given function to each element of the stream and
-    /// returns the stream comprised of the results for each element
-    /// where the function returns Some with some value.
+    /// Applies the given function to each element of the stream and returns the stream comprised of the results for
+    /// each element where the function returns Some with some value.
     let choose (chooser: 'TSource -> 'TResult option) : Stream<'TSource, 'TResult> =
         Transform.transformAsync (fun next a ->
             match chooser a with
@@ -25,9 +23,8 @@ module internal Filter =
             | None -> Async.empty
         )
 
-    /// Filters the elements of an observable sequence based on an async
-    /// predicate. Returns an observable sequence that contains elements
-    /// from the input sequence that satisfy the condition.
+    /// Filters the elements of an observable sequence based on an async predicate. Returns an observable sequence that
+    /// contains elements from the input sequence that satisfy the condition.
     let filterAsync (predicate: 'TSource -> Async<bool>) : Stream<'TSource> =
         Transform.transformAsync (fun next a -> async {
             match! predicate a with
@@ -36,9 +33,8 @@ module internal Filter =
         })
 
 
-    /// Filters the elements of an observable sequence based on a
-    /// predicate. Returns an observable sequence that contains elements
-    /// from the input sequence that satisfy the condition.
+    /// Filters the elements of an observable sequence based on a predicate. Returns an observable sequence that
+    /// contains elements from the input sequence that satisfy the condition.
     let filter (predicate: 'TSource -> bool) : Stream<'TSource> =
         Transform.transformAsync (fun next a ->
             match predicate a with
@@ -46,8 +42,7 @@ module internal Filter =
             | _ -> Async.empty
         )
 
-    /// Return an observable sequence only containing the distinct
-    /// contiguous elementsfrom the source sequence.
+    /// Return an observable sequence only containing the distinct contiguous elementsfrom the source sequence.
     let distinctUntilChanged (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
         let subscribeAsync (aobv : IAsyncObserver<'TSource>) =
             let safeObserver = safeObserver aobv
@@ -85,8 +80,7 @@ module internal Filter =
             }
         { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 
-    /// Bypasses a specified number of elements in an observable sequence
-    /// and then returns the remaining elements.
+    /// Bypasses a specified number of elements in an observable sequence and then returns the remaining elements.
     let skip (count: int) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
         let subscribeAsync (obvAsync : IAsyncObserver<'TSource>) =
             let safeObv = safeObserver obvAsync
@@ -111,8 +105,7 @@ module internal Filter =
             }
         { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 
-    /// Returns a specified number of contiguous elements from the start of
-    /// an observable sequence.
+    /// Returns a specified number of contiguous elements from the start of an observable sequence.
     let take (count: int) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
         let subscribeAsync (obvAsync : IAsyncObserver<'TSource>) =
             let safeObv = safeObserver obvAsync
@@ -139,8 +132,7 @@ module internal Filter =
             }
         { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 
-    /// Returns a specified number of contiguous elements from the end of an
-    /// observable sequence.
+    /// Returns a specified number of contiguous elements from the end of an observable sequence.
     let takeLast (count: int) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
         let subscribeAsync (obvAsync : IAsyncObserver<'TSource>) =
             let safeObv = safeObserver obvAsync
@@ -165,8 +157,7 @@ module internal Filter =
             }
         { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 
-    /// Returns the values from the source observable sequence until the
-    /// other observable sequence produces a value.
+    /// Returns the values from the source observable sequence until the other observable sequence produces a value.
     let takeUntil (other: IAsyncObservable<'TResult>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
         let subscribeAsync (obvAsync : IAsyncObserver<'TSource>) =
             let safeObv = safeObserver obvAsync

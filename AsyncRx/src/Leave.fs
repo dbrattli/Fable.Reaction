@@ -6,9 +6,8 @@ open FSharp.Control
 
 [<RequireQualifiedAccess>]
 module internal Leave =
-    /// Convert async observable to async sequence, non-blocking.
-    /// Producer will be awaited until item is consumed by the async
-    /// enumerator.
+    /// Convert async observable to async sequence, non-blocking. Producer will be awaited until item is consumed by the
+    /// async enumerator.
     let toAsyncSeq (source: IAsyncObservable<'TSource>): AsyncSeq<'TSource> =
         let ping = new AutoResetEvent false
         let pong = new AutoResetEvent false
