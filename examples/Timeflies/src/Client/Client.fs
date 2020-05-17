@@ -95,5 +95,5 @@ let stream (model : Model) (msgs: IAsyncObservable<Msg>) =
 
 printf "Starting program"
 
-let app = Reaction.StreamView initialModel view update stream
+let app () = Reaction.StreamView initialModel view update stream
 mountById "reaction-app" (ofFunction app () [])
