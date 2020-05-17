@@ -47,12 +47,10 @@ let viewStatus dispatch model =
                 Html.tr [
                     Html.th "Remote (string and number of messages over websockets)"
                     Html.th [
-                        Bulma.checkboxLabel [
-                            Bulma.checkboxInput [
-                                prop.isChecked model.Remote
-                                prop.id "remoteInfo"
-                                prop.onChange (fun (_: bool) -> dispatch RemoteToggled)
-                            ]
+                        Bulma.input.checkbox [
+                            prop.isChecked model.Remote
+                            prop.id "remoteInfo"
+                            prop.onChange (fun (_: bool) -> dispatch RemoteToggled)
                         ]
                     ]
                 ]
@@ -76,8 +74,8 @@ let view model dispatch =
     Bulma.container [
         prop.style [ style.border(1, borderStyle.dashed, color.black); style.margin 20; style.padding 20 ]
         prop.children [
-            Bulma.title1 "Info Component"
-            Bulma.subtitle4 "Different Websocket subscription"
+            Bulma.title.h1 "Info Component"
+            Bulma.subtitle.h4 "Different Websocket subscription"
 
             Bulma.columns [
                 Bulma.column [

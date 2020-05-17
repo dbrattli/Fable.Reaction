@@ -25,7 +25,6 @@ group Client
     nuget Fable.Reaction ~> 3
     nuget Fable.FontAwesome.Free ~> 2
     nuget Fable.Fetch
-    nuget Fulma.Extensions.Wikiki.Switch
     nuget Feliz
     nuget Feliz.Bulma
     nuget Thoth.Json

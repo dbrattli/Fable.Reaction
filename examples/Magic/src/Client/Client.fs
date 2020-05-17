@@ -1,7 +1,5 @@
 module Client
 
-//open Fable.React
-//open Fable.React.Props
 open Fetch.Types
 
 open Fable.React
@@ -11,6 +9,7 @@ open Feliz
 open Feliz.Bulma
 
 open Thoth.Json
+open System
 
 type AppModel = {
     InitialString: string
@@ -71,17 +70,17 @@ let viewApp model dispatch =
 
     | App model ->
         Html.div [
-            Magic.magic model.InitialString ()
-            Info.info model.InitialString ()
+            Magic.magic model.InitialString
+            Info.info model.InitialString
         ]
 
 let view (model : Model) (dispatch : Msg -> unit) =
     Html.div [
         Bulma.navbar [
-            navbar.isPrimary
+            color.isPrimary
             prop.children [
-                Bulma.navbarItemDiv [
-                    Bulma.title2 "Fable Reaction Playground"
+                Bulma.navbarItem.div [
+                    Bulma.title.h2 "Fable Reaction Playground"
                 ]
             ]
         ]
@@ -124,5 +123,5 @@ let stream model msgs =
     | Error exn -> msgs |> AsyncRx.tag "error"
     | App model -> msgs |> AsyncRx.tag "msgs"
 
-let app = Reaction.StreamView initialModel view update stream
+let app props = Reaction.StreamView initialModel view update stream
 mountById "reaction-app" (ofFunction app () [])
