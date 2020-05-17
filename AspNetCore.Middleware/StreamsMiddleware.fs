@@ -99,7 +99,7 @@ module Middleware =
 
                 // Stitch stream and subscribe
                 let msgs = options.Stream connectionId stream
-                let useAsyncDisposable (disposable: IAsyncDisposable) workflow = async {
+                let useAsyncDisposable (disposable: IAsyncRxDisposable) workflow = async {
                     let! result = Async.Catch workflow
                     do! disposable.DisposeAsync()
                     match result with
