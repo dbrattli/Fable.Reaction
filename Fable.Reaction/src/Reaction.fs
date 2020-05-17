@@ -49,36 +49,44 @@ module Reaction =
         dispatch', msgs'
 
     /// Simple MVU view.
+    let private view'<'model, 'msg> = FunctionComponent.Of(fun (input: {| initialModel: 'model; view: 'model -> Dispatch<'msg> -> ReactElement; update: 'model -> 'msg -> 'model |}) ->
+        let model = Hooks.useReducer(input.update, input.initialModel)
+
+        input.view model.current model.update
+    , "Reaction.View")
+
     let View<'model, 'msg> (initialModel: 'model)
               (view: 'model -> Dispatch<'msg> -> ReactElement)
               (update: 'model -> 'msg -> 'model) =
 
-        FunctionComponent.Of(fun () ->
-            let model = Hooks.useReducer(update, initialModel)
-            view model.current model.update
-        , "Reaction.View")
+        view' {| initialModel = initialModel; view = view; update = update |}
 
     /// Simple MVU view with stateful stream.
-    let StreamView<'model, 'msg, 'tag> (initialModel: 'model)
-              (view: 'model -> Dispatch<'msg> -> ReactElement)
-              (update: 'model -> 'msg -> 'model)
-              (stream: 'model -> IAsyncObservable<'msg> -> TaggedStream<'msg, 'tag>) =
+    let private streamView'<'model, 'msg, 'tag> = FunctionComponent.Of(fun (input: {| initialModel: 'model; view: 'model -> Dispatch<'msg> -> ReactElement; update: 'model -> 'msg -> 'model; stream: 'model -> IAsyncObservable<'msg> -> TaggedStream<'msg, 'tag> |}) ->
+        let model = Hooks.useReducer(input.update, input.initialModel)
+        let dispatch, _ = useStatefulStream(model.current, model.update, input.stream)
 
-        FunctionComponent.Of(fun () ->
-            let model = Hooks.useReducer(update, initialModel)
-            let dispatch, _ = useStatefulStream(model.current, model.update, stream)
+        input.view model.current dispatch
+    , "Reaction.StreamView")
 
-            view model.current dispatch
-        , "Reaction.StreamView")
+    let StreamView<'model, 'msg, 'tag>
+          (initialModel: 'model)
+          (view: 'model -> Dispatch<'msg> -> ReactElement)
+          (update: 'model -> 'msg -> 'model)
+          (stream: 'model -> IAsyncObservable<'msg> -> TaggedStream<'msg, 'tag>) =
+             streamView' {| initialModel = initialModel; view = view; update = update; stream=stream |}
 
-    let StreamViewWithProps<'model, 'msg, 'tag, 'props> (initialModel: 'model)
-              (view: 'props -> 'model -> Dispatch<'msg> -> ReactElement)
-              (update: 'model -> 'msg -> 'model)
-              (stream: 'props ->'model -> IAsyncObservable<'msg> -> TaggedStream<'msg, 'tag>) =
+    let private streamViewWithProps'<'model, 'msg, 'tag, 'props> = FunctionComponent.Of(fun (input: {| initialModel: 'model; view: 'model -> Dispatch<'msg> -> ReactElement; update: 'model -> 'msg -> 'model; stream: 'props ->'model -> IAsyncObservable<'msg> -> TaggedStream<'msg, 'tag>; props: 'props |}) ->
+        let model = Hooks.useReducer(input.update, input.initialModel)
+        let dispatch, _ = useStatefulStream(model.current, model.update, input.stream input.props)
 
-        FunctionComponent.Of(fun (props : 'props) ->
-            let model = Hooks.useReducer(update, initialModel)
-            let dispatch, _ = useStatefulStream(model.current, model.update, stream props)
+        input.view model.current dispatch
+    , "Reaction.StreamView")
 
-            view props model.current dispatch
-        , "Reaction.StreamViewWithProps")
+    let StreamViewWithProps<'model, 'msg, 'tag, 'props>
+          (initialModel: 'model)
+          (view: 'model -> Dispatch<'msg> -> ReactElement)
+          (update: 'model -> 'msg -> 'model)
+          (stream: 'props -> 'model -> IAsyncObservable<'msg> -> TaggedStream<'msg, 'tag>)
+          (props: 'props) =
+             streamViewWithProps' {| initialModel = initialModel; view = view; update = update; stream=stream; props=props |}
