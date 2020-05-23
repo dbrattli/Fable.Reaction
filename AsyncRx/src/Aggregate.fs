@@ -26,7 +26,7 @@ open FSharp.Control.Core
                     | OnError e -> do! safeObv.OnErrorAsync e
                     | OnCompleted -> do! safeObv.OnCompletedAsync ()
                 }
-            AsyncObserver obv |> source.SubscribeAsync //|> autoDetach
+            AsyncObserver obv |> source.SubscribeAsync |> autoDetach
         { new IAsyncObservable<'TState> with member __.SubscribeAsync o = subscribeAsync o }
 
     /// Applies an async accumulator function over an observable sequence and returns each intermediate result. The
@@ -54,7 +54,7 @@ open FSharp.Control.Core
                     | OnError e -> do! safeObv.OnErrorAsync e
                     | OnCompleted -> do! safeObv.OnCompletedAsync ()
                 }
-            AsyncObserver obv |> source.SubscribeAsync //|> autoDetach
+            AsyncObserver obv |> source.SubscribeAsync |> autoDetach
         { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 
 
