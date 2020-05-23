@@ -21,7 +21,7 @@ module internal Combine =
 
     let mergeInner (maxConcurrent: int) (source: IAsyncObservable<IAsyncObservable<'TSource>>) : IAsyncObservable<'TSource> =
         let subscribeAsync (aobv: IAsyncObserver<'TSource>) =
-            let safeObv = Core.safeObserver aobv
+            let safeObv = safeObserver aobv
 
             let initialModel = {
                 Subscriptions = Map.empty
@@ -121,7 +121,7 @@ module internal Combine =
     /// tuples. Returns an observable sequence containing the combined results.
     let combineLatest (other: IAsyncObservable<'TOther>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource*'TOther> =
         let subscribeAsync (aobv: IAsyncObserver<'TSource*'TOther>) =
-            let safeObserver = Core.safeObserver aobv
+            let safeObserver = safeObserver aobv
 
             let agent = MailboxProcessor.Start(fun inbox ->
                 let rec messageLoop (source: option<'TSource>) (other: option<'TOther>) = async {
@@ -176,7 +176,7 @@ module internal Combine =
     /// when the first observable sequence produces an element. Returns the combined observable sequence.
     let withLatestFrom (other: IAsyncObservable<'TOther>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource*'TOther> =
         let subscribeAsync (aobv: IAsyncObserver<'TSource*'TOther>) =
-            let safeObserver = Core.safeObserver aobv
+            let safeObserver = safeObserver aobv
 
             let agent = MailboxProcessor.Start(fun inbox ->
                 let rec messageLoop (latest : option<'TOther>) = async {
@@ -250,6 +250,6 @@ module internal Combine =
                         | OnCompleted -> do! aobv.OnCompletedAsync ()
 
                     }
-                return! AsyncObserver _obv |> Core.safeObserver |> source.SubscribeAsync
+                return! AsyncObserver _obv |> safeObserver |> source.SubscribeAsync
             }
         { new IAsyncObservable<'TSource*'TOther> with member __.SubscribeAsync o = subscribeAsync o }

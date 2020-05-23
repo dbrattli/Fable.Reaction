@@ -42,3 +42,47 @@ module AsyncObserver =
                 member __.OnCompletedAsync () = async { this.OnCompleted () }
             }
 
+    /// Safe observer that wraps the given observer. Makes sure that
+    /// invocations are serialized and that the Rx grammar (OnNext*
+    /// (OnError|OnCompleted)?) is not violated.
+    let safeObserver (obv: IAsyncObserver<'TSource>) : IAsyncObserver<'TSource> =
+        let agent = MailboxProcessor.Start (fun inbox ->
+            let rec messageLoop stopped = async {
+                let! n = inbox.Receive ()
+
+                if stopped then
+                    return! messageLoop stopped
+
+                let! stop = async {
+                    match n with
+                    | OnNext x ->
+                        try
+                            do! obv.OnNextAsync x
+                            return false
+                        with
+                        | ex ->
+                            do! obv.OnErrorAsync ex
+                            return true
+                    | OnError ex ->
+                        do! obv.OnErrorAsync ex
+                        return true
+                    | OnCompleted ->
+                        do! obv.OnCompletedAsync ()
+                        return true
+                }
+
+                return! messageLoop stop
+            }
+            messageLoop false)
+        { new IAsyncObserver<'TSource> with
+            member this.OnNextAsync x = async {
+                OnNext x |> agent.Post
+            }
+            member this.OnErrorAsync err = async {
+                OnError err |> agent.Post
+            }
+            member this.OnCompletedAsync () = async {
+                OnCompleted  |> agent.Post
+            }
+        }
+
