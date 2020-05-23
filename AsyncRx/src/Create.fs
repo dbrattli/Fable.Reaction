@@ -21,7 +21,7 @@ module internal Create =
     let ofAsyncWorker (worker: IAsyncObserver<'TSource> -> CancellationToken -> Async<unit>) : IAsyncObservable<'TSource> =
         let subscribeAsync (aobv : IAsyncObserver<'TSource>) : Async<IAsyncRxDisposable> =
             let disposable, token = canceller ()
-            let safeObv = safeObserver aobv
+            let safeObv = safeObserver aobv disposable
 
             async {
                 Async.Start' (worker safeObv token, token)
@@ -32,7 +32,7 @@ module internal Create =
     /// Returns the async observable sequence whose single element is the result of the given async workflow.
     let ofAsync (workflow : Async<'TSource>)  : IAsyncObservable<'TSource> =
         let subscribeAsync (aobv : IAsyncObserver<_>) : Async<IAsyncRxDisposable> =
-            let safeObv = safeObserver aobv
+            let safeObv = safeObserver aobv AsyncDisposable.Empty
 
             async {
                 let! result = workflow
@@ -45,7 +45,7 @@ module internal Create =
     /// Returns an observable sequence containing the single specified element.
     let single (value: 'TSource) =
         let subscribeAsync (aobv : IAsyncObserver<'TSource>) : Async<IAsyncRxDisposable> =
-            let safeObv = safeObserver aobv
+            let safeObv = safeObserver aobv AsyncDisposable.Empty
 
             async {
                 do! safeObv.OnNextAsync value

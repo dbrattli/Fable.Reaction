@@ -10,7 +10,7 @@ open FSharp.Control.Core
     /// values.
     let scanInitAsync (initial: 'TState) (accumulator: 'TState -> 'TSource -> Async<'TState>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TState> =
         let subscribeAsync (aobv : IAsyncObserver<'TState>) =
-            let safeObserver = safeObserver aobv
+            let safeObv, autoDetach = autoDetachObserver aobv
             let mutable state = initial
 
             let obv n =
@@ -20,13 +20,13 @@ open FSharp.Control.Core
                         try
                             let! state' = accumulator state x
                             state <- state'
-                            do! safeObserver.OnNextAsync state
+                            do! safeObv.OnNextAsync state
                         with
-                        | err -> do! safeObserver.OnErrorAsync err
-                    | OnError e -> do! safeObserver.OnErrorAsync e
-                    | OnCompleted -> do! safeObserver.OnCompletedAsync ()
+                        | err -> do! safeObv.OnErrorAsync err
+                    | OnError e -> do! safeObv.OnErrorAsync e
+                    | OnCompleted -> do! safeObv.OnCompletedAsync ()
                 }
-            AsyncObserver obv |> source.SubscribeAsync
+            AsyncObserver obv |> source.SubscribeAsync |> autoDetach
         { new IAsyncObservable<'TState> with member __.SubscribeAsync o = subscribeAsync o }
 
     /// Applies an async accumulator function over an observable sequence and returns each intermediate result. The
@@ -34,7 +34,7 @@ open FSharp.Control.Core
     /// values.
     let scanAsync (accumulator: 'TSource -> 'TSource -> Async<'TSource>) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
         let subscribeAsync (aobv : IAsyncObserver<'TSource>) =
-            let safeObserver = safeObserver aobv
+            let safeObv, autoDetach = autoDetachObserver aobv
             let mutable states = None
 
             let obv n =
@@ -46,15 +46,15 @@ open FSharp.Control.Core
                             try
                                 let! state' = accumulator state x
                                 states <- Some state'
-                                do! safeObserver.OnNextAsync state
+                                do! safeObv.OnNextAsync state
                             with
-                            | err -> do! safeObserver.OnErrorAsync err
+                            | err -> do! safeObv.OnErrorAsync err
                         | None ->
                             states <- Some x
-                    | OnError e -> do! safeObserver.OnErrorAsync e
-                    | OnCompleted -> do! safeObserver.OnCompletedAsync ()
+                    | OnError e -> do! safeObv.OnErrorAsync e
+                    | OnCompleted -> do! safeObv.OnCompletedAsync ()
                 }
-            AsyncObserver obv |> source.SubscribeAsync
+            AsyncObserver obv |> source.SubscribeAsync |> autoDetach
         { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
 
 

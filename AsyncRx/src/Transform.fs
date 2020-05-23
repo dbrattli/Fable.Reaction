@@ -81,12 +81,12 @@ module internal Transform =
     /// the most recent observable sequence.
     let switchLatest (source: IAsyncObservable<IAsyncObservable<'TSource>>) : IAsyncObservable<'TSource> =
         let subscribeAsync (aobv : IAsyncObserver<'TSource>) =
-            let safeObserver = safeObserver aobv
+            let safeObv, autoDetach = autoDetachObserver aobv
             let innerAgent =
                 let obv (mb: MailboxProcessor<InnerSubscriptionCmd<'TSource>>) (id: int) = {
                     new IAsyncObserver<'TSource> with
-                        member __.OnNextAsync x = safeObserver.OnNextAsync x
-                        member __.OnErrorAsync err = safeObserver.OnErrorAsync err
+                        member __.OnNextAsync x = safeObv.OnNextAsync x
+                        member __.OnErrorAsync err = safeObv.OnErrorAsync err
                         member __.OnCompletedAsync () = async {
                             mb.Post (InnerCompleted id)
                         }
@@ -106,13 +106,13 @@ module internal Transform =
                                 return Some inner, isStopped, nextId
                             | InnerCompleted idx ->
                                 if isStopped && idx = currentId then
-                                    do! safeObserver.OnCompletedAsync ()
+                                    do! safeObv.OnCompletedAsync ()
                                     return (None, true, currentId)
                                 else
                                     return (current, isStopped, currentId)
                             | Completed ->
                                 if current.IsNone then
-                                    do! safeObserver.OnCompletedAsync ()
+                                    do! safeObv.OnCompletedAsync ()
                                 return (current, true, currentId)
                             | Dispose ->
                                 if current.IsSome then
@@ -131,11 +131,11 @@ module internal Transform =
                     async {
                         match ns with
                         | OnNext xs -> InnerObservable xs |> innerAgent.Post
-                        | OnError e -> do! safeObserver.OnErrorAsync e
+                        | OnError e -> do! safeObv.OnErrorAsync e
                         | OnCompleted -> innerAgent.Post Completed
                     }
 
-                let! dispose = AsyncObserver obv |> source.SubscribeAsync
+                let! dispose = AsyncObserver obv |> source.SubscribeAsync |> autoDetach
                 let cancel () =
                     async {
                         do! dispose.DisposeAsync ()
