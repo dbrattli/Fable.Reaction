@@ -2,7 +2,6 @@ namespace FSharp.Control
 
 #if !FABLE_COMPILER
 open System.Threading
-open FSharp.Control
 
 [<RequireQualifiedAccess>]
 module internal Leave =

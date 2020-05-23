@@ -1,15 +1,17 @@
 namespace FSharp.Control
 
 open System
-open Core
+open System.Threading
+
+open FSharp.Control.Core
 
 /// Overloads and extensions for AsyncDisposable
-type AsyncDisposable (cancel) =
+type AsyncDisposable private (cancel) =
     interface IAsyncRxDisposable with
         member this.DisposeAsync () =
             cancel ()
 
-    static member Create (cancel) : IAsyncRxDisposable =
+    static member Create cancel : IAsyncRxDisposable =
         AsyncDisposable cancel :> IAsyncRxDisposable
 
     static member Empty : IAsyncRxDisposable =
@@ -54,4 +56,12 @@ module AsyncDisposable =
 
     type System.IDisposable with
         member this.ToAsyncDisposable () : IAsyncRxDisposable =
-            { new IAsyncRxDisposable with member __.DisposeAsync () = async { this.Dispose () } }
+            AsyncDisposable.Create (fun () -> async { this.Dispose () })
+
+    let canceller () =
+        let cts = new CancellationTokenSource()
+        let cancel () = async {
+            cts.Cancel ()
+        }
+        AsyncDisposable.Create cancel, cts.Token
+

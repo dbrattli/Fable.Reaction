@@ -5,14 +5,6 @@ open System.Threading
 module Core =
     let infinite = Seq.initInfinite id
 
-    let canceller () =
-        let cts = new CancellationTokenSource()
-        let cancel () = async {
-            cts.Cancel ()
-        }
-        let disposable = { new IAsyncRxDisposable with member __.DisposeAsync () = cancel () }
-        disposable, cts.Token
-
     /// Safe observer that wraps the given observer. Makes sure that
     /// invocations are serialized and that the Rx grammar (OnNext*
     /// (OnError|OnCompleted)?) is not violated.

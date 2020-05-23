@@ -3,7 +3,7 @@ namespace FSharp.Control
 open System.Collections.Generic
 open System.Threading
 
-open Core
+open FSharp.Control.Core
 
 module Subjects =
     /// A cold stream that only supports a single subscriber

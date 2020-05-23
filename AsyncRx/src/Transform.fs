@@ -1,7 +1,7 @@
 namespace FSharp.Control
 
 open System
-open Core
+open FSharp.Control.Core
 
 [<RequireQualifiedAccess>]
 module internal Transform =

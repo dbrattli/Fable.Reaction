@@ -1,6 +1,6 @@
 namespace FSharp.Control
 
-open Core
+open FSharp.Control.Core
 
 [<RequireQualifiedAccess>]
 module internal Tap =

@@ -24,5 +24,3 @@ type Stream<'TSource> = Stream<'TSource, 'TSource>
 [<AutoOpen>]
 module Streams =
     let (>=>) (source: Stream<'T1, 'T2>) (other: Stream<'T2, 'T3>) = source >> other
-
-

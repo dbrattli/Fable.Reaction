@@ -2,7 +2,7 @@ namespace FSharp.Control
 
 open System.Threading
 
-open Core
+open FSharp.Control.Core
 
 open System.Runtime.CompilerServices
 [<assembly:InternalsVisibleTo("Tests")>]

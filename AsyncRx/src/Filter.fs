@@ -1,7 +1,7 @@
 namespace FSharp.Control
 
-open FSharp.Control.Core
 open System.Collections.Generic
+open FSharp.Control.Core
 
 [<RequireQualifiedAccess>]
 module internal Filter =

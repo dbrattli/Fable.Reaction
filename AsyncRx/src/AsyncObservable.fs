@@ -2,7 +2,8 @@ namespace FSharp.Control
 
 open System
 open System.Threading
-open Core
+
+open FSharp.Control.Core
 
 /// Overloads and extensions for AsyncObservable
 [<AutoOpen>]
