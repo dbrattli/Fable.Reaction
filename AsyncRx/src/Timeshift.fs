@@ -52,7 +52,7 @@ module internal Timeshift =
     /// another value before the given timeout.
     let debounce msecs (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
         let subscribeAsync (aobv: IAsyncObserver<'TSource>) =
-            let safeObserver = safeObserver aobv
+            let safeObv, autoDetach = autoDetachObserver aobv
             let infinite = Seq.initInfinite id
 
             let agent = MailboxProcessor.Start(fun inbox ->
@@ -62,7 +62,7 @@ module internal Timeshift =
                     let! newIndex = async {
                         match n, index with
                         | OnNext x, idx when idx = currentIndex ->
-                            do! safeObserver.OnNextAsync x
+                            do! safeObv.OnNextAsync x
                             return index
                         | OnNext _, _ ->
                             if index > currentIndex then
@@ -70,10 +70,10 @@ module internal Timeshift =
                             else
                                 return currentIndex
                         | OnError ex, _ ->
-                            do! safeObserver.OnErrorAsync ex
+                            do! safeObv.OnErrorAsync ex
                             return currentIndex
                         | OnCompleted, _ ->
-                            do! safeObserver.OnCompletedAsync ()
+                            do! safeObv.OnCompletedAsync ()
                             return currentIndex
 
                     }
@@ -99,7 +99,7 @@ module internal Timeshift =
 
                         Async.Start' worker
                     }
-                let! dispose = AsyncObserver obv |> source.SubscribeAsync
+                let! dispose = AsyncObserver obv |> source.SubscribeAsync |> autoDetach
 
                 let cancel () =
                     async {

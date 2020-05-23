@@ -42,15 +42,15 @@ module AsyncObserver =
                 member __.OnCompletedAsync () = async { this.OnCompleted () }
             }
 
-    /// Safe observer that wraps the given observer. Makes sure that
-    /// invocations are serialized and that the Rx grammar (OnNext*
-    /// (OnError|OnCompleted)?) is not violated.
-    let safeObserver (obv: IAsyncObserver<'TSource>) : IAsyncObserver<'TSource> =
+    /// Safe observer that wraps the given observer. Makes sure that invocations are serialized and that the Rx grammar
+    /// (OnNext* (OnError|OnCompleted)?) is not violated.
+    let safeObserver (obv: IAsyncObserver<'TSource>) (disposable: IAsyncRxDisposable): IAsyncObserver<'TSource> =
         let agent = MailboxProcessor.Start (fun inbox ->
             let rec messageLoop stopped = async {
                 let! n = inbox.Receive ()
 
                 if stopped then
+                    do! disposable.DisposeAsync ()
                     return! messageLoop stopped
 
                 let! stop = async {
@@ -86,3 +86,18 @@ module AsyncObserver =
             }
         }
 
+    let autoDetachObserver (obv: IAsyncObserver<'TSource>) : IAsyncObserver<'TSource>*(Async<IAsyncRxDisposable>->Async<IAsyncRxDisposable>) =
+        let disposables : ResizeArray<IAsyncRxDisposable> = ResizeArray ()
+        let cancel () = async {
+            for disp in disposables do
+                do! disp.DisposeAsync ()
+        }
+        let safeObv = AsyncDisposable.Create cancel |> safeObserver obv
+
+        // Auto-detaches (disposes) the disposable when the observer completes with success or error.
+        let autoDetach (disposable: Async<IAsyncRxDisposable>) = async {
+            let! disp = disposable
+            disposables.Add disp
+            return disp
+        }
+        safeObv, autoDetach

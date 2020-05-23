@@ -12,7 +12,7 @@ module Subjects =
         let cts = new CancellationTokenSource ()
 
         let subscribeAsync (aobv : IAsyncObserver<'TSource>) : Async<IAsyncRxDisposable> =
-            let sobv = safeObserver aobv
+            let sobv = safeObserver aobv AsyncDisposable.Empty
             if Option.isSome oobv then
                 failwith "singleStream: Already subscribed"
 
@@ -80,7 +80,7 @@ module Subjects =
 
         let subscribeAsync (aobv: IAsyncObserver<'TSource>) : Async<IAsyncRxDisposable> =
             async {
-                let sobv = safeObserver aobv
+                let sobv = safeObserver aobv AsyncDisposable.Empty
                 obvs.Add sobv
 
                 let cancel () = async {

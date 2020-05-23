@@ -15,7 +15,7 @@ let tests = testList "Observer Tests" [
         // Arrange
         let xs = fromNotification Seq.empty
         let obv = TestObserver<int> ()
-        let safeObv = safeObserver obv
+        let safeObv = safeObserver obv AsyncDisposable.Empty
 
         // Act
         let! dispose = xs.SubscribeAsync safeObv
@@ -32,7 +32,7 @@ let tests = testList "Observer Tests" [
         let error = MyError "error"
         let xs = fromNotification [ OnError error ]
         let obv = TestObserver<int>()
-        let safeObv = safeObserver obv
+        let safeObv = safeObserver obv AsyncDisposable.Empty
 
         // Act
         let! dispose = xs.SubscribeAsync safeObv
@@ -52,7 +52,7 @@ let tests = testList "Observer Tests" [
         // Arrange
         let xs = AsyncRx.ofSeq [ 1..3]
         let obv = TestObserver<int>()
-        let safeObv = safeObserver obv
+        let safeObv = safeObserver obv AsyncDisposable.Empty
 
         // Act
         let! dispose = xs.SubscribeAsync safeObv
@@ -69,7 +69,7 @@ let tests = testList "Observer Tests" [
         // Arrange
         let xs = fromNotification [ OnNext 1; OnCompleted; OnNext 2]
         let obv = TestObserver<int>()
-        let safeObv = safeObserver obv
+        let safeObv = safeObserver obv AsyncDisposable.Empty
 
         // Act
         let! dispose = xs.SubscribeAsync safeObv
@@ -86,7 +86,7 @@ let tests = testList "Observer Tests" [
         // Arrange
         let xs = fromNotification [ OnNext 1; OnCompleted; OnCompleted]
         let obv = TestObserver<int>()
-        let safeObv = safeObserver obv
+        let safeObv = safeObserver obv AsyncDisposable.Empty
 
         // Act
         let! dispose = xs.SubscribeAsync safeObv
@@ -104,7 +104,7 @@ let tests = testList "Observer Tests" [
         let error = MyError "error"
         let xs = fromNotification [ OnNext 1; OnError error; OnNext 2]
         let obv = TestObserver<int>()
-        let safeObv = safeObserver obv
+        let safeObv = safeObserver obv AsyncDisposable.Empty
 
         // Act
         let! dispose = xs.SubscribeAsync safeObv
@@ -125,7 +125,7 @@ let tests = testList "Observer Tests" [
         let error = MyError "error"
         let xs = fromNotification [ OnNext 1; OnError error; OnError error]
         let obv = TestObserver<int>()
-        let safeObv = safeObserver obv
+        let safeObv = safeObserver obv AsyncDisposable.Empty
 
         // Act
         let! dispose = xs.SubscribeAsync safeObv
