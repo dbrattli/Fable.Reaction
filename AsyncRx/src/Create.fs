@@ -21,7 +21,7 @@ module internal Create =
     let ofAsyncWorker (worker: IAsyncObserver<'TSource> -> CancellationToken -> Async<unit>) : IAsyncObservable<'TSource> =
         let subscribeAsync (aobv : IAsyncObserver<'TSource>) : Async<IAsyncRxDisposable> =
             let disposable, token = canceller ()
-            let safeObv = safeObserver aobv AsyncDisposable.Empty
+            let safeObv = safeObserver aobv disposable
 
             async {
                 Async.Start' (worker safeObv token, token)
