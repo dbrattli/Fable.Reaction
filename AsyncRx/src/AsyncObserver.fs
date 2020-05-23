@@ -50,7 +50,6 @@ module AsyncObserver =
                 let! n = inbox.Receive ()
 
                 if stopped then
-                    do! disposable.DisposeAsync ()
                     return! messageLoop stopped
 
                 let! stop = async {
@@ -64,13 +63,14 @@ module AsyncObserver =
                             do! obv.OnErrorAsync ex
                             return true
                     | OnError ex ->
+                        do! disposable.DisposeAsync ()
                         do! obv.OnErrorAsync ex
                         return true
                     | OnCompleted ->
+                        do! disposable.DisposeAsync ()
                         do! obv.OnCompletedAsync ()
                         return true
                 }
-
                 return! messageLoop stop
             }
             messageLoop false)
