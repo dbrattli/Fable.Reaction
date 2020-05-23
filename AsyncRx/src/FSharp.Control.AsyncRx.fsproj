@@ -2,8 +2,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>FSharp.Control.AsyncRx</PackageId>
-    <Version>1.3.2</Version>
-    <PackageVersion>1.3.2</PackageVersion>
+    <Version>1.3.3</Version>
+    <PackageVersion>1.3.3</PackageVersion>
     <Authors>Dag Brattli</Authors>
     <Company>Brattli Labs</Company>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
