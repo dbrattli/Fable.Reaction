@@ -7,9 +7,18 @@ open FSharp.Control.Core
 
 /// Overloads and extensions for AsyncDisposable
 type AsyncDisposable private (cancel) =
+    let mutable isDisposed = 0
     interface IAsyncRxDisposable with
-        member this.DisposeAsync () =
-            cancel ()
+        member this.DisposeAsync () = async {
+#if FABLE_COMPILER
+            if isDisposed = 0 then
+                isDisposed <- 1
+                do! cancel ()
+#else
+            if System.Threading.Interlocked.Exchange(&isDisposed, 1) = 0 then
+                do! cancel ()
+#endif
+        }
 
     static member Create cancel : IAsyncRxDisposable =
         AsyncDisposable cancel :> IAsyncRxDisposable
@@ -28,9 +37,17 @@ type AsyncDisposable private (cancel) =
         AsyncDisposable cancel :> IAsyncRxDisposable
 
 type Disposable (cancel) =
+    let mutable isDisposed = 0
     interface IDisposable with
         member this.Dispose () =
-            cancel ()
+#if FABLE_COMPILER
+            if isDisposed = 0 then
+                isDisposed <- 1
+                cancel ()
+#else
+            if System.Threading.Interlocked.Exchange(&isDisposed, 1) = 0 then
+                cancel ()
+#endif
 
     static member Create (cancel) : IDisposable =
         new Disposable(cancel) :> IDisposable
