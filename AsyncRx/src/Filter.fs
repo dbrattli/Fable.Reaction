@@ -113,20 +113,17 @@ module internal Filter =
             async {
                 let mutable remaining = count
 
-                let _obv (n : Notification<'TSource>) =
-                    async {
-                        match n with
-                        | OnNext x ->
-                            if remaining > 0 then
-                                do! safeObv.OnNextAsync x
-                                remaining <- remaining - 1
-                            if remaining = 0 then
-                                do! safeObv.OnCompletedAsync ()
-                                remaining <- remaining - 1
-
-                        | OnError ex -> do! safeObv.OnErrorAsync ex
-                        | OnCompleted -> do! safeObv.OnCompletedAsync ()
-                    }
+                let _obv (n : Notification<'TSource>) : Async<unit> =
+                    match n, remaining with
+                    | OnNext x, n when n > 0 ->
+                        remaining <- n - 1
+                        safeObv.OnNextAsync x
+                    | OnNext x, n when n = 0 ->
+                        remaining <- - 1
+                        safeObv.OnCompletedAsync ()
+                    | OnNext _, _ -> Async.empty
+                    | OnError ex, _ -> safeObv.OnErrorAsync ex
+                    | OnCompleted, _ -> safeObv.OnCompletedAsync ()
 
                 return! source.SubscribeAsync (AsyncObserver.Create _obv)
             }
@@ -164,13 +161,10 @@ module internal Filter =
 
             async {
                 let _obv (n : Notification<'TResult>) =
-                    async {
-                        match n with
-                        | OnNext x ->
-                            do! safeObv.OnCompletedAsync ()
-                        | OnError ex -> do! safeObv.OnErrorAsync ex
-                        | OnCompleted -> ()
-                    }
+                    match n with
+                    | OnNext x -> safeObv.OnCompletedAsync ()
+                    | OnError ex -> safeObv.OnErrorAsync ex
+                    | OnCompleted -> Async.empty
 
                 let! sub2 = AsyncObserver _obv |> other.SubscribeAsync
                 let! sub1 = source.SubscribeAsync safeObv
