@@ -86,18 +86,35 @@ module AsyncObserver =
             }
         }
 
+    type private Msg =
+        | Disposable of IAsyncRxDisposable
+        | Dispose
+
     let autoDetachObserver (obv: IAsyncObserver<'TSource>) : IAsyncObserver<'TSource>*(Async<IAsyncRxDisposable>->Async<IAsyncRxDisposable>) =
-        let disposables : ResizeArray<IAsyncRxDisposable> = ResizeArray ()
+        let agent = MailboxProcessor.Start((fun inbox ->
+            let rec messageLoop disposables = async {
+                let! cmd = inbox.Receive ()
+
+                let! disposables' = async {
+                    match cmd with
+                    | Disposable disp -> return disp :: disposables
+                    | Dispose ->
+                        for disp in disposables do
+                            do! disp.DisposeAsync ()
+                        return []
+                }
+                return! messageLoop disposables'
+            }
+            messageLoop []))
         let cancel () = async {
-            for disp in disposables do
-                do! disp.DisposeAsync ()
+            agent.Post Dispose
         }
         let safeObv = AsyncDisposable.Create cancel |> safeObserver obv
 
         // Auto-detaches (disposes) the disposable when the observer completes with success or error.
         let autoDetach (disposable: Async<IAsyncRxDisposable>) = async {
             let! disp = disposable
-            disposables.Add disp
+            agent.Post (Disposable disp)
             return disp
         }
         safeObv, autoDetach

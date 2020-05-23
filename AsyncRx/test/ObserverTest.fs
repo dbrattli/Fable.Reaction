@@ -166,6 +166,9 @@ let tests = testList "Observer Tests" [
         let! dispose = xs.SubscribeAsync obv
         do! obv.AwaitIgnore ()
 
+        // Give dispose logic a run on the loop.
+        do! Async.Sleep 10
+
         // Assert
         let actual = obv.Notifications |> Seq.toList
         let expected = [ OnNext 1; OnNext 2; OnNext 3; OnNext 4; OnCompleted ]

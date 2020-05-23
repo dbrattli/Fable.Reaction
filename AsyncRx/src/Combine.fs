@@ -13,7 +13,7 @@ module internal Combine =
     }
 
     [<RequireQualifiedAccess>]
-    type Msg<'a> =
+    type private Msg<'a> =
         | InnerObservable of IAsyncObservable<'a>
         | InnerCompleted of Key
         | OuterCompleted
