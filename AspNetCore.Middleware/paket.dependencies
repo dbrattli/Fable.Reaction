@@ -3,8 +3,6 @@ source https://api.nuget.org/v3/index.json
 
 nuget FSharp.Core
 
-nuget Giraffe ~> 4
-
 nuget Microsoft.AspNetCore
 nuget Microsoft.AspNetCore.WebSockets
 
