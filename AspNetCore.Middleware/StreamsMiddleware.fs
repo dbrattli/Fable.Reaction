@@ -4,11 +4,11 @@ open System
 open System.Collections.Generic
 open System.Net.WebSockets
 open System.Runtime.ExceptionServices
-open System.Threading
 
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.DependencyInjection
+open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 
 open FSharp.Control
@@ -40,6 +40,8 @@ module Middleware =
             let loggerFactory  = ctx.RequestServices.GetService<ILoggerFactory> ()
             let logger = loggerFactory.CreateLogger("Elmish.Streams.Middleware")
 
+            let appLifetime  = ctx.RequestServices.GetService<IApplicationLifetime> ()
+            
             let defaultOptions = {
                 Stream = fun _ msgs -> msgs
                 Encode = fun msg -> ""
@@ -60,13 +62,15 @@ module Middleware =
                         logger.LogInformation ("Established WebSocket connection with ID: {ConnectionID}", connectionId)
 
                         sockets.Add webSocket
-                        do! this.HandleWebSocket connectionId webSocket options logger
-                        sockets.Remove webSocket |> ignore
+                        try
+                            do! this.HandleWebSocket connectionId webSocket options logger
+                        finally
+                            sockets.Remove webSocket |> ignore
 
                     | false -> ctx.Response.StatusCode <- 400
                 else
                     return! next.Invoke ctx |> Async.AwaitTask
-            } |> Async.StartAsTask
+            } |> fun wf -> Async.StartAsTask (wf, cancellationToken = appLifetime.ApplicationStopping)
 
         member private this.HandleWebSocket (connectionId: ConnectionId) (webSocket: WebSocket) (options: StreamsConfig<'msg>) (logger: ILogger): Async<unit> =
             async {
@@ -81,7 +85,7 @@ module Middleware =
                         let bytes = System.Text.Encoding.UTF8.GetBytes (newString)
                         logger.LogDebug ("Sending message with {bytes} bytes", bytes.Length)
                         try
-                            do! webSocket.SendAsync (new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None) |> Async.AwaitTask
+                            do! webSocket.SendAsync (new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, cancellation) |> Async.AwaitTask
                         with
                         | ex ->
                             logger.LogError("Unable to write to WebSocket, closing ...")
@@ -141,7 +145,7 @@ module Middleware =
 
                 logger.LogInformation ("Closing WebSocket with ID: {ConnectionID}", connectionId)
                 try
-                    do! webSocket.CloseAsync (closure, "Closing", CancellationToken.None) |> Async.AwaitTask
+                    do! webSocket.CloseAsync (closure, "Closing", cancellation) |> Async.AwaitTask
                 with
                 | _ -> ()
             }
