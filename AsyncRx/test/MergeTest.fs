@@ -94,4 +94,25 @@ let tests = testList "Merge Tests" [
         Expect.contains actual (OnNext 5) "Should contain the element"
         Expect.contains actual (OnCompleted) "Should contain the element"
     }
+
+    testAsync "Test subscribe immediately" {
+        // Arrange
+        let obv, stream = AsyncRx.subject<int> ()
+        let msgs =
+            stream
+            |> AsyncRx.merge (AsyncRx.empty ())
+
+        let testObv = TestObserver<int>()
+
+        // Act
+        let! subscription = msgs.SubscribeAsync testObv
+        // do! Async.Sleep 100 // uncomment this line and the test will pass
+        do! obv.OnNextAsync 1
+        do! Async.Sleep 100
+        do! obv.OnCompletedAsync ()
+        do! testObv.AwaitIgnore ()
+
+        // Assert
+        Expect.sequenceEqual testObv.Notifications [OnNext 1; OnCompleted] "Should have received one OnNext and OnCompleted notifications"
+    }
 ]
