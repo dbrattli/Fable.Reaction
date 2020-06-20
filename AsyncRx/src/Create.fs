@@ -31,16 +31,15 @@ module internal Create =
 
     /// Returns the async observable sequence whose single element is the result of the given async workflow.
     let ofAsync (workflow : Async<'TSource>)  : IAsyncObservable<'TSource> =
-        let subscribeAsync (aobv : IAsyncObserver<_>) : Async<IAsyncRxDisposable> =
-            let safeObv = safeObserver aobv AsyncDisposable.Empty
-
-            async {
+        AsyncRx.ofAsyncWorker(fun obv _ -> async {
+            try
                 let! result = workflow
-                do! safeObv.OnNextAsync result
-                do! safeObv.OnCompletedAsync ()
-                return AsyncDisposable.Empty
-            }
-        { new IAsyncObservable<'TSource> with member __.SubscribeAsync o = subscribeAsync o }
+                do! obv.OnNextAsync result
+                do! obv.OnCompletedAsync ()
+            with
+            | ex ->
+                do! obv.OnErrorAsync ex
+        })
 
     /// Returns an observable sequence containing the single specified element.
     let single (value: 'TSource) =
