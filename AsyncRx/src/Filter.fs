@@ -115,12 +115,15 @@ module internal Filter =
 
                 let _obv (n : Notification<'TSource>) : Async<unit> =
                     match n, remaining with
-                    | OnNext x, n when n > 0 ->
+                    | OnNext x, n when n > 1 ->
                         remaining <- n - 1
                         safeObv.OnNextAsync x
-                    | OnNext x, n when n = 0 ->
-                        remaining <- - 1
-                        safeObv.OnCompletedAsync ()
+                    | OnNext x, n when n = 1 ->
+                        async {
+                            remaining <- 0
+                            do! safeObv.OnNextAsync x
+                            do! safeObv.OnCompletedAsync ()
+                        }
                     | OnNext _, _ -> Async.empty
                     | OnError ex, _ -> safeObv.OnErrorAsync ex
                     | OnCompleted, _ -> safeObv.OnCompletedAsync ()
