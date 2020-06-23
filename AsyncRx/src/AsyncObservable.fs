@@ -193,6 +193,10 @@ module AsyncRx =
     let distinctUntilChanged (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
         Filter.distinctUntilChanged source
 
+    /// Bypasses a specified number of elements in an observable sequence and then returns the remaining elements.
+    let skip (count: int) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
+        Filter.skip count source
+
     /// Filters the elements of an observable sequence based on a predicate. Returns an observable sequence that
     /// contains elements from the input sequence that satisfy the condition.
     let filter (predicate: 'a -> bool) (source: IAsyncObservable<'a>) : IAsyncObservable<'a> =
