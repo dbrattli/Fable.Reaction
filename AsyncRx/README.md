@@ -14,7 +14,7 @@ FSharp.Control.AsyncRx was designed specifically for targeting [Fable](http://fa
 
 ## Documentation
 
-Please check out the [documentation](https://dbrattli.github.io/Reaction/)
+Please check out the [documentation](https://fablereaction.readthedocs.io/en/latest/asyncrx/)
 
 ## Install
 
