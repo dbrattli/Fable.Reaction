@@ -21,6 +21,6 @@ FSharp.Control.AsyncRx was designed spesifically for targeting `Fable
 JavaScript, and thus the same F# code may be used both client and server
 side for full stack software development.
 
-See :doc:`/fable.elmish/index`  for
+See :doc:`/fable.reaction/index` for
 use of FSharp.Control.AsyncRx with Elmish and the model view update (MVU) style
 architecture.
