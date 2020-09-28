@@ -18,7 +18,7 @@ import alabaster
 
 # -- Project information -----------------------------------------------------
 
-project = 'Elmish.Streams'
+project = 'Fable.Reaction'
 copyright = '2019, Dag Brattli'
 author = 'Dag Brattli'
 
@@ -66,7 +66,7 @@ html_static_path = ['_static']
 html_theme_options = {
     'logo': 'logo.png',
     'github_user': 'dbrattli',
-    'github_repo': 'Reaction',
+    'github_repo': 'Fable.Reaction',
 }
 
 html_sidebars = {
