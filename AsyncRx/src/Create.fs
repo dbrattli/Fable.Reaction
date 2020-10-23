@@ -147,7 +147,7 @@ module internal Create =
         let subscribeAsync  (aobv : IAsyncObserver<int>) : Async<IAsyncRxDisposable> =
             let cancel, token = canceller ()
             async {
-                let rec handler msecs next = async {
+                let rec handler (msecs : int) next = async {
                     do! Async.Sleep msecs
                     do! aobv.OnNextAsync next
 
