@@ -50,7 +50,7 @@ module internal Timeshift =
 
     /// Ignores values from an observable sequence which are followed by
     /// another value before the given timeout.
-    let debounce msecs (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
+    let debounce (msecs : int) (source: IAsyncObservable<'TSource>) : IAsyncObservable<'TSource> =
         let subscribeAsync (aobv: IAsyncObserver<'TSource>) =
             let safeObv, autoDetach = autoDetachObserver aobv
             let infinite = Seq.initInfinite id
