@@ -91,6 +91,7 @@ let view (model: Model) (dispatch : Dispatch<Msg>) =
             h1 [] [
                 str "Search Wikipedia"
             ]
+
             autocomplete { Search=searchWikipedia; Dispatch = Select >> dispatch; DebounceTimeout=750 }
 
             div [ Style [ MarginTop "30px" ]] [

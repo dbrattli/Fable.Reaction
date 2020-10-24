@@ -41,7 +41,7 @@ module Middleware =
             let logger = loggerFactory.CreateLogger("Elmish.Streams.Middleware")
 
             let appLifetime  = ctx.RequestServices.GetService<IHostApplicationLifetime> ()
-            
+
             let defaultOptions = {
                 Stream = fun _ msgs -> msgs
                 Encode = fun msg -> ""
