@@ -1,3 +1,5 @@
 FSharp.Core
 Microsoft.NET.Test.Sdk
+coverlet.msbuild
+YoloDev.Expecto.TestSdk
 Expecto
