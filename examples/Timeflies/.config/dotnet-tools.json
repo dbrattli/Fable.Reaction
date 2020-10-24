@@ -7,6 +7,12 @@
       "commands": [
         "paket"
       ]
+    },
+    "fable": {
+      "version": "3.0.0-nagareyama-beta-002",
+      "commands": [
+        "fable"
+      ]
     }
   }
 }

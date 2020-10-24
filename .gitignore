@@ -465,3 +465,4 @@ AsyncRx/.ionide
 AsyncRx/.paket/.store
 .ionide
 examples/Timeflies/.paket/.store
+Client.fs.js
