@@ -3,8 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <PackageId>Fable.Reaction</PackageId>
-    <Version>3.3.3</Version>
-    <PackageVersion>3.3.3</PackageVersion>
     <Authors>Dag Brattli</Authors>
     <Company>Brattli Labs</Company>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
