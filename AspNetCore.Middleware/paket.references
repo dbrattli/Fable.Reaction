@@ -1,3 +1,5 @@
+group AspNetCore
+
 FSharp.Core
 Microsoft.AspNetCore
 Microsoft.AspNetCore.WebSockets

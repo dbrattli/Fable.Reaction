@@ -1,14 +1,30 @@
-source https://www.nuget.org/api/v2
-storage: none
+group Reaction
+    source https://www.nuget.org/api/v2
+    storage: none
 
-nuget Fable.Core ~> 3
-nuget Fable.React ~> 6
-nuget Fable.Browser.WebSocket
-nuget Fable.Browser.Event
-nuget Fable.Fetch
-nuget FSharp.Control.AsyncRx ~> 1.5
+    nuget Fable.Core ~> 3
+    nuget Fable.React ~> 6
+    nuget Fable.Browser.WebSocket
+    nuget Fable.Browser.Event
+    nuget Fable.Fetch
+    nuget FSharp.Control.AsyncRx ~> 1.5
 
-nuget Microsoft.NET.Test.Sdk ~> 15
-nuget Expecto ~> 8
-nuget coverlet.msbuild
-nuget YoloDev.Expecto.TestSdk
+group Test
+    source https://www.nuget.org/api/v2
+    storage: none
+
+    nuget Microsoft.NET.Test.Sdk ~> 15
+    nuget Expecto ~> 8
+    nuget coverlet.msbuild
+    nuget YoloDev.Expecto.TestSdk
+
+group AspNetCore
+    storage: none
+    source https://api.nuget.org/v3/index.json
+
+    nuget FSharp.Core
+
+    nuget Microsoft.AspNetCore
+    nuget Microsoft.AspNetCore.WebSockets
+
+    nuget FSharp.Control.AsyncRx

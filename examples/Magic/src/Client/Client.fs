@@ -124,5 +124,5 @@ let stream model msgs =
 
 
 open Browser.Dom
-let app = Reaction.StreamView initialModel view update stream
+let app = Reaction.streamComponent(initialModel, view, update, stream)
 ReactDOM.render(app, document.getElementById "reaction-app")

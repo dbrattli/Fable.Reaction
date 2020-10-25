@@ -466,3 +466,7 @@ AsyncRx/.paket/.store
 .ionide
 examples/Timeflies/.paket/.store
 Client.fs.js
+Utils.fs.js
+Shared.fs.js
+Info.fs.js
+Magic.fs.js

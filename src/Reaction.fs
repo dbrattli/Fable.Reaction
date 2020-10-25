@@ -18,6 +18,7 @@ module Debug =
     let inline debug (text: string, o: #obj) = ()
     #endif
 
+// fsharplint:disable
 
 [<Erase>]
 type Reaction =

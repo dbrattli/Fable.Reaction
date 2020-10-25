@@ -111,4 +111,4 @@ let stream model msgs =
 
 let info initialString =
     let initialModel = init initialString
-    Reaction.StreamView initialModel view update stream
+    Reaction.streamComponent(initialModel, view, update, stream)

@@ -7,6 +7,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Fable.Reaction", "src\Fable
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Tests", "test\Tests.fsproj", "{C91DBBF5-71AA-4352-9FA3-920B8974E14C}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Reaction.AspNetCore.Middleware", "AspNetCore.Middleware\Reaction.AspNetCore.Middleware.fsproj", "{AB02D4D1-84C9-4491-8AB9-65A235723042}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,17 @@ Global
 		{C91DBBF5-71AA-4352-9FA3-920B8974E14C}.Release|x64.Build.0 = Release|Any CPU
 		{C91DBBF5-71AA-4352-9FA3-920B8974E14C}.Release|x86.ActiveCfg = Release|Any CPU
 		{C91DBBF5-71AA-4352-9FA3-920B8974E14C}.Release|x86.Build.0 = Release|Any CPU
+		{AB02D4D1-84C9-4491-8AB9-65A235723042}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB02D4D1-84C9-4491-8AB9-65A235723042}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB02D4D1-84C9-4491-8AB9-65A235723042}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AB02D4D1-84C9-4491-8AB9-65A235723042}.Debug|x64.Build.0 = Debug|Any CPU
+		{AB02D4D1-84C9-4491-8AB9-65A235723042}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AB02D4D1-84C9-4491-8AB9-65A235723042}.Debug|x86.Build.0 = Debug|Any CPU
+		{AB02D4D1-84C9-4491-8AB9-65A235723042}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB02D4D1-84C9-4491-8AB9-65A235723042}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB02D4D1-84C9-4491-8AB9-65A235723042}.Release|x64.ActiveCfg = Release|Any CPU
+		{AB02D4D1-84C9-4491-8AB9-65A235723042}.Release|x64.Build.0 = Release|Any CPU
+		{AB02D4D1-84C9-4491-8AB9-65A235723042}.Release|x86.ActiveCfg = Release|Any CPU
+		{AB02D4D1-84C9-4491-8AB9-65A235723042}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

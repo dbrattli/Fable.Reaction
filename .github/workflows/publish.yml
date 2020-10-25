@@ -26,6 +26,10 @@ jobs:
     - name: Push Nuget
       run: dotnet nuget push src/bin/Release/*.nupkg -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGET_API_KEY }}
       continue-on-error: false
+    - name: Push AspNetCore.MiddleWare Nuget
+      run: dotnet nuget push AspNetCore.Middleaware/bin/Release/*.nupkg -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGET_API_KEY }}
+      continue-on-error: false
+
 
     - name: Create Release
       uses: actions/create-release@master

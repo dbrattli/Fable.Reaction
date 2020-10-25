@@ -137,5 +137,5 @@ let stream model msgs =
 
 
 let initialModel = init ()
-let app = Reaction.StreamView initialModel view update stream
+let app = Reaction.streamComponent(initialModel, view, update, stream)
 mountById "reaction-app" (ofFunction app () [])
