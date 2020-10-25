@@ -2,8 +2,8 @@
 Getting Started
 ===============
 
-To use Fable.Reaction you need to create an instance of a `StreamView`.
-The `StreamView` works almost the same way as an Elmish application
+To use Fable.Reaction you need to create an instance of a `streamComponent`.
+The `streamComponent` works almost the same way as an Elmish application
 taking an initial model, a view and and update function. In addition it
 takes a stream function that transforms the stream of dispatched
 messages before they reach the update function.
@@ -24,7 +24,7 @@ messages before they reach the update function.
         |> AsyncRx.delay 1000
         |> AsyncRx.toStream "msgs"
 
-    let app = Reaction.StreamView initialModel view update stream
+    let app = Reaction.streamComponent(initialModel, view, update, stream)
     mountById "reaction-app" (ofFunction app () [])
 
 Loading initial State

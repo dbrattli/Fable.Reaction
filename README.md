@@ -4,7 +4,7 @@
 Fable |> AsyncRx
 ```
 
-<img src="/AsyncRx/logo/logo.png" width="100">
+<img src="/logo/logo.png" width="100">
 
 Fable.Reaction is a collection of projects that combines the power of asynchronous reactive (AsyncRx) functional programming (RFP) with F#, [Fable](http://fable.io/) and [Elmish](https://elmish.github.io/) applications.
 
