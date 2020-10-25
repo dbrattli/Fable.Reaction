@@ -137,5 +137,5 @@ let stream model msgs =
 
 
 printf "Starting program"
-let app = Reaction.StreamView initialModel view update stream
-mountById "reaction-app" (ofFunction app () [])
+let app = Reaction.streamComponent(initialModel, view, update, stream)
+mountById "reaction-app" app

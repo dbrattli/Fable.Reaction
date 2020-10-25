@@ -410,7 +410,7 @@ NUGET
       Fable.Browser.Dom (>= 1.0)
       Fable.Core (>= 3.1.5)
       FSharp.Core (>= 4.7)
-    Fable.Reaction (3.4)
+    Fable.Reaction (3.4.2)
       Fable.Browser.Event (>= 1.2.1)
       Fable.Browser.WebSocket (>= 1.0.1)
       Fable.Core (>= 3.1.6)

@@ -104,7 +104,6 @@ let view (model : Model) (dispatch : Msg -> unit) =
     ]
 
 let stream model msgs =
-    let mouseMove = AsyncRx.ofMouseMove ()
     let mouseUp =
         msgs
         |> AsyncRx.choose Msg.asMouseUpEvent
@@ -119,7 +118,7 @@ let stream model msgs =
         let rect = ev.nativeEvent.srcElement.getBoundingClientRect ()
         let startX, startY = (ev.clientX - rect.left, ev.clientY - rect.top)
 
-        mouseMove
+        AsyncRx.ofMouseMove ()
         |> AsyncRx.map (fun ev ->
             MouseDragEvent ev.clientX - startX, ev.clientY - startY)
         |> AsyncRx.takeUntil mouseUp)
@@ -129,7 +128,7 @@ let stream model msgs =
         let rect : ClientRect = !!ev.target?getBoundingClientRect ()
         let startX, startY = ev.clientX - rect.left, ev.clientY - rect.top
 
-        yield! mouseMove
+        yield! AsyncRx.ofMouseMove ()
             |> AsyncRx.map (fun ev ->
                 MouseDragEvent (ev.clientX - startX, ev.clientY - startY, project))
             |> AsyncRx.takeUntil mouseUp
@@ -138,4 +137,4 @@ let stream model msgs =
 
 let initialModel = init ()
 let app = Reaction.streamComponent(initialModel, view, update, stream)
-mountById "reaction-app" (ofFunction app () [])
+mountById "reaction-app" app
