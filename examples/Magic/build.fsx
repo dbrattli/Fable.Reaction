@@ -71,7 +71,7 @@ Target.create "InstallClient" (fun _ ->
 
 Target.create "Build" (fun _ ->
     runDotNet "build" serverPath
-    runTool yarnTool "webpack-cli -p" __SOURCE_DIRECTORY__
+    runDotNet "fable src/Client --run webpack" __SOURCE_DIRECTORY__
 )
 
 Target.create "Run" (fun _ ->
@@ -79,11 +79,11 @@ Target.create "Run" (fun _ ->
         runDotNet "watch run" serverPath
     }
     let client = async {
-        runTool yarnTool "webpack-dev-server" __SOURCE_DIRECTORY__
+        runDotNet "fable watch src/Client --run webpack-dev-server" __SOURCE_DIRECTORY__
     }
     let browser = async {
         do! Async.Sleep 5000
-        openBrowser "http://localhost:8080"
+        openBrowser "http://localhost:8085"
     }
 
     let vsCodeSession = Environment.hasEnvironVar "vsCodeSession"
