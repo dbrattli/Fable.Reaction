@@ -20,7 +20,6 @@ module Debug =
 
 // fsharplint:disable
 
-[<Erase>]
 type Reaction =
 
     /// Stateful AsyncRx stream hook.
